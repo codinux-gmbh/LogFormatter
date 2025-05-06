@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
 
@@ -74,11 +75,13 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
 
+    val kotlinxSerializationVersion: String by project
+
     val assertKVersion: String by project
 
     sourceSets {
         commonMain.dependencies {
-
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

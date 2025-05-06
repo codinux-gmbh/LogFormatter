@@ -1,11 +1,15 @@
 package net.codinux.log.stacktrace
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
 data class SerializableThrowable(
     val type: String,
     val message: String? = null,
     val stackTrace: String? = null,
     val cause: SerializableThrowable? = null,
-    //@Transient
+    @Transient
     val originalException: Throwable? = null,
 
 ) {
