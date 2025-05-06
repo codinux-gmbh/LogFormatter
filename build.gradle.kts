@@ -1,21 +1,14 @@
-plugins {
-    kotlin("jvm")
-}
 
-group = "net.codinux.log"
-version = "1.0.0-SNAPSHOT"
+allprojects {
+    repositories {
+        mavenCentral()
+    }
 
-repositories {
-    mavenCentral()
-}
+    group = "net.codinux.log"
+    version = "1.0.0-SNAPSHOT"
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
 
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(8)
+    ext["sourceCodeRepositoryBaseUrl"] = "github.com/codinux/LogUtils"
+
+    ext["projectDescription"] = "Utils common to loggers like stacktrace shortener and class name abbreviator"
 }

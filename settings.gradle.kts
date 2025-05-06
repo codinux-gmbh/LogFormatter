@@ -19,3 +19,6 @@ plugins {
 }
 
 rootProject.name = "LogUtils"
+
+
+include("log-utils")
