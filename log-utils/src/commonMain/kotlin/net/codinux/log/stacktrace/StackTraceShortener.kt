@@ -3,14 +3,18 @@ package net.codinux.log.stacktrace
 open class StackTraceShortener(
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
 ) {
+    companion object {
+        val Default = StackTraceShortener()
+    }
 
-    open fun shorten(throwable: Throwable, maxFramesPerThrowable: Int? = null) =
+
+    open fun shorten(throwable: Throwable, maxFramesPerThrowable: Int?) =
         shorten(extractStackTrace(throwable), maxFramesPerThrowable)
 
     open fun shorten(throwable: Throwable, config: StackTraceShortenerConfig = StackTraceShortenerConfig.Default) =
         shorten(extractStackTrace(throwable), config)
 
-    open fun shorten(stackTrace: StackTrace, maxFramesPerThrowable: Int? = null) =
+    open fun shorten(stackTrace: StackTrace, maxFramesPerThrowable: Int?) =
         shorten(stackTrace, StackTraceShortenerConfig(maxFramesPerThrowable))
 
     open fun shorten(stackTrace: StackTrace, config: StackTraceShortenerConfig = StackTraceShortenerConfig.Default): ShortenedStackTrace {

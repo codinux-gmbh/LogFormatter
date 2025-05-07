@@ -9,6 +9,17 @@ import kotlin.test.fail
  */
 object StackTraceGenerator {
 
+    const val ExceptionsNamespace = "org.example.log.stack."
+
+    const val RootCauseMessageLineUnqualified = "RootCauseException: Root cause"
+
+    const val FirstCausedByLineUnqualified = "ParentException: Wrapper #1"
+
+    const val SecondCausedByLineUnqualified = "ParentException: Wrapper #2"
+
+    const val FirstSuppressedExceptionLineUnqualified = "SuppressedException: Suppressed #1"
+
+
     fun generateSingle(): Throwable = try {
         oneSingle()
         fail("Will never come to here")
