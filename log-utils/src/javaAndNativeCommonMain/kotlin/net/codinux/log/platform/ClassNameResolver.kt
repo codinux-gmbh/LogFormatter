@@ -5,15 +5,15 @@ import kotlin.reflect.KClass
 
 object ClassNameResolver {
 
-    fun getQualifiedClassName(forClass: KClass<*>): String {
+    fun getQualifiedClassName(forClass: KClass<*>, getEnclosingClass: Boolean = false): String {
         forClass.qualifiedName?.let { qualifiedName ->
-            return getClassName(qualifiedName)
+            return getClassName(qualifiedName, getEnclosingClass)
         }
 
-        return getClassName(forClass.toString())
+        return getClassName(forClass.toString(), getEnclosingClass)
     }
 
-    private fun getClassName(name: String): String {
+    private fun getClassName(name: String, getEnclosingClass: Boolean): String {
         var cleaned = name
 
         if (cleaned.startsWith("class ")) { // remove 'class ' from beginning to .toString() return value
@@ -36,12 +36,15 @@ object ClassNameResolver {
             stringAfterLastDollarSign = cleaned.substringAfterLastOrNull('$')
         }
 
-        if (cleaned.endsWith(".Companion")) { // ok, someone could name a class 'Companion', but in this case i have no pity that his/her logger name is wrong then
-            cleaned = cleaned.substring(0, cleaned.length - ".Companion".length)
-        }
+        return if (getEnclosingClass) {
+            if (cleaned.endsWith(".Companion") || cleaned.endsWith("\$Companion")) { // ok, someone could name a class 'Companion', but in this case i have no pity that his/her logger name is wrong then
+                cleaned = cleaned.substring(0, cleaned.length - ".Companion".length)
+            }
 
-        return cleaned
-            .replace('$', '.')
+            cleaned.substringBefore('$')
+        } else {
+            cleaned.replace('$', '.')
+        }
     }
 
 }

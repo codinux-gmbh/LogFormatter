@@ -25,6 +25,13 @@ class ClassNameResolverTest {
     fun getQualifiedClassName_CompanionObject() {
         val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.Companion::class)
 
+        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass.Companion")
+    }
+
+    @Test
+    fun getQualifiedClassName_CompanionObject_getEnclosingClass() {
+        val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.Companion::class, getEnclosingClass = true)
+
         assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass") // assert 'Companion' gets removed from logger name
     }
 
@@ -39,7 +46,14 @@ class ClassNameResolverTest {
     fun getQualifiedClassName_InnerClassCompanionObject() {
         val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.InnerClass.Companion::class)
 
-        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass.InnerClass")
+        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass.InnerClass.Companion")
+    }
+
+    @Test
+    fun getQualifiedClassName_InnerClassCompanionObject_getEnclosingClass() {
+        val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.InnerClass.Companion::class, getEnclosingClass = true)
+
+        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass.InnerClass") // assert 'Companion' gets removed from logger name
     }
 
     @Test
@@ -60,6 +74,15 @@ class ClassNameResolverTest {
     }
 
     @Test
+    fun getQualifiedClassName_AnonymousClass_getEnclosingClass() {
+        val anonymous = object : Throwable() {}
+
+        val result = ClassNameResolver.getQualifiedClassName(anonymous::class, getEnclosingClass = true)
+
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
+    }
+
+    @Test
     fun getQualifiedClassName_LocalClass() {
         class LocalClass
 
@@ -69,12 +92,30 @@ class ClassNameResolverTest {
     }
 
     @Test
+    fun getQualifiedClassName_LocalClass_getEnclosingClass() {
+        class LocalClass
+
+        val result = ClassNameResolver.getQualifiedClassName(LocalClass::class, getEnclosingClass = true)
+
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
+    }
+
+    @Test
     fun getQualifiedClassName_Lambda() {
         val lambda = { x: Int -> x * 2 }
 
         val result = ClassNameResolver.getQualifiedClassName(lambda::class)
 
         assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest.getQualifiedClassName_Lambda.lambda")
+    }
+
+    @Test
+    fun getQualifiedClassName_Lambda_getEnclosingClass() {
+        val lambda = { x: Int -> x * 2 }
+
+        val result = ClassNameResolver.getQualifiedClassName(lambda::class, getEnclosingClass = true)
+
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
     }
 
 }
