@@ -17,6 +17,7 @@ class StackTraceExtractorTest {
         val result = underTest.extractStackTrace(throwable)
 
         assertIsRootCause(result)
+        assertThat(result.countSkippedCommonFrames).isEqualTo(0)
     }
 
 
@@ -25,6 +26,7 @@ class StackTraceExtractorTest {
         val throwable = StackTraceGenerator.generateCausedBy()
 
         val result = underTest.extractStackTrace(throwable)
+        assertThat(result.countSkippedCommonFrames).isEqualTo(0)
 
         assertIsFirstParentException(result)
         assertThat(result.suppressed).isEmpty()
@@ -32,6 +34,7 @@ class StackTraceExtractorTest {
         assertThat(result.causedBy).isNotNull()
         val rootCause = result.causedBy!!
         assertIsRootCause(rootCause)
+        assertThat(rootCause.countSkippedCommonFrames).isGreaterThanOrEqualTo(13)
     }
 
     @Test
@@ -43,16 +46,19 @@ class StackTraceExtractorTest {
         assertThat(result.messageLine).isIn("ParentException: Wrapper #2", "org.example.log.stack.ParentException: Wrapper #2")
         assertThat(result.frames.size).isGreaterThanOrEqualTo(8)
         assertThat(result.suppressed).isEmpty()
+        assertThat(result.countSkippedCommonFrames).isEqualTo(0)
 
         assertThat(result.causedBy).isNotNull()
         val intermediateCause = result.causedBy!!
         assertIsFirstParentException(intermediateCause)
         assertThat(intermediateCause.suppressed).isEmpty()
+        assertThat(intermediateCause.countSkippedCommonFrames).isGreaterThanOrEqualTo(5)
 
         assertThat(intermediateCause.causedBy).isNotNull()
         val rootCause = intermediateCause.causedBy!!
         assertIsRootCause(rootCause)
         assertThat(rootCause.suppressed).isEmpty()
+        assertThat(rootCause.countSkippedCommonFrames).isGreaterThanOrEqualTo(5)
     }
 
 
@@ -63,12 +69,14 @@ class StackTraceExtractorTest {
         val result = underTest.extractStackTrace(throwable)
 
         assertIsRootCause(result, 1)
+        assertThat(result.countSkippedCommonFrames).isEqualTo(0)
 
         assertThat(result.suppressed).hasSize(1)
         val firstSuppressedException = result.suppressed.first()
         assertThat(firstSuppressedException.messageLine).isIn("SuppressedException: Suppressed #1", "org.example.log.stack.SuppressedException: Suppressed #1")
-        assertThat(firstSuppressedException.frames.size).isGreaterThanOrEqualTo(3)
+        assertThat(firstSuppressedException.frames.size).isGreaterThanOrEqualTo(2)
         assertThat(firstSuppressedException.suppressed).isEmpty()
+        assertThat(firstSuppressedException.countSkippedCommonFrames).isGreaterThanOrEqualTo(13)
     }
 
 
@@ -111,6 +119,24 @@ class StackTraceExtractorTest {
     @Test
     fun isCausedByLine_SuppressedLineStartingWithTab() {
         val line = "\tSuppressed: org.example.log.stack.SuppressedException: Suppressed #1"
+
+        val result = underTest.isCausedByLine(line)
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun isCausedByLine_SkippedCommonFramesJava() {
+        val line = "\t... 46 more"
+
+        val result = underTest.isCausedByLine(line)
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun isCausedByLine_SkippedCommonFramesAllOtherPlatforms() {
+        val line = "\t\t... and 13 more common stack frames skipped"
 
         val result = underTest.isCausedByLine(line)
 
@@ -161,6 +187,79 @@ class StackTraceExtractorTest {
         val result = underTest.isSuppressedExceptionLine(line)
 
         assertThat(result).isFalse()
+    }
+
+    @Test
+    fun isSuppressedExceptionLine_SkippedCommonFramesJava() {
+        val line = "\t... 46 more"
+
+        val result = underTest.isSuppressedExceptionLine(line)
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun isSuppressedExceptionLine_SkippedCommonFramesAllOtherPlatforms() {
+        val line = "\t\t... and 13 more common stack frames skipped"
+
+        val result = underTest.isSuppressedExceptionLine(line)
+
+        assertThat(result).isFalse()
+    }
+
+
+    @Test
+    fun extractSkippedCommonFrames_SkippedCommonFramesJava() {
+        val line = "\t... 46 more"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isEqualTo(46)
+    }
+
+    @Test
+    fun extractSkippedCommonFrames_SkippedCommonFramesAllOtherPlatforms() {
+        val line = "\t\t... and 13 more common stack frames skipped"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isEqualTo(13)
+    }
+
+    @Test
+    fun extractSkippedCommonFrames_MessageLine() {
+        val line = "org.example.log.stack.RootCauseException: Root cause"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun extractSkippedCommonFrames_StackFrameLine() {
+        val line = "\t\tat org.example.log.stack.StackTraceGenerator.twoSuppressed(StackTraceGenerator.kt:91)"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun extractSkippedCommonFrames_CausedByLine() {
+        val line = "Caused by: org.example.log.stack.RootCauseException: Root cause"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun extractSkippedCommonFrames_SuppressedExceptionLine() {
+        val line = "\tSuppressed: org.example.log.stack.SuppressedException: Suppressed #1"
+
+        val result = underTest.extractSkippedCommonFrames(listOf(line))
+
+        assertThat(result).isNull()
     }
 
 

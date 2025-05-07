@@ -8,6 +8,11 @@ open class StackTraceExtractor {
         const val CausedByPrefix = "Caused by: "
         const val SuppressedPrefix = "Suppressed: "
         val SuppressedExceptionLineRegex = Regex("^\\s*$SuppressedPrefix.+")
+
+        // Finds lines that state the count of skipped common frames:
+        // Java: 	... 46 more
+        // all others:     ... and 13 more common stack frames skipped
+        val SkippedCommonStackFramesIndicatorRegex = Regex("""^\s*\.\.\. (?:and )?(\d+) more\s*(?:common stack frames skipped)?""")
     }
 
     open fun extractStackTrace(throwable: Throwable): StackTrace =
@@ -24,17 +29,47 @@ open class StackTraceExtractor {
             val linesAfterMessage = stackTraceLines.drop(0)
 
             val stackFramesEndIndex = linesAfterMessage.indexOfFirst { isCausedByLine(it) || isSuppressedExceptionLine(it) }
-            val stackFramesLines = if (stackFramesEndIndex == -1) linesAfterMessage else linesAfterMessage.subList(0, stackFramesEndIndex)
+            val remainingStackTraceLines = if (stackFramesEndIndex == -1) linesAfterMessage else linesAfterMessage.subList(0, stackFramesEndIndex)
+            val (stackFramesLines, countSkippedCommonFrames) = getStackFramesAndCountCommonStackFrames(remainingStackTraceLines)
             val stackFrames = stackFramesLines.map { StackFrame(it) }
 
             if (stackFramesEndIndex == -1) {
-                StackTrace(messageLine, stackFrames)
+                StackTrace(messageLine, stackFrames, countSkippedCommonFrames = countSkippedCommonFrames)
             } else {
                 val (causedBy, suppressed) = extractCausedByAndSuppressed(linesAfterMessage.drop(stackFramesEndIndex))
 
-                StackTrace(messageLine, stackFrames, causedBy, suppressed)
+                StackTrace(messageLine, stackFrames, causedBy, suppressed, countSkippedCommonFrames)
             }
         }
+
+    protected open fun getStackFramesAndCountCommonStackFrames(stackTraceLinesWithoutMessage: List<String>): Pair<List<String>, Int> {
+        var lines = stackTraceLinesWithoutMessage
+
+        // remove empty lines from end of stack trace
+        while (lines.isNotEmpty() && lines.last().isBlank()) {
+            lines = lines.dropLast(1)
+        }
+
+        val countSkippedCommonFrames = extractSkippedCommonFrames(lines)
+        if (countSkippedCommonFrames != null) {
+            return Pair(lines.dropLast(1), countSkippedCommonFrames)
+        }
+
+        return Pair(lines, 0)
+    }
+
+    // VisibleForTesting
+    open fun extractSkippedCommonFrames(stackTraceLines: List<String>): Int? {
+        if (stackTraceLines.isNotEmpty()) {
+            val isSkippedCommonFramesLine = SkippedCommonStackFramesIndicatorRegex.matchEntire(stackTraceLines.last())
+
+            if (isSkippedCommonFramesLine != null) {
+                return isSkippedCommonFramesLine.groupValues[1].toInt()
+            }
+        }
+
+        return null
+    }
 
     protected open fun extractCausedByAndSuppressed(stackTraceLines: List<String>): Pair<StackTrace?, List<StackTrace>> {
         if (stackTraceLines.isEmpty()) { // should never happen at this point, just to be on the safe side
@@ -63,9 +98,11 @@ open class StackTraceExtractor {
         }
     }
 
+    // VisibleForTesting
     open fun isCausedByLine(line: String): Boolean =
         line.startsWith(CausedByPrefix)
 
+    // VisibleForTesting
     open fun isSuppressedExceptionLine(line: String): Boolean =
         line.matches(SuppressedExceptionLineRegex)
 
