@@ -3,8 +3,6 @@ package net.codinux.log.platform
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isIn
-import net.codinux.kotlin.Platform
-import net.codinux.kotlin.PlatformType
 import net.codinux.log.test.TestClasses
 import kotlin.test.Test
 
@@ -117,6 +115,6 @@ class LogUtilsPlatformTest {
     }
 
 
-    private val supportsQualifiedClassName: Boolean = Platform.type !in listOf(PlatformType.JavaScriptBrowser, PlatformType.JavaScriptNodeJS, PlatformType.WasmJs)
+    private val supportsQualifiedClassName: Boolean = LogUtilsPlatform.supportsPackageNames
     
 }
