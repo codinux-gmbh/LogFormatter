@@ -5,8 +5,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThanOrEqualTo
 import assertk.assertions.isNotNull
-import net.codinux.kotlin.Platform
-import net.codinux.kotlin.isJvmOrAndroid
+import net.codinux.kotlin.platform.Platform
+import net.codinux.kotlin.platform.isJvmOrAndroid
 import org.example.log.stack.StackTraceGenerator
 import kotlin.test.Test
 
