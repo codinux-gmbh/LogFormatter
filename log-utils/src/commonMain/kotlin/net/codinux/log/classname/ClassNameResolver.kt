@@ -2,17 +2,18 @@ package net.codinux.log.classname
 
 import net.codinux.log.extensions.substringAfterLastOrNull
 import net.codinux.log.extensions.substringBeforeLastOrNull
+import net.codinux.log.platform.LogUtilsPlatform
 import kotlin.reflect.KClass
 
 object ClassNameResolver {
 
-    fun getClassNameComponents(forClass: KClass<*>, qualifiedName: String? = null, supportsPackageName: Boolean = true): ClassNameComponents {
+    fun getClassNameComponents(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
         val classToString = forClass.toString()
         val cleanedClassToString = removeAnonymousClassesNumberSuffixes(clean(classToString))
 
         var packageName: String? = null
         var className: String
-        if (supportsPackageName) {
+        if (LogUtilsPlatform.supportsPackageNames) {
             packageName = cleanedClassToString.substringBeforeLastOrNull('.')
             className = cleanedClassToString.substringAfterLast('.')
         } else {

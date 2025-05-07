@@ -5,6 +5,9 @@ import kotlin.reflect.KClass
 
 expect object LogUtilsPlatform {
 
+    val supportsPackageNames: Boolean
+
+
     fun <T : Any> getQualifiedClassName(forClass: KClass<T>): String
 
     fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents
