@@ -33,7 +33,7 @@ open class StackTraceExtractor {
             val stackFramesEndIndex = linesAfterMessage.indexOfFirst { isCausedByLine(it) || isSuppressedExceptionLine(it) }
             val remainingStackTraceLines = if (stackFramesEndIndex == -1) linesAfterMessage else linesAfterMessage.subList(0, stackFramesEndIndex)
             val (stackFramesLines, countSkippedCommonFrames) = getStackFramesAndCountCommonStackFrames(remainingStackTraceLines)
-            val stackFrames = stackFramesLines.map { StackFrame(it) }
+            val stackFrames = stackFramesLines.map { extractStackFrame(it) }
 
             if (stackFramesEndIndex == -1) {
                 StackTrace(messageLine, stackFrames, countSkippedCommonFrames = countSkippedCommonFrames)
@@ -43,6 +43,13 @@ open class StackTraceExtractor {
                 StackTrace(messageLine, stackFrames, causedBy, suppressed, countSkippedCommonFrames)
             }
         }
+
+    private fun extractStackFrame(stackFrameLine: String): StackFrame {
+        val trimmedLine = stackFrameLine.trim() // remove original indent from stack frame line
+        val originalIndent = stackFrameLine.substringBefore(trimmedLine, "")
+
+        return StackFrame(trimmedLine, originalIndent, stackFrameLine)
+    }
 
     protected open fun getStackFramesAndCountCommonStackFrames(stackTraceLinesWithoutMessage: List<String>): Pair<List<String>, Int> {
         var lines = stackTraceLinesWithoutMessage
