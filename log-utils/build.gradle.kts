@@ -21,7 +21,7 @@ kotlin {
     }
 
 
-    jvmToolchain(8)
+    jvmToolchain(11)
 
     jvm()
 
@@ -77,6 +77,8 @@ kotlin {
 
     val kotlinxSerializationVersion: String by project
 
+    val kmpBaseVersion: String by project
+
     val assertKVersion: String by project
 
     sourceSets {
@@ -86,7 +88,23 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
 
+            implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
+
             implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
+        }
+
+
+        val javaAndNativeCommonMain by creating {
+            dependsOn(commonMain.get())
+
+            jvmMain.get().dependsOn(this)
+            nativeMain.get().dependsOn(this)
+        }
+        val javaAndNativeCommonTest by creating {
+            dependsOn(commonTest.get())
+
+            jvmTest.get().dependsOn(this)
+            nativeTest.get().dependsOn(this)
         }
     }
 }
