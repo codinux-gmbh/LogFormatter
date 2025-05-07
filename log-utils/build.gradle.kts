@@ -84,11 +84,11 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
+
+            implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
-
-            implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
 
             implementation("com.willowtreeapps.assertk:assertk:$assertKVersion")
         }

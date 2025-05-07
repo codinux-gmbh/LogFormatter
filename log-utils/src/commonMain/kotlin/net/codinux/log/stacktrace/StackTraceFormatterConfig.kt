@@ -1,5 +1,7 @@
 package net.codinux.log.stacktrace
 
+import net.codinux.kotlin.text.LineSeparator
+
 data class StackTraceFormatterConfig(
     val messageLineIndent: String = "",
     val stackFrameIndent: String = "    ",
@@ -7,7 +9,7 @@ data class StackTraceFormatterConfig(
     val causedByMessagePrefix: String = "Caused by: ",
     val suppressedExceptionIndent: String = "    ",
     val suppressedExceptionMessagePrefix: String = "Suppressed: ",
-    val lineSeparator: String = "\n",
+    val lineSeparator: String = LineSeparator.System,
 ) {
     companion object {
         val Default = StackTraceFormatterConfig()
