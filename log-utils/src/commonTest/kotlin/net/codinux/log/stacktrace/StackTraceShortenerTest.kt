@@ -5,6 +5,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThanOrEqualTo
 import assertk.assertions.isNotNull
+import net.codinux.kotlin.Platform
+import net.codinux.kotlin.isJvmOrAndroid
 import org.example.log.stack.StackTraceGenerator
 import kotlin.test.Test
 
@@ -34,7 +36,7 @@ class StackTraceShortenerTest {
 
     @Test
     fun maxFramesPerThrowable_2_SuppressedExceptions() {
-        val maxFramesPerThrowable = 2
+        val maxFramesPerThrowable = if (Platform.isJvmOrAndroid) 1 else 2 // on JVM suppressed exception is already truncated to one not-common frame
         val throwable = StackTraceGenerator.generateSuppressed()
 
         val result = underTest.shorten(throwable, maxFramesPerThrowable = maxFramesPerThrowable)

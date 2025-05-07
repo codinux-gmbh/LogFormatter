@@ -28,7 +28,7 @@ open class StackTraceExtractor {
             StackTrace("Empty string, not a Stack Trace", emptyList())
         } else {
             val messageLine = stackTraceLines.first()
-            val linesAfterMessage = stackTraceLines.drop(0)
+            val linesAfterMessage = stackTraceLines.drop(1)
 
             val stackFramesEndIndex = linesAfterMessage.indexOfFirst { isCausedByLine(it) || isSuppressedExceptionLine(it) }
             val remainingStackTraceLines = if (stackFramesEndIndex == -1) linesAfterMessage else linesAfterMessage.subList(0, stackFramesEndIndex)

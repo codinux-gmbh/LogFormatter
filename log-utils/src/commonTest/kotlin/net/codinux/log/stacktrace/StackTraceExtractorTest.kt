@@ -74,7 +74,7 @@ class StackTraceExtractorTest {
         assertThat(result.suppressed).hasSize(1)
         val firstSuppressedException = result.suppressed.first()
         assertThat(firstSuppressedException.messageLine).isIn("SuppressedException: Suppressed #1", "org.example.log.stack.SuppressedException: Suppressed #1")
-        assertThat(firstSuppressedException.frames.size).isGreaterThanOrEqualTo(2)
+        assertThat(firstSuppressedException.frames.size).isGreaterThanOrEqualTo(1) // on JVM there's really only on frame left
         assertThat(firstSuppressedException.suppressed).isEmpty()
         assertThat(firstSuppressedException.countSkippedCommonFrames).isGreaterThanOrEqualTo(13)
     }
@@ -272,7 +272,7 @@ class StackTraceExtractorTest {
 
     private fun assertIsFirstParentException(stackTrace: StackTrace) {
         assertThat(stackTrace.messageLine).isIn("ParentException: Wrapper #1", "org.example.log.stack.ParentException: Wrapper #1")
-        assertThat(stackTrace.frames.size).isGreaterThanOrEqualTo(5)
+        assertThat(stackTrace.frames.size).isGreaterThanOrEqualTo(4)
         assertThat(stackTrace.causedBy).isNotNull()
         assertThat(stackTrace.suppressed).isEmpty()
     }
