@@ -8,6 +8,8 @@ import kotlin.reflect.KClass
 object ClassNameResolver {
 
     fun getClassNameComponents(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
+        println("qualifiedName: ${qualifiedName}, simpleName: ${forClass.simpleName}, toString(): ${forClass.toString()}") // TODO: remove again
+
         val classToString = forClass.toString()
         val cleanedClassToString = removeAnonymousClassesNumberSuffixes(clean(classToString))
 
@@ -16,12 +18,25 @@ object ClassNameResolver {
         if (LogUtilsPlatform.supportsPackageNames) {
             packageName = cleanedClassToString.substringBeforeLastOrNull('.')
             className = cleanedClassToString.substringAfterLast('.')
+
+            // for Companion objects including name of enclosing class in className
+            if ((className == "Companion" || className.startsWith("Companion$")) && packageName != null) {
+                val indexOfSecondLastDot = packageName.lastIndexOf('.')
+                if (indexOfSecondLastDot >= 0) {
+                    packageName = packageName.substring(0, indexOfSecondLastDot)
+                    className = cleanedClassToString.substring(indexOfSecondLastDot + 1)
+                }
+            }
         } else {
             className = qualifiedName ?: cleanedClassToString
         }
 
-        val enclosingClassName = if (className.contains('$')) className.substringBefore('$')
+        var enclosingClassName = if (className.contains('$')) className.substringBefore('$')
+                                else if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                 else null
+        if (enclosingClassName?.endsWith(".Companion") == true) {
+            enclosingClassName = enclosingClassName.substring(0, enclosingClassName.length - ".Companion".length)
+        }
 
         return ClassNameComponents(className.replace('$', '.'), packageName, enclosingClassName)
     }
