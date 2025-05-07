@@ -2,6 +2,7 @@ package net.codinux.log.platform
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import net.codinux.log.classname.ClassNameResolver
 import net.codinux.log.test.TestClasses
 import kotlin.test.Test
 
@@ -32,7 +33,7 @@ class ClassNameResolverTest {
     fun getQualifiedClassName_CompanionObject_getEnclosingClass() {
         val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.Companion::class, getEnclosingClass = true)
 
-        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass") // assert 'Companion' gets removed from logger name
+        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses") // assert 'Companion' gets removed from class name
     }
 
     @Test
@@ -53,7 +54,7 @@ class ClassNameResolverTest {
     fun getQualifiedClassName_InnerClassCompanionObject_getEnclosingClass() {
         val result = ClassNameResolver.getQualifiedClassName(TestClasses.OuterClass.InnerClass.Companion::class, getEnclosingClass = true)
 
-        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses.OuterClass.InnerClass") // assert 'Companion' gets removed from logger name
+        assertThat(result).isEqualTo("net.codinux.log.test.TestClasses") // assert 'Companion' gets removed from class name
     }
 
     @Test
