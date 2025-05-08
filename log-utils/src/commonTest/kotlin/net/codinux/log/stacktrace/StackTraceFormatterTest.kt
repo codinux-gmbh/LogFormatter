@@ -13,6 +13,17 @@ class StackTraceFormatterTest {
 
 
     @Test
+    fun maxStackTraceStringLength() {
+        val maxStackTraceStringLength = 100
+        val config = StackTraceFormatterConfig(maxStackTraceStringLength = maxStackTraceStringLength)
+
+        val result = underTest.format(StackTraceGenerator.generateTwoCausedBy(), config)
+
+        assertThat(result.length).isEqualTo(maxStackTraceStringLength)
+    }
+    
+
+    @Test
     fun maxFramesPerThrowable_2_SingleThrowable() {
         val maxFramesPerThrowable = 2
         val config = StackTraceFormatterConfig.Default

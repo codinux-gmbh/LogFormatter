@@ -15,6 +15,10 @@ open class StackTraceFormatter(
 
         appendStackTraceAndChildren(stackTrace, builder, config)
 
+        if (exceedsMaxLength(builder, config)) {
+            cropToMaxLength(builder, config)
+        }
+
         return builder.toString()
     }
 
@@ -54,5 +58,17 @@ open class StackTraceFormatter(
 
     protected open fun formatFrame(frame: StackFrame): String =
         frame.line
+
+
+    protected open fun cropToMaxLength(builder: StringBuilder, config: StackTraceFormatterConfig) {
+        val maxLength = config.maxStackTraceStringLength ?: return
+
+        // TODO: may also show ... 1234 characters truncated
+        builder.setLength(maxLength - config.ellipsis.length - config.lineSeparator.length)
+        builder.append(config.ellipsis).append(config.lineSeparator)
+    }
+
+    protected open fun exceedsMaxLength(builder: StringBuilder, config: StackTraceFormatterConfig): Boolean =
+        (config.maxStackTraceStringLength ?: -1) > 0 && builder.length > config.maxStackTraceStringLength!!
 
 }

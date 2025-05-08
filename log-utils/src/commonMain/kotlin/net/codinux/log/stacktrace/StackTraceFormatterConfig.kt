@@ -12,10 +12,22 @@ data class StackTraceFormatterConfig(
     val lineSeparator: String = LineSeparator.System,
 
     /**
-     * The ellipsis string to show for skipped common frames or truncated frames when
-     * [StackTraceShortenerConfig.maxFramesPerThrowable] is set.
+     * The ellipsis string to show for skipped common frames, truncated frames when
+     * [StackTraceShortenerConfig.maxFramesPerThrowable] is set or if stack trace
+     * string exceeds [maxStackTraceStringLength].
      */
     val ellipsis: String = "...",
+
+    /**
+     * The maximum amount of characters the resulting stack trace string may have.
+     *
+     * Set to `null` or value less than zero to disable stack trace string truncation.
+     *
+     * Be aware, count characters used may not equal count bytes used, which may is the
+     * more important value when sending log to a log storage like Loki or Elasticsearch,
+     * if stack trace contains non-UTF-8 characters.
+     */
+    val maxStackTraceStringLength: Int? = null,
 ) {
     companion object {
         val Default = StackTraceFormatterConfig()
