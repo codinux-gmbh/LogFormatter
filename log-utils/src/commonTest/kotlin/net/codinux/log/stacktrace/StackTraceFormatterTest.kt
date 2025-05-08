@@ -90,6 +90,9 @@ class StackTraceFormatterTest {
     }
 
 
+    // TODO: add a test for a suppressed exception that contains a caused by exception
+
+
     private fun assertTruncatedStackTrace(lines: List<String>, stackTrace: ShortenedStackTrace, unqualifiedMessageLine: String,
                                           options: StackTraceFormatterOptions, maxFramesPerThrowable: Int, messageLinePrefix: String = "", additionalIndent: String = "") {
         assertThat(lines.size).isGreaterThanOrEqualTo(2 + maxFramesPerThrowable)

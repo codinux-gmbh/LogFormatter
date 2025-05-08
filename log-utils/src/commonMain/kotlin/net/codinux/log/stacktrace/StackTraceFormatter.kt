@@ -33,7 +33,7 @@ open class StackTraceFormatter(
 
         stackTrace.suppressed.forEach { suppressed ->
             builder.append(options.lineSeparator)
-            appendStackTrace(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
+            appendStackTraceAndChildren(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
         }
 
         if (exceedsMaxLength(builder, options)) {
