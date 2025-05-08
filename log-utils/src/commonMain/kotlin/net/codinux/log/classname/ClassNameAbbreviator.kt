@@ -2,9 +2,11 @@ package net.codinux.log.classname
 
 import kotlin.math.max
 
-open class ClassNameAbbreviator {
+open class ClassNameAbbreviator(
+    protected val options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default
+) {
 
-    open fun abbreviate(qualifiedClassName: String, maxLength: Int, options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default): String {
+    open fun abbreviate(qualifiedClassName: String, maxLength: Int, options: ClassNameAbbreviatorOptions = this.options): String {
         if (qualifiedClassName.length <= maxLength) {
             return qualifiedClassName
         }

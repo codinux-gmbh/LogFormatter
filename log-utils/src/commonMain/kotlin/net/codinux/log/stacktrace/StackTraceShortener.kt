@@ -1,6 +1,7 @@
 package net.codinux.log.stacktrace
 
 open class StackTraceShortener(
+    protected val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
 ) {
     companion object {
@@ -11,13 +12,13 @@ open class StackTraceShortener(
     open fun shorten(throwable: Throwable, maxFramesPerThrowable: Int?) =
         shorten(extractStackTrace(throwable), maxFramesPerThrowable)
 
-    open fun shorten(throwable: Throwable, options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default) =
+    open fun shorten(throwable: Throwable, options: StackTraceShortenerOptions = this.options) =
         shorten(extractStackTrace(throwable), options)
 
     open fun shorten(stackTrace: StackTrace, maxFramesPerThrowable: Int?) =
-        shorten(stackTrace, StackTraceShortenerOptions(maxFramesPerThrowable))
+        shorten(stackTrace, options.copy(maxFramesPerThrowable = maxFramesPerThrowable))
 
-    open fun shorten(stackTrace: StackTrace, options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default): ShortenedStackTrace {
+    open fun shorten(stackTrace: StackTrace, options: StackTraceShortenerOptions = this.options): ShortenedStackTrace {
         val shortened = if (options.maxNestedThrowables == null || options.maxNestedThrowables < 0) {
             ShortenedStackTrace(stackTrace)
         } else {
