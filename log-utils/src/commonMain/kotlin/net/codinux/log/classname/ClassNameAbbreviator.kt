@@ -1,8 +1,8 @@
 package net.codinux.log.classname
 
-class ClassNameAbbreviator {
+open class ClassNameAbbreviator {
 
-    fun abbreviate(qualifiedClassName: String, maxLength: Int): String {
+    open fun abbreviate(qualifiedClassName: String, maxLength: Int, packageAbbreviation: PackageAbbreviationStrategy = PackageAbbreviationStrategy.FillSegmentsEqually): String {
         if (qualifiedClassName.length <= maxLength) {
             return qualifiedClassName
         }
@@ -20,16 +20,58 @@ class ClassNameAbbreviator {
         val minClassNameWithPackageSegmentsLength = className.length + packageParts.size * 2
         if (minClassNameWithPackageSegmentsLength >= maxLength) {
             // for now also return min abbreviated package names even though it exceeds maxLength
-            return packageParts.joinToString(".") { it.first().toString() } + "." + className
+            return combine(packageParts.map { it.first().toString() }, className)
         }
 
-        // fill each package segment equally
+        return fillPackageSegments(className, packageParts, maxLength, minClassNameWithPackageSegmentsLength, packageAbbreviation)
+    }
+
+    protected open fun fillPackageSegments(
+        className: String,
+        packageParts: List<String>,
+        maxLength: Int,
+        minClassNameWithPackageSegmentsLength: Int,
+        packageAbbreviation: PackageAbbreviationStrategy
+    ): String {
         val remainingLength = maxLength - minClassNameWithPackageSegmentsLength
 
-        // fill path segments equally
-        val charsPerSegment = (remainingLength / packageParts.size) + 1 // + 1 because one char per segment has already been included in min length
+        return when (packageAbbreviation) {
+            PackageAbbreviationStrategy.FillSegmentsEqually -> {
+                val charsPerSegment = (remainingLength / packageParts.size) + 1 // + 1 because one char per segment has already been included in min length
 
-        return packageParts.joinToString(".") { it.take(charsPerSegment) } + "." + className
+                combine(packageParts.map { it.take(charsPerSegment) }, className)
+            }
+            PackageAbbreviationStrategy.FillSegmentsFromStart ->
+                fillPackageSegments(className, packageParts, maxLength, packageParts.indices.toList())
+            PackageAbbreviationStrategy.FillSegmentsFromEnd ->
+                fillPackageSegments(className, packageParts, maxLength, packageParts.indices.reversed().toList())
+        }
     }
+
+    protected open fun fillPackageSegments(
+        className: String,
+        packageParts: List<String>,
+        maxLength: Int,
+        packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled: List<Int>
+    ): String {
+        val abbreviatedParts = packageParts.map { it.first().toString() }.toMutableList()
+
+        // expand package segments till maxLength is reached
+        for (i in packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled) {
+            abbreviatedParts[i] = packageParts[i]
+
+            val candidate = combine(abbreviatedParts, className)
+            if (candidate.length > maxLength) {
+                // Revert the last expansion since it caused overflow
+                abbreviatedParts[i] = packageParts[i].first().toString()
+                break
+            }
+        }
+
+        return combine(abbreviatedParts, className)
+    }
+
+    protected open fun combine(packageSegments: List<String>, className: String): String =
+        packageSegments.joinToString(".") + "." + className
 
 }
