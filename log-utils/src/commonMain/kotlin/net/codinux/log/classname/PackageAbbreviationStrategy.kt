@@ -10,10 +10,27 @@ package net.codinux.log.classname
  */
 enum class PackageAbbreviationStrategy {
 
+    /**
+     * All package segments are filled equally till maxLength is reached.
+     *
+     * E.g. `org.comp.proj.modu.subm.feat.serv`.
+     */
     FillSegmentsEqually,
 
+    /**
+     * Package segments are filled from right to left.
+     *
+     * Default behavior of Logback.
+     *
+     * E.g. `o.c.p.m.submodule.feature.service`.
+     */
     FillSegmentsFromEnd,
 
+    /**
+     * Package segments are filled from left to right.
+     *
+     * E.g. `org.company.project.m.s.f.s`.
+     */
     FillSegmentsFromStart
 
 }
