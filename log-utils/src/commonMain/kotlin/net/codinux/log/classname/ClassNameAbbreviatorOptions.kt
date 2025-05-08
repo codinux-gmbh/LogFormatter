@@ -27,5 +27,15 @@ data class ClassNameAbbreviatorOptions(
 ) {
     companion object {
         val Default = ClassNameAbbreviatorOptions()
+
+        /**
+         * Mimics the same behavior of Logback: Fill package segments from the end and keep class name and
+         * first character of each package segment even if it exceeds `maxLength`.
+         */
+        val Logback = ClassNameAbbreviatorOptions(
+            classNameAbbreviation = ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger,
+            packageAbbreviation = PackageAbbreviationStrategy.FillSegmentsFromEnd,
+            classNameAbbreviationEllipsis = "..."
+        )
     }
 }
