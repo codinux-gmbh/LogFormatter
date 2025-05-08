@@ -14,7 +14,11 @@ open class StackTraceFormatter(
     open fun format(stackTrace: ShortenedStackTrace, options: StackTraceFormatterOptions = this.options): String {
         val builder = StringBuilder()
 
-        appendStackTraceAndChildren(stackTrace, builder, options)
+        if (options.rootCauseFirst) {
+            appendStackTraceAndChildrenRootCauseFirst(stackTrace, builder, options)
+        } else {
+            appendStackTraceAndChildrenRootCauseLast(stackTrace, builder, options)
+        }
 
         if (exceedsMaxLength(builder, options)) {
             cropToMaxLength(builder, options)
@@ -23,8 +27,8 @@ open class StackTraceFormatter(
         return builder.toString()
     }
 
-    protected open fun appendStackTraceAndChildren(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
-                                                   additionalIndent: String = "", messageLinePrefix: String = "") {
+    protected open fun appendStackTraceAndChildrenRootCauseLast(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
+                                                                additionalIndent: String = "", messageLinePrefix: String = "") {
         appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefix)
 
         if (exceedsMaxLength(builder, options)) {
@@ -34,7 +38,7 @@ open class StackTraceFormatter(
         if (options.ignoreSuppressedExceptions == false) {
             stackTrace.suppressed.forEach { suppressed ->
                 builder.append(options.lineSeparator)
-                appendStackTraceAndChildren(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
+                appendStackTraceAndChildrenRootCauseLast(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
             }
 
             if (exceedsMaxLength(builder, options)) {
@@ -44,7 +48,39 @@ open class StackTraceFormatter(
 
         stackTrace.causedBy?.let { causedBy ->
             builder.append(options.lineSeparator)
-            appendStackTraceAndChildren(causedBy, builder, options, additionalIndent + options.causedByIndent, options.causedByMessagePrefix)
+            appendStackTraceAndChildrenRootCauseLast(causedBy, builder, options, additionalIndent + options.causedByIndent, options.causedByMessagePrefix)
+        }
+    }
+
+    protected open fun appendStackTraceAndChildrenRootCauseFirst(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
+                                                   additionalIndent: String = "", messageLinePrefix: String = "") {
+
+        var messageLinePrefixToUse = messageLinePrefix
+        stackTrace.causedBy?.let { causedBy ->
+            appendStackTraceAndChildrenRootCauseFirst(causedBy, builder, options, additionalIndent + options.wrappedByIndent)
+            builder.append(options.lineSeparator)
+
+            if (messageLinePrefixToUse.isBlank()) {
+                messageLinePrefixToUse = options.wrappedByMessagePrefix
+            }
+        }
+
+
+        appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefixToUse)
+
+        if (exceedsMaxLength(builder, options)) {
+            return // no need to add even more characters, maximum length already reached
+        }
+
+        if (options.ignoreSuppressedExceptions == false) {
+            stackTrace.suppressed.forEach { suppressed ->
+                builder.append(options.lineSeparator)
+                appendStackTraceAndChildrenRootCauseFirst(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
+            }
+
+            if (exceedsMaxLength(builder, options)) {
+                return // no need to add even more characters, maximum length already reached
+            }
         }
     }
 

@@ -17,6 +17,8 @@ object StackTraceGenerator {
 
     const val SecondCausedByLineUnqualified = "ParentException: Wrapper #2"
 
+    const val ThirdCausedByLineUnqualified = "ParentException: Wrapper #3"
+
     const val FirstSuppressedExceptionLineUnqualified = "SuppressedException: Suppressed #1"
 
 

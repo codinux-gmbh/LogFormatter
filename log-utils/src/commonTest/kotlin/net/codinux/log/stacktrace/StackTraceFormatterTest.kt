@@ -108,6 +108,38 @@ class StackTraceFormatterTest {
     }
 
 
+    @Test
+    fun rootCauseFirst() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val maxFramesPerThrowable = 2
+        val options = StackTraceFormatterOptions(rootCauseFirst = true)
+        val stackTrace = stackTraceShortener.shorten(throwable, maxFramesPerThrowable = maxFramesPerThrowable)
+
+
+        val result = underTest.format(stackTrace, options)
+
+
+        val lines = result.lines()
+        assertThat(lines).hasSize(4 * 4)
+
+        assertThat(lines.first()).isIn(StackTraceGenerator.RootCauseMessageLineUnqualified,
+            StackTraceGenerator.ExceptionsNamespace + StackTraceGenerator.RootCauseMessageLineUnqualified)
+
+        var wrappedByLines = lines.drop(4)
+        assertThat(wrappedByLines.first()).isIn(options.wrappedByMessagePrefix + StackTraceGenerator.FirstCausedByLineUnqualified,
+            options.wrappedByMessagePrefix + StackTraceGenerator.ExceptionsNamespace + StackTraceGenerator.FirstCausedByLineUnqualified)
+
+        wrappedByLines = wrappedByLines.drop(4)
+        assertThat(wrappedByLines.first()).isIn(options.wrappedByMessagePrefix + StackTraceGenerator.SecondCausedByLineUnqualified,
+            options.wrappedByMessagePrefix + StackTraceGenerator.ExceptionsNamespace + StackTraceGenerator.SecondCausedByLineUnqualified)
+
+        wrappedByLines = wrappedByLines.drop(4)
+        assertThat(wrappedByLines.first()).isIn(options.wrappedByMessagePrefix + StackTraceGenerator.ThirdCausedByLineUnqualified,
+            options.wrappedByMessagePrefix + StackTraceGenerator.ExceptionsNamespace + StackTraceGenerator.ThirdCausedByLineUnqualified)
+    }
+
+
     private fun assertTruncatedStackTrace(lines: List<String>, stackTrace: ShortenedStackTrace, unqualifiedMessageLine: String,
                                           options: StackTraceFormatterOptions, maxFramesPerThrowable: Int, messageLinePrefix: String = "", additionalIndent: String = "") {
         assertThat(lines.size).isGreaterThanOrEqualTo(2 + maxFramesPerThrowable)

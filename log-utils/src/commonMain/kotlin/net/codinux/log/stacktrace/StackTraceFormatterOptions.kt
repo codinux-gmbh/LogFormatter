@@ -17,6 +17,27 @@ data class StackTraceFormatterOptions(
     val ignoreSuppressedExceptions: Boolean = false,
     val suppressedExceptionIndent: String = "    ",
     val suppressedExceptionMessagePrefix: String = "Suppressed: ",
+
+    /**
+     * If `true`, prints the innermost exception (the root cause) at the beginning of the output,
+     * reversing the traditional order of the exception cause chain.
+     *
+     * This allows you to see the actual underlying error more quickly, instead of having to scroll
+     * to the end of a long stack trace to find it. The root cause is typically the most relevant
+     * and informative part of an exception, especially in deeply nested failure scenarios.
+     *
+     * Be aware, this only affects the order of the printed exceptions. But currently it does not
+     * change how common stack frames are handled: shared frames between nested exceptions are still
+     * printed only for the outermost exception. Inner exceptions will continue to include a summary
+     * line such as `... N common frames omitted`.
+     *
+     * If `false`, stack traces are printed in the conventional order — starting with the outermost
+     * exception and following the cause chain to the root.
+     */
+    val rootCauseFirst: Boolean = false,
+    val wrappedByIndent: String = causedByIndent,
+    val wrappedByMessagePrefix: String = "Wrapped by: ",
+
     val lineSeparator: String = LineSeparator.System,
 
     /**
