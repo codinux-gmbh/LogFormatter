@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 package net.codinux.log.examples
 
 import net.codinux.kotlin.text.LineSeparator
