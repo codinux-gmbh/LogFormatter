@@ -2,7 +2,7 @@ package net.codinux.log.classname
 
 open class ClassNameAbbreviator {
 
-    open fun abbreviate(qualifiedClassName: String, maxLength: Int, packageAbbreviation: PackageAbbreviationStrategy = PackageAbbreviationStrategy.FillSegmentsEqually): String {
+    open fun abbreviate(qualifiedClassName: String, maxLength: Int, options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default): String {
         if (qualifiedClassName.length <= maxLength) {
             return qualifiedClassName
         }
@@ -23,19 +23,14 @@ open class ClassNameAbbreviator {
             return combine(packageParts.map { it.first().toString() }, className)
         }
 
-        return fillPackageSegments(className, packageParts, maxLength, minClassNameWithPackageSegmentsLength, packageAbbreviation)
+        return fillPackageSegments(className, packageParts, maxLength, minClassNameWithPackageSegmentsLength, options)
     }
 
-    protected open fun fillPackageSegments(
-        className: String,
-        packageParts: List<String>,
-        maxLength: Int,
-        minClassNameWithPackageSegmentsLength: Int,
-        packageAbbreviation: PackageAbbreviationStrategy
-    ): String {
+    protected open fun fillPackageSegments(className: String, packageParts: List<String>, maxLength: Int,
+        minClassNameWithPackageSegmentsLength: Int, options: ClassNameAbbreviatorOptions): String {
         val remainingLength = maxLength - minClassNameWithPackageSegmentsLength
 
-        return when (packageAbbreviation) {
+        return when (options.packageAbbreviation) {
             PackageAbbreviationStrategy.FillSegmentsEqually -> {
                 val charsPerSegment = (remainingLength / packageParts.size) + 1 // + 1 because one char per segment has already been included in min length
 

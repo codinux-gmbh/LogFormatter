@@ -30,7 +30,7 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsEqually_OneCharPerSegment() {
         val result = underTest.abbreviate(LongPackageName + LongClassName,
             LongClassName.length + CountLongPackageNameSegments * 2,
-            PackageAbbreviationStrategy.FillSegmentsEqually)
+            options(PackageAbbreviationStrategy.FillSegmentsEqually))
 
         assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + LongClassName)
     }
@@ -39,7 +39,7 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsEqually_ThreeCharsPerSegment() {
         val result = underTest.abbreviate(LongPackageName + LongClassName,
             LongClassName.length + CountLongPackageNameSegments * 4,
-            PackageAbbreviationStrategy.FillSegmentsEqually)
+            options(PackageAbbreviationStrategy.FillSegmentsEqually))
 
         assertThat(result).isEqualTo("org.com.pro.mod.sub.fea.ser." + LongClassName)
     }
@@ -48,7 +48,7 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsEqually_MoreCharsThenSomeSegmentsHave() {
         val result = underTest.abbreviate(LongPackageName + LongClassName,
             LongClassName.length + CountLongPackageNameSegments * 6,
-            PackageAbbreviationStrategy.FillSegmentsEqually)
+            options(PackageAbbreviationStrategy.FillSegmentsEqually))
 
         assertThat(result).isEqualTo("org.compa.proje.modul.submo.featu.servi." + LongClassName)
     }
@@ -56,7 +56,9 @@ class ClassNameAbbreviatorTest {
 
     @Test
     fun fillPackageSegmentsFromTheStart_FirstSegmentOnly() {
-        val result = underTest.abbreviate(LongPackageName + ShortClassName, ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 2, PackageAbbreviationStrategy.FillSegmentsFromStart)
+        val result = underTest.abbreviate(LongPackageName + ShortClassName,
+            ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 2,
+            options(PackageAbbreviationStrategy.FillSegmentsFromStart))
 
         assertThat(result).isEqualTo("org.c.p.m.s.f.s." + ShortClassName)
     }
@@ -65,7 +67,7 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsFromTheStart_FirstFourSegments() {
         val result = underTest.abbreviate(LongPackageName + ShortClassName,
             ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 2 + 6 + 6 + 5,
-            PackageAbbreviationStrategy.FillSegmentsFromStart)
+            options(PackageAbbreviationStrategy.FillSegmentsFromStart))
 
         assertThat(result).isEqualTo("org.company.project.module.s.f.s." + ShortClassName)
     }
@@ -75,7 +77,7 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsFromTheEnd_LastSegmentOnly() {
         val result = underTest.abbreviate(LongPackageName + ShortClassName,
             ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 6,
-            PackageAbbreviationStrategy.FillSegmentsFromEnd)
+            options(PackageAbbreviationStrategy.FillSegmentsFromEnd))
 
         assertThat(result).isEqualTo("o.c.p.m.s.f.service." + ShortClassName)
     }
@@ -84,9 +86,13 @@ class ClassNameAbbreviatorTest {
     fun fillPackageSegmentsFromTheEnd_LastThreeSegments() {
         val result = underTest.abbreviate(LongPackageName + ShortClassName,
             ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 6 + 6 + 8,
-            PackageAbbreviationStrategy.FillSegmentsFromEnd)
+            options(PackageAbbreviationStrategy.FillSegmentsFromEnd))
 
         assertThat(result).isEqualTo("o.c.p.m.submodule.feature.service." + ShortClassName)
     }
+
+
+    private fun options(packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation) =
+        ClassNameAbbreviatorOptions(packageAbbreviationStrategy)
 
 }
