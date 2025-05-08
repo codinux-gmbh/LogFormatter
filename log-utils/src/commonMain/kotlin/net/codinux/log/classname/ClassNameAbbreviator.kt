@@ -1,5 +1,7 @@
 package net.codinux.log.classname
 
+import kotlin.math.max
+
 open class ClassNameAbbreviator {
 
     open fun abbreviate(qualifiedClassName: String, maxLength: Int, options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default): String {
@@ -23,24 +25,25 @@ open class ClassNameAbbreviator {
             return combine(packageParts.map { it.first().toString() }, className)
         }
 
-        return fillPackageSegments(className, packageParts, maxLength, minClassNameWithPackageSegmentsLength, options)
+        return fillPackageSegments(className, packageParts, maxLength, options)
     }
 
-    protected open fun fillPackageSegments(className: String, packageParts: List<String>, maxLength: Int,
-        minClassNameWithPackageSegmentsLength: Int, options: ClassNameAbbreviatorOptions): String {
-        val remainingLength = maxLength - minClassNameWithPackageSegmentsLength
-
+    protected open fun fillPackageSegments(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String {
         return when (options.packageAbbreviation) {
-            PackageAbbreviationStrategy.FillSegmentsEqually -> {
-                val charsPerSegment = (remainingLength / packageParts.size) + 1 // + 1 because one char per segment has already been included in min length
-
-                combine(packageParts.map { it.take(charsPerSegment) }, className)
-            }
+            PackageAbbreviationStrategy.FillSegmentsEqually ->
+                fillPathSegmentsEqually(maxLength, className, packageParts)
             PackageAbbreviationStrategy.FillSegmentsFromStart ->
                 fillPackageSegments(className, packageParts, maxLength, packageParts.indices.toList())
             PackageAbbreviationStrategy.FillSegmentsFromEnd ->
                 fillPackageSegments(className, packageParts, maxLength, packageParts.indices.reversed().toList())
         }
+    }
+
+    protected open fun fillPathSegmentsEqually(maxLength: Int, className: String, packageParts: List<String>): String {
+        val remainingLength = maxLength - className.length - packageParts.size
+        val charsPerSegment = max(1, (remainingLength / packageParts.size)) // use at least one char per segment
+
+        return combine(packageParts.map { it.take(charsPerSegment) }, className)
     }
 
     protected open fun fillPackageSegments(
