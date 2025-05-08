@@ -1,4 +1,4 @@
-# Log Utils
+# Log Formatter
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-utils)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
