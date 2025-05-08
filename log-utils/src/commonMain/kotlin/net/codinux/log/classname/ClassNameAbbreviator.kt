@@ -16,17 +16,41 @@ open class ClassNameAbbreviator {
 
         // class name alone exceeds already maxLength
         if (className.length >= maxLength) {
-            return className // for now we don't shorten class name
+            return abbreviateClassName(className, packageParts, maxLength, options)
         }
 
+        // class name with only one char per segment exceeds maxLength
         val minClassNameWithPackageSegmentsLength = className.length + packageParts.size * 2
         if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            // for now also return min abbreviated package names even though it exceeds maxLength
-            return combine(packageParts.map { it.first().toString() }, className)
+            return if (options.classNameAbbreviation == ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger) {
+                combine(firstCharOfEachPackageSegment(packageParts), className)
+            } else {
+                className
+            }
         }
 
         return fillPackageSegments(className, packageParts, maxLength, options)
     }
+
+
+    protected open fun abbreviateClassName(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String =
+        when (options.classNameAbbreviation) {
+            ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger -> className
+            ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger -> combine(firstCharOfEachPackageSegment(packageParts), className)
+            ClassNameAbbreviationStrategy.ClipStart -> className.takeLast(maxLength)
+            ClassNameAbbreviationStrategy.ClipEnd -> className.take(maxLength)
+            ClassNameAbbreviationStrategy.EllipsisStart -> options.classNameAbbreviationEllipsis +
+                    className.takeLast(maxLength - options.classNameAbbreviationEllipsis.length)
+            ClassNameAbbreviationStrategy.EllipsisMiddle -> {
+                val lengthPerPart = (maxLength - options.classNameAbbreviationEllipsis.length) / 2
+                val remainingChars = (maxLength - options.classNameAbbreviationEllipsis.length) % 2
+                // in case of maxLength - options.classNameAbbreviationEllipsis.length is an odd number, give that additional char to the start part
+                className.take(lengthPerPart + remainingChars) + options.classNameAbbreviationEllipsis + className.takeLast(lengthPerPart)
+            }
+            ClassNameAbbreviationStrategy.EllipsisEnd-> className.take(maxLength - options.classNameAbbreviationEllipsis.length) +
+                    options.classNameAbbreviationEllipsis
+        }
+
 
     protected open fun fillPackageSegments(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String {
         return when (options.packageAbbreviation) {
@@ -52,7 +76,7 @@ open class ClassNameAbbreviator {
         maxLength: Int,
         packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled: List<Int>
     ): String {
-        val abbreviatedParts = packageParts.map { it.first().toString() }.toMutableList()
+        val abbreviatedParts = firstCharOfEachPackageSegment(packageParts).toMutableList()
 
         // expand package segments till maxLength is reached
         for (i in packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled) {
@@ -68,6 +92,9 @@ open class ClassNameAbbreviator {
 
         return combine(abbreviatedParts, className)
     }
+
+    protected open fun firstCharOfEachPackageSegment(packageParts: List<String>): List<String> =
+        packageParts.map { it.first().toString() }
 
     protected open fun combine(packageSegments: List<String>, className: String): String =
         packageSegments.joinToString(".") + "." + className

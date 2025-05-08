@@ -1,6 +1,7 @@
 package net.codinux.log.classname
 
 import assertk.assertThat
+import assertk.assertions.hasLength
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
 
@@ -11,7 +12,7 @@ class ClassNameAbbreviatorTest {
         private const val LongPackageNameFirstCharPerSegmentOnly = "o.c.p.m.s.f.s."
         private val CountLongPackageNameSegments = LongPackageName.split('.').size
 
-        private const val LongClassName = "VeryLongClassNameThatSimplyDoesNotEnd"
+        private const val LongClassName = "ServiceWithALongClassName"
         private const val ShortClassName = "NameAbbreviator"
     }
 
@@ -19,10 +20,103 @@ class ClassNameAbbreviatorTest {
 
 
     @Test
-    fun classNameShorterThanMaxLength_KeepClassName() {
-        val result = underTest.abbreviate(LongPackageName + ShortClassName, ShortClassName.length - 1)
+    fun classNameShorterThanMaxLength_KeepClassNameEvenIfLonger() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName, ShortClassName.length - 1,
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger))
 
         assertThat(result).isEqualTo(ShortClassName)
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
+        val result = underTest.abbreviate(LongPackageName + LongClassName, LongClassName.length - 1,
+            options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+
+        assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + LongClassName)
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_ClipStart() {
+        val maxLength = 8
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.ClipStart))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("lassName")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_ClipEnd() {
+        val maxLength = 8
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.ClipEnd))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("ServiceW")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_EllipsisStart() {
+        val maxLength = 8
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.EllipsisStart))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("...sName")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_EllipsisMiddle_EvenPartsLength() {
+        val maxLength = 19
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.EllipsisMiddle))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("ServiceW...lassName")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_EllipsisMiddle_OddPartsLength() {
+        val maxLength = 20
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.EllipsisMiddle))
+
+        assertThat(result).hasLength(maxLength)
+        // if length of start and end parts is odd, start part is supposed to get the additional char
+        assertThat(result).isEqualTo("ServiceWi...lassName")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_EllipsisEnd() {
+        val maxLength = 8
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.EllipsisEnd))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("Servi...")
+    }
+
+
+    @Test
+    fun classNameAndMinPackageSegmentLengthShorterThanMaxLength_KeepClassNameEvenIfLonger() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName, ShortClassName.length + 1,
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger))
+
+        assertThat(result).isEqualTo(ShortClassName)
+    }
+
+    @Test
+    fun classNameAndMinPackageSegmentLengthShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName, LongClassName.length + 1,
+            options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+
+        assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + ShortClassName)
     }
 
 
@@ -93,6 +187,13 @@ class ClassNameAbbreviatorTest {
 
 
     private fun options(packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation) =
-        ClassNameAbbreviatorOptions(packageAbbreviationStrategy)
+        options(ClassNameAbbreviatorOptions.Default.classNameAbbreviation, packageAbbreviationStrategy)
+
+    private fun options(
+        classNameAbbreviationStrategy: ClassNameAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.classNameAbbreviation,
+        packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation,
+        classNameAbbreviationEllipsis: String = ClassNameAbbreviatorOptions.Default.classNameAbbreviationEllipsis,
+    ) =
+        ClassNameAbbreviatorOptions(classNameAbbreviationStrategy, packageAbbreviationStrategy, classNameAbbreviationEllipsis)
 
 }
