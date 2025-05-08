@@ -4,63 +4,63 @@ open class StackTraceFormatter(
     protected val stackTraceShortener: StackTraceShortener = StackTraceShortener.Default
 ) {
 
-    open fun format(throwable: Throwable, config: StackTraceFormatterConfig = StackTraceFormatterConfig.Default) =
-        format(stackTraceShortener.shorten(throwable), config)
+    open fun format(throwable: Throwable, options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default) =
+        format(stackTraceShortener.shorten(throwable), options)
 
-    open fun format(stackTrace: StackTrace, config: StackTraceFormatterConfig = StackTraceFormatterConfig.Default) =
-        format(stackTraceShortener.shorten(stackTrace), config)
+    open fun format(stackTrace: StackTrace, options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default) =
+        format(stackTraceShortener.shorten(stackTrace), options)
 
-    open fun format(stackTrace: ShortenedStackTrace, config: StackTraceFormatterConfig = StackTraceFormatterConfig.Default): String {
+    open fun format(stackTrace: ShortenedStackTrace, options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default): String {
         val builder = StringBuilder()
 
-        appendStackTraceAndChildren(stackTrace, builder, config)
+        appendStackTraceAndChildren(stackTrace, builder, options)
 
-        if (exceedsMaxLength(builder, config)) {
-            cropToMaxLength(builder, config)
+        if (exceedsMaxLength(builder, options)) {
+            cropToMaxLength(builder, options)
         }
 
         return builder.toString()
     }
 
-    protected open fun appendStackTraceAndChildren(stackTrace: ShortenedStackTrace, builder: StringBuilder, config: StackTraceFormatterConfig,
-                                        additionalIndent: String = "", messageLinePrefix: String = "") {
-        appendStackTrace(stackTrace, builder, config, additionalIndent, messageLinePrefix)
+    protected open fun appendStackTraceAndChildren(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
+                                                   additionalIndent: String = "", messageLinePrefix: String = "") {
+        appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefix)
 
-        if (exceedsMaxLength(builder, config)) {
+        if (exceedsMaxLength(builder, options)) {
             return // no need to add even more characters, maximum length already reached
         }
 
         stackTrace.suppressed.forEach { suppressed ->
-            builder.append(config.lineSeparator)
-            appendStackTrace(suppressed, builder, config, additionalIndent + config.suppressedExceptionIndent, config.suppressedExceptionMessagePrefix)
+            builder.append(options.lineSeparator)
+            appendStackTrace(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
         }
 
-        if (exceedsMaxLength(builder, config)) {
+        if (exceedsMaxLength(builder, options)) {
             return // no need to add even more characters, maximum length already reached
         }
 
         stackTrace.causedBy?.let { causedBy ->
-            builder.append(config.lineSeparator)
-            appendStackTraceAndChildren(causedBy, builder, config, additionalIndent + config.causedByIndent, config.causedByMessagePrefix)
+            builder.append(options.lineSeparator)
+            appendStackTraceAndChildren(causedBy, builder, options, additionalIndent + options.causedByIndent, options.causedByMessagePrefix)
         }
     }
 
-    protected open fun appendStackTrace(stackTrace: ShortenedStackTrace, builder: StringBuilder, config: StackTraceFormatterConfig,
+    protected open fun appendStackTrace(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
                                         additionalIndent: String = "", messageLinePrefix: String = "") {
-        builder.append(additionalIndent + config.messageLineIndent + messageLinePrefix + stackTrace.messageLine)
+        builder.append(additionalIndent + options.messageLineIndent + messageLinePrefix + stackTrace.messageLine)
 
         stackTrace.framesToDisplay.forEach { frame ->
-            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + formatFrame(frame))
+            builder.append(options.lineSeparator + additionalIndent + options.stackFrameIndent + formatFrame(frame))
         }
 
         if (stackTrace.countTruncatedFrames > 0) {
-            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + config.ellipsis + " ${stackTrace.countTruncatedFrames} frames truncated")
+            builder.append(options.lineSeparator + additionalIndent + options.stackFrameIndent + options.ellipsis + " ${stackTrace.countTruncatedFrames} frames truncated")
             if (stackTrace.countSkippedCommonFrames > 0) {
                 builder.append(" (including ${stackTrace.countSkippedCommonFrames} common frames)")
             }
         } else if (stackTrace.countSkippedCommonFrames > 0) {
             // TODO: Kotlin uses "... and 18 more common stack frames skipped", what is better?
-            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + config.ellipsis + " ${stackTrace.countSkippedCommonFrames} common frames omitted")
+            builder.append(options.lineSeparator + additionalIndent + options.stackFrameIndent + options.ellipsis + " ${stackTrace.countSkippedCommonFrames} common frames omitted")
         }
     }
 
@@ -68,15 +68,15 @@ open class StackTraceFormatter(
         frame.line
 
 
-    protected open fun cropToMaxLength(builder: StringBuilder, config: StackTraceFormatterConfig) {
-        val maxLength = config.maxStackTraceStringLength ?: return
+    protected open fun cropToMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions) {
+        val maxLength = options.maxStackTraceStringLength ?: return
 
         // TODO: may also show ... 1234 characters truncated
-        builder.setLength(maxLength - config.ellipsis.length - config.lineSeparator.length)
-        builder.append(config.ellipsis).append(config.lineSeparator)
+        builder.setLength(maxLength - options.ellipsis.length - options.lineSeparator.length)
+        builder.append(options.ellipsis).append(options.lineSeparator)
     }
 
-    protected open fun exceedsMaxLength(builder: StringBuilder, config: StackTraceFormatterConfig): Boolean =
-        (config.maxStackTraceStringLength ?: -1) > 0 && builder.length > config.maxStackTraceStringLength!!
+    protected open fun exceedsMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions): Boolean =
+        (options.maxStackTraceStringLength ?: -1) > 0 && builder.length > options.maxStackTraceStringLength!!
 
 }

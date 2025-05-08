@@ -94,7 +94,7 @@ println(formatter.format(throwable))
 println(formatter.format(StackTraceShortener().shorten(throwable, maxFramesPerThrowable = 3)))
 
 // a lot of config options to format stack trace
-println(formatter.format(throwable, StackTraceFormatterConfig(
+println(formatter.format(throwable, StackTraceFormatterOptions(
     messageLineIndent = "",
     stackFrameIndent = "    ",
     causedByIndent = "",

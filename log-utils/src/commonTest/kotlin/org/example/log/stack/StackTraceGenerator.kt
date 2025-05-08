@@ -72,6 +72,12 @@ object StackTraceGenerator {
         ParentException("Wrapper #2", e)
     }
 
+    fun generateThreeCausedBy(): Throwable = try {
+        throw generateTwoCausedBy()
+    } catch (e: Throwable) {
+        ParentException("Wrapper #3", e)
+    }
+
     private fun oneCausedBy() {
         twoCausedBy()
     }

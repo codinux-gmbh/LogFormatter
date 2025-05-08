@@ -2,7 +2,7 @@ package net.codinux.log.stacktrace
 
 import net.codinux.kotlin.text.LineSeparator
 
-data class StackTraceFormatterConfig(
+data class StackTraceFormatterOptions(
     val messageLineIndent: String = "",
     val stackFrameIndent: String = "    ",
     val causedByIndent: String = "",
@@ -13,7 +13,7 @@ data class StackTraceFormatterConfig(
 
     /**
      * The ellipsis string to show for skipped common frames, truncated frames when
-     * [StackTraceShortenerConfig.maxFramesPerThrowable] is set or if stack trace
+     * [StackTraceShortenerOptions.maxFramesPerThrowable] is set or if stack trace
      * string exceeds [maxStackTraceStringLength].
      */
     val ellipsis: String = "...",
@@ -30,6 +30,6 @@ data class StackTraceFormatterConfig(
     val maxStackTraceStringLength: Int? = null,
 ) {
     companion object {
-        val Default = StackTraceFormatterConfig()
+        val Default = StackTraceFormatterOptions()
     }
 }
