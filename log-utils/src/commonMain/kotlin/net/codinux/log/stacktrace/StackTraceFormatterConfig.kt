@@ -10,6 +10,12 @@ data class StackTraceFormatterConfig(
     val suppressedExceptionIndent: String = "    ",
     val suppressedExceptionMessagePrefix: String = "Suppressed: ",
     val lineSeparator: String = LineSeparator.System,
+
+    /**
+     * The ellipsis string to show for skipped common frames or truncated frames when
+     * [StackTraceShortenerConfig.maxFramesPerThrowable] is set.
+     */
+    val ellipsis: String = "...",
 ) {
     companion object {
         val Default = StackTraceFormatterConfig()

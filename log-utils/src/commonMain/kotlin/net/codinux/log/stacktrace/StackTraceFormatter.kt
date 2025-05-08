@@ -42,13 +42,13 @@ open class StackTraceFormatter(
         }
 
         if (stackTrace.countTruncatedFrames > 0) {
-            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + "... ${stackTrace.countTruncatedFrames} frames truncated")
+            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + config.ellipsis + " ${stackTrace.countTruncatedFrames} frames truncated")
             if (stackTrace.countSkippedCommonFrames > 0) {
                 builder.append(" (including ${stackTrace.countSkippedCommonFrames} common frames)")
             }
         } else if (stackTrace.countSkippedCommonFrames > 0) {
             // TODO: Kotlin uses "... and 18 more common stack frames skipped", what is better?
-            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + "... ${stackTrace.countSkippedCommonFrames} common frames omitted")
+            builder.append(config.lineSeparator + additionalIndent + config.stackFrameIndent + config.ellipsis + " ${stackTrace.countSkippedCommonFrames} common frames omitted")
         }
     }
 
