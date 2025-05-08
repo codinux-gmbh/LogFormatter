@@ -26,9 +26,17 @@ open class StackTraceFormatter(
                                         additionalIndent: String = "", messageLinePrefix: String = "") {
         appendStackTrace(stackTrace, builder, config, additionalIndent, messageLinePrefix)
 
+        if (exceedsMaxLength(builder, config)) {
+            return // no need to add even more characters, maximum length already reached
+        }
+
         stackTrace.suppressed.forEach { suppressed ->
             builder.append(config.lineSeparator)
             appendStackTrace(suppressed, builder, config, additionalIndent + config.suppressedExceptionIndent, config.suppressedExceptionMessagePrefix)
+        }
+
+        if (exceedsMaxLength(builder, config)) {
+            return // no need to add even more characters, maximum length already reached
         }
 
         stackTrace.causedBy?.let { causedBy ->
