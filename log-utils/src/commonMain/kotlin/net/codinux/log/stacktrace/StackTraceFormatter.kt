@@ -111,8 +111,8 @@ open class StackTraceFormatter(
         val maxLength = options.maxStackTraceStringLength ?: return
 
         // TODO: may also show ... 1234 characters truncated
-        builder.setLength(maxLength - options.ellipsis.length - options.lineSeparator.length)
-        builder.append(options.ellipsis).append(options.lineSeparator)
+        builder.setLength(maxLength - options.ellipsis.length)
+        builder.append(options.ellipsis)
     }
 
     protected open fun exceedsMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions): Boolean =

@@ -20,6 +20,7 @@ class StackTraceFormatterTest {
         val result = underTest.format(StackTraceGenerator.generateTwoCausedBy(), options)
 
         assertThat(result.length).isEqualTo(maxStackTraceStringLength)
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
 
@@ -38,6 +39,7 @@ class StackTraceFormatterTest {
         val lines = result.lines()
 
         assertTruncatedStackTrace(lines, stackTrace, StackTraceGenerator.RootCauseMessageLineUnqualified, options, maxFramesPerThrowable)
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
     @Test
@@ -64,6 +66,8 @@ class StackTraceFormatterTest {
         assertThat(intermediateCause.causedBy).isNotNull()
         val rootCause = intermediateCause.causedBy!!
         assertTruncatedStackTrace(lines.drop(8), rootCause, StackTraceGenerator.RootCauseMessageLineUnqualified, options, maxFramesPerThrowable, "Caused by: ")
+
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
 
@@ -87,6 +91,8 @@ class StackTraceFormatterTest {
         assertThat(stackTrace.suppressed).hasSize(1)
         val suppressed = stackTrace.suppressed.first()
         assertTruncatedStackTrace(lines.drop(3), suppressed, StackTraceGenerator.FirstSuppressedExceptionLineUnqualified, options, maxFramesPerThrowable, options.suppressedExceptionMessagePrefix, options.suppressedExceptionIndent)
+
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
 
@@ -105,6 +111,8 @@ class StackTraceFormatterTest {
 
         assertThat(result).doesNotContain(options.suppressedExceptionMessagePrefix)
         assertThat(result).doesNotContain("Suppressed #1")
+
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
 
@@ -137,6 +145,8 @@ class StackTraceFormatterTest {
         wrappedByLines = wrappedByLines.drop(4)
         assertThat(wrappedByLines.first()).isIn(options.wrappedByMessagePrefix + StackTraceGenerator.ThirdCausedByLineUnqualified,
             options.wrappedByMessagePrefix + StackTraceGenerator.ExceptionsNamespace + StackTraceGenerator.ThirdCausedByLineUnqualified)
+
+        assertDoesNotEndWithLineSeparator(result, options)
     }
 
 
@@ -166,6 +176,10 @@ class StackTraceFormatterTest {
         } else if (stackTrace.countSkippedCommonFrames > 0) {
             assertThat(countTruncatedFramesLine).isEqualTo(additionalIndent + options.stackFrameIndent + "... " + stackTrace.countSkippedCommonFrames + " common frames omitted")
         }
+    }
+
+    private fun assertDoesNotEndWithLineSeparator(result: String, options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default) {
+        assertThat(result.endsWith(options.lineSeparator)).isFalse()
     }
 
 }
