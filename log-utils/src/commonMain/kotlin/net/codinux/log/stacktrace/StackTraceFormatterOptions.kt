@@ -5,8 +5,16 @@ import net.codinux.kotlin.text.LineSeparator
 data class StackTraceFormatterOptions(
     val messageLineIndent: String = "",
     val stackFrameIndent: String = "    ",
+
     val causedByIndent: String = "",
     val causedByMessagePrefix: String = "Caused by: ",
+
+    /**
+     * If suppressed exceptions should be ignored and not included in stack trace string.
+     *
+     * Defaults to `false`.
+     */
+    val ignoreSuppressedExceptions: Boolean = false,
     val suppressedExceptionIndent: String = "    ",
     val suppressedExceptionMessagePrefix: String = "Suppressed: ",
     val lineSeparator: String = LineSeparator.System,

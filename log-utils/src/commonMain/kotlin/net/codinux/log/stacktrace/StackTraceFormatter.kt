@@ -31,13 +31,15 @@ open class StackTraceFormatter(
             return // no need to add even more characters, maximum length already reached
         }
 
-        stackTrace.suppressed.forEach { suppressed ->
-            builder.append(options.lineSeparator)
-            appendStackTraceAndChildren(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
-        }
+        if (options.ignoreSuppressedExceptions == false) {
+            stackTrace.suppressed.forEach { suppressed ->
+                builder.append(options.lineSeparator)
+                appendStackTraceAndChildren(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
+            }
 
-        if (exceedsMaxLength(builder, options)) {
-            return // no need to add even more characters, maximum length already reached
+            if (exceedsMaxLength(builder, options)) {
+                return // no need to add even more characters, maximum length already reached
+            }
         }
 
         stackTrace.causedBy?.let { causedBy ->

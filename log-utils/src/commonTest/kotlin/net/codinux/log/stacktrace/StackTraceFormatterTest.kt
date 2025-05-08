@@ -93,6 +93,21 @@ class StackTraceFormatterTest {
     // TODO: add a test for a suppressed exception that contains a caused by exception
 
 
+    @Test
+    fun ignoreSuppressedExceptions() {
+        val throwable = StackTraceGenerator.generateSuppressed()
+
+        val options = StackTraceFormatterOptions(ignoreSuppressedExceptions = true)
+
+
+        val result = underTest.format(throwable, options)
+
+
+        assertThat(result).doesNotContain(options.suppressedExceptionMessagePrefix)
+        assertThat(result).doesNotContain("Suppressed #1")
+    }
+
+
     private fun assertTruncatedStackTrace(lines: List<String>, stackTrace: ShortenedStackTrace, unqualifiedMessageLine: String,
                                           options: StackTraceFormatterOptions, maxFramesPerThrowable: Int, messageLinePrefix: String = "", additionalIndent: String = "") {
         assertThat(lines.size).isGreaterThanOrEqualTo(2 + maxFramesPerThrowable)
