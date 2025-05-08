@@ -18,7 +18,11 @@ open class StackTraceShortener(
         shorten(stackTrace, StackTraceShortenerConfig(maxFramesPerThrowable))
 
     open fun shorten(stackTrace: StackTrace, config: StackTraceShortenerConfig = StackTraceShortenerConfig.Default): ShortenedStackTrace {
-        val shortened = ShortenedStackTrace(stackTrace)
+        val shortened = if (config.maxNestedThrowables == null || config.maxNestedThrowables < 0) {
+            ShortenedStackTrace(stackTrace)
+        } else {
+            shortenedStackTraceWithMaxDepth(stackTrace, config.maxNestedThrowables)
+        }
 
         if (config.maxFramesPerThrowable != null && config.maxFramesPerThrowable >= 0) {
             truncateToMaxFramesPerThrowable(shortened, config.maxFramesPerThrowable)
@@ -26,6 +30,19 @@ open class StackTraceShortener(
 
         return shortened
     }
+
+
+    protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, maxNestedThrowables: Int) =
+        shortenedStackTraceWithMaxDepth(stackTrace, maxNestedThrowables, 0)
+
+    protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, maxNestedThrowables: Int, countAddedNestedThrowables: Int): ShortenedStackTrace =
+        ShortenedStackTrace(stackTrace,
+            if (countAddedNestedThrowables < maxNestedThrowables && stackTrace.causedBy != null) {
+                shortenedStackTraceWithMaxDepth(stackTrace.causedBy, maxNestedThrowables, countAddedNestedThrowables + 1)
+            } else {
+                null
+            }
+        )
 
 
     protected open fun truncateToMaxFramesPerThrowable(shortened: ShortenedStackTrace, maxFramesPerThrowable: Int) {

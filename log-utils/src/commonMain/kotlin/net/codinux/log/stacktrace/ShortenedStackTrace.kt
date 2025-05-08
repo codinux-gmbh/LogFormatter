@@ -15,10 +15,12 @@ data class ShortenedStackTrace(
         internal set
 
 
-    constructor(stackTrace: StackTrace) : this(
+    constructor(stackTrace: StackTrace) : this(stackTrace, stackTrace.causedBy?.let { ShortenedStackTrace(it) })
+
+    constructor(stackTrace: StackTrace, causedBy: ShortenedStackTrace?) : this(
         stackTrace.messageLine,
         stackTrace.frames,
-        stackTrace.causedBy?.let { ShortenedStackTrace(it) },
+        causedBy,
         stackTrace.suppressed.map { ShortenedStackTrace(it) },
         stackTrace.countSkippedCommonFrames
     )

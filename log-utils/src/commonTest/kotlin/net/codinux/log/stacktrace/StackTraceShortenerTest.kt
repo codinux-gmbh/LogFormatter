@@ -1,10 +1,7 @@
 package net.codinux.log.stacktrace
 
 import assertk.assertThat
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThanOrEqualTo
-import assertk.assertions.isNotNull
+import assertk.assertions.*
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.isJvmOrAndroid
 import org.example.log.stack.StackTraceGenerator
@@ -20,7 +17,7 @@ class StackTraceShortenerTest {
         val maxFramesPerThrowable = 2
         val throwable = StackTraceGenerator.generateTwoCausedBy()
 
-        val result = underTest.shorten(throwable, maxFramesPerThrowable = maxFramesPerThrowable)
+        val result = underTest.shorten(throwable, config(maxFramesPerThrowable = maxFramesPerThrowable))
 
         assertMaxFramesPerThrowable(result, maxFramesPerThrowable)
 
@@ -39,13 +36,84 @@ class StackTraceShortenerTest {
         val maxFramesPerThrowable = if (Platform.isJvmOrAndroid) 1 else 2 // on JVM suppressed exception is already truncated to one not-common frame
         val throwable = StackTraceGenerator.generateSuppressed()
 
-        val result = underTest.shorten(throwable, maxFramesPerThrowable = maxFramesPerThrowable)
+        val result = underTest.shorten(throwable, config(maxFramesPerThrowable = maxFramesPerThrowable))
 
         assertMaxFramesPerThrowable(result, maxFramesPerThrowable)
 
         assertThat(result.suppressed).hasSize(1)
         val suppressedException = result.suppressed.first()
         assertMaxFramesPerThrowable(suppressedException, maxFramesPerThrowable, 5)
+    }
+
+
+    @Test
+    fun maxNestedThrowables_0() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = 0))
+
+        assertThat(result.causedBy).isNull()
+        assertThat(throwable.cause).isNotNull()
+    }
+
+    @Test
+    fun maxNestedThrowables_1() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = 1))
+
+        assertThat(result.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy).isNull()
+    }
+
+    @Test
+    fun maxNestedThrowables_2() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = 2))
+
+        assertThat(result.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy!!.causedBy).isNull()
+    }
+
+    @Test
+    fun maxNestedThrowables_3() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = 3))
+
+        assertMaxNumberOfCausesIsReturned(result)
+    }
+
+    @Test
+    fun maxNestedThrowables_MoreThanNumberOfCauses() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = 4))
+
+        assertMaxNumberOfCausesIsReturned(result)
+    }
+
+    @Test
+    fun maxNestedThrowables_Null_MaxNumberOfCausesIsReturned() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = null))
+
+        assertMaxNumberOfCausesIsReturned(result)
+    }
+
+    @Test
+    fun maxNestedThrowables_LessThanZero_MaxNumberOfCausesIsReturned() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+
+        val result = underTest.shorten(throwable, config(maxNestedThrowables = -1))
+
+        assertMaxNumberOfCausesIsReturned(result)
     }
 
 
@@ -56,5 +124,20 @@ class StackTraceShortenerTest {
 
         assertThat(stackTrace.countSkippedCommonFrames).isGreaterThanOrEqualTo(countMinSkippedCommonFrames)
     }
+
+
+    private fun assertMaxNumberOfCausesIsReturned(result: ShortenedStackTrace) {
+        assertThat(result.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy!!.causedBy).isNotNull()
+
+        assertThat(result.causedBy!!.causedBy!!.causedBy!!.causedBy).isNull()
+    }
+
+
+    private fun config(maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null) =
+        StackTraceShortenerConfig(maxFramesPerThrowable, maxNestedThrowables)
 
 }
