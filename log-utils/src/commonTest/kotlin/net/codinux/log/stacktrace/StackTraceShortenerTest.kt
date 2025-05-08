@@ -119,8 +119,8 @@ class StackTraceShortenerTest {
 
     private fun assertMaxFramesPerThrowable(stackTrace: ShortenedStackTrace, maxFramesPerThrowable: Int, countMinSkippedCommonFrames: Int = 0) {
         assertThat(stackTrace.framesToDisplay).hasSize(maxFramesPerThrowable)
-        assertThat(stackTrace.originalFrames).hasSize(maxFramesPerThrowable + stackTrace.countTruncatedFrames)
-        assertThat(stackTrace.countTruncatedFrames).isEqualTo(stackTrace.originalFrames.size - maxFramesPerThrowable)
+        assertThat(stackTrace.originalStackTrace).hasSize(maxFramesPerThrowable + stackTrace.countTruncatedFrames)
+        assertThat(stackTrace.countTruncatedFrames).isEqualTo(stackTrace.originalStackTrace.size - maxFramesPerThrowable)
 
         assertThat(stackTrace.countSkippedCommonFrames).isGreaterThanOrEqualTo(countMinSkippedCommonFrames)
     }

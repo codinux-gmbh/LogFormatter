@@ -51,7 +51,7 @@ private fun printStackTrace(stackTrace: StackTrace) {
     println("Message line: ${stackTrace.messageLine}")
 
     println("Stack frames:")
-    stackTrace.frames.forEach { println(it.line) }
+    stackTrace.stackTrace.forEach { println(it.line) }
 
     println("Count skipped common frames: ${stackTrace.countSkippedCommonFrames}")
 

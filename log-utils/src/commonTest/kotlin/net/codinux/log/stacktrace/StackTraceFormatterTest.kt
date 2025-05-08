@@ -162,7 +162,7 @@ class StackTraceFormatterTest {
         IntRange(1, maxFramesPerThrowable).forEach { index ->
             val stackFrameLine = lines[index]
             assertThat(stackFrameLine).startsWith(additionalIndent + options.stackFrameIndent)
-            assertThat(stackFrameLine).isEqualTo(additionalIndent + options.stackFrameIndent + stackTrace.originalFrames[index - 1].line)
+            assertThat(stackFrameLine).isEqualTo(additionalIndent + options.stackFrameIndent + stackTrace.originalStackTrace[index - 1].line)
         }
 
         val countTruncatedFramesLine = lines[maxFramesPerThrowable + 1]

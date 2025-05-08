@@ -49,7 +49,7 @@ open class StackTraceShortener(
     protected open fun truncateToMaxFramesPerThrowable(shortened: ShortenedStackTrace, maxFramesPerThrowable: Int) {
         if (shortened.framesToDisplay.size > maxFramesPerThrowable) {
             shortened.framesToDisplay = shortened.framesToDisplay.subList(0, maxFramesPerThrowable)
-            shortened.countTruncatedFrames = shortened.originalFrames.size - maxFramesPerThrowable
+            shortened.countTruncatedFrames = shortened.originalStackTrace.size - maxFramesPerThrowable
         }
 
         shortened.suppressed.forEach {

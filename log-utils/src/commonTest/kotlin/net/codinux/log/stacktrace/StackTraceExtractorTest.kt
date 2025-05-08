@@ -44,7 +44,7 @@ class StackTraceExtractorTest {
         val result = underTest.extractStackTrace(throwable)
 
         assertThat(result.messageLine).isIn("ParentException: Wrapper #2", "org.example.log.stack.ParentException: Wrapper #2")
-        assertThat(result.frames.size).isGreaterThanOrEqualTo(8)
+        assertThat(result.stackTrace.size).isGreaterThanOrEqualTo(8)
         assertThat(result.suppressed).isEmpty()
         assertThat(result.countSkippedCommonFrames).isEqualTo(0)
 
@@ -74,7 +74,7 @@ class StackTraceExtractorTest {
         assertThat(result.suppressed).hasSize(1)
         val firstSuppressedException = result.suppressed.first()
         assertThat(firstSuppressedException.messageLine).isIn("SuppressedException: Suppressed #1", "org.example.log.stack.SuppressedException: Suppressed #1")
-        assertThat(firstSuppressedException.frames.size).isGreaterThanOrEqualTo(1) // on JVM there's really only on frame left
+        assertThat(firstSuppressedException.stackTrace.size).isGreaterThanOrEqualTo(1) // on JVM there's really only on frame left
         assertThat(firstSuppressedException.suppressed).isEmpty()
         assertThat(firstSuppressedException.countSkippedCommonFrames).isGreaterThanOrEqualTo(13)
     }
@@ -265,14 +265,14 @@ class StackTraceExtractorTest {
 
     private fun assertIsRootCause(stackTrace: StackTrace, countSuppressedExceptions: Int = 0) {
         assertThat(stackTrace.messageLine).isIn("RootCauseException: Root cause", "org.example.log.stack.RootCauseException: Root cause")
-        assertThat(stackTrace.frames.size).isGreaterThanOrEqualTo(5)
+        assertThat(stackTrace.stackTrace.size).isGreaterThanOrEqualTo(5)
         assertThat(stackTrace.causedBy).isNull()
         assertThat(stackTrace.suppressed).hasSize(countSuppressedExceptions)
     }
 
     private fun assertIsFirstParentException(stackTrace: StackTrace) {
         assertThat(stackTrace.messageLine).isIn("ParentException: Wrapper #1", "org.example.log.stack.ParentException: Wrapper #1")
-        assertThat(stackTrace.frames.size).isGreaterThanOrEqualTo(4)
+        assertThat(stackTrace.stackTrace.size).isGreaterThanOrEqualTo(4)
         assertThat(stackTrace.causedBy).isNotNull()
         assertThat(stackTrace.suppressed).isEmpty()
     }
