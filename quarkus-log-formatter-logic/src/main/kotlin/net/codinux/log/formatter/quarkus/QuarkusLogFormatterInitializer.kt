@@ -105,33 +105,25 @@ class QuarkusLogFormatterInitializer {
 
     private fun patchFormatters(formatter: PatternFormatter) {
         // the step may again is wrapped, e.g. in a ColorPatternFormatter.ColorStep
-        val steps = formatter.steps.map { unwrapStep(it) }
+        val steps = formatter.steps.mapIndexed { index, step -> unwrapStep(step, index) }
 
-        val stepsByType = getStepTypes(steps)
-
-        stepsByType.forEach { (originalStep, wrappedStep, itemType) ->
-            patchStepWith(itemType, wrappedStep ?: originalStep)?.let { toPatchWith ->
-                val index = formatter.steps.indexOf(originalStep)
-                if (index > -1) {
-                    if (wrappedStep != null) { // then replace the wrapped FormatStep
-                        val delegateField = originalStep.javaClass.declaredFields.firstOrNull { it.name == "delegate" }
-                        if (delegateField != null) {
-                            if (delegateField.trySetAccessible()) {
-                                delegateField.set(originalStep, toPatchWith)
-                            }
-                        }
-                    } else {
-                        formatter.steps = formatter.steps.apply {
-                            this[index] = toPatchWith
-                        }
+        steps.forEach { stepInfo ->
+            patchStepWith(stepInfo)?.let { toPatchWith ->
+                if (stepInfo.wrappedStep != null && stepInfo.delegateField != null) { // then replace the wrapped FormatStep
+                    stepInfo.delegateField.set(stepInfo.step, toPatchWith)
+                } else {
+                    formatter.steps = formatter.steps.apply {
+                        this[stepInfo.index] = toPatchWith
                     }
                 }
+
+                println("Replace ${stepInfo.type} step ${stepInfo.wrappedStep ?: stepInfo.step} with $toPatchWith")
             }
         }
     }
 
-    private fun patchStepWith(type: ItemType?, step: FormatStep): FormatStep? =
-        if (type == ItemType.EXCEPTION_TRACE) {
+    private fun patchStepWith(stepInfo: FormatStepInfo): FormatStep? =
+        if (stepInfo.type == ItemType.EXCEPTION_TRACE) {
             val options = StackTraceFormatterOptions(rootCauseFirst = true, maxStackTraceStringLength = 500)
             val shortener = StackTraceShortener(StackTraceShortenerOptions(maxFramesPerThrowable = 4, maxNestedThrowables = 0))
             ExceptionFormatStep(StackTraceFormatter(options, shortener), options.lineSeparator)
@@ -139,24 +131,19 @@ class QuarkusLogFormatterInitializer {
             null
         }
 
-    private fun unwrapStep(step: FormatStep): Pair<FormatStep, FormatStep?> {
+    private fun unwrapStep(step: FormatStep, index: Int): FormatStepInfo {
         val delegateField = step.javaClass.declaredFields.firstOrNull { it.name == "delegate" }
         if (delegateField != null) {
             if (delegateField.trySetAccessible()) {
                 val delegate = delegateField.get(step)
                 if (delegate is FormatStep) {
-                    return step to delegate
+                    return FormatStepInfo(step, getStepType(delegate), index, delegate, delegateField)
                 }
             }
         }
 
-        return step to null
+        return FormatStepInfo(step, getStepType(step), index, null, null)
     }
-
-    private fun getStepTypes(steps: List<Pair<FormatStep, FormatStep?>>): List<Triple<FormatStep, FormatStep?, ItemType?>> =
-        steps.map { (originalStep, wrappedStep) ->
-            Triple(originalStep, wrappedStep, wrappedStep?.let { getStepType(it) } ?: getStepType(originalStep))
-        }
 
     private fun getStepType(step: FormatStep): ItemType? {
         val stepClass = step.javaClass
