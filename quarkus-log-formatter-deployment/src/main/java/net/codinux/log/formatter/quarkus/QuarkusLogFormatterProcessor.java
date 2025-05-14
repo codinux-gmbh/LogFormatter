@@ -5,7 +5,8 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 class QuarkusLogFormatterProcessor {
 
-    private static final String FEATURE = "quarkus-log-formatter";
+    // this value gets displayed on Quarkus startup in installed-features
+    private static final String FEATURE = "log-formatter";
 
     @BuildStep
     FeatureBuildItem feature() {
