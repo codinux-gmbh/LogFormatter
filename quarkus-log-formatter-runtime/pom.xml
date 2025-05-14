@@ -21,6 +21,12 @@
             <version>${quarkus.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.codinux.log</groupId>
+            <artifactId>quarkus-log-formatter-logic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

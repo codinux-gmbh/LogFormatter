@@ -22,3 +22,4 @@ rootProject.name = "LogFormatter"
 
 
 include("log-formatter")
+include("quarkus-log-formatter-logic")
