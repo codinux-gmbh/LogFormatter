@@ -126,8 +126,6 @@ class QuarkusLogFormatterInitializer {
 
     private fun patchStepWith(stepInfo: FormatStepInfo, config: LogFormatterConfig): FormatStep? =
         if (stepInfo.type == ItemType.EXCEPTION_TRACE) {
-            val options = StackTraceFormatterOptions(rootCauseFirst = true, maxStackTraceStringLength = 500)
-            val shortener = StackTraceShortener(StackTraceShortenerOptions(maxFramesPerThrowable = 4, maxNestedThrowables = 0))
             val options = StackTraceFormatterOptions(rootCauseFirst = config.rootCauseFirst, maxStackTraceStringLength = config.maxStackTraceStringLength)
             val shortener = StackTraceShortener(StackTraceShortenerOptions(config.maxFramesPerThrowable, config.maxNestedThrowables))
             ExceptionFormatStep(StackTraceFormatter(options, shortener), options.lineSeparator)
