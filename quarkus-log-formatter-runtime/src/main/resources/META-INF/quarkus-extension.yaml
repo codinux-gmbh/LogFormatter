@@ -1,0 +1,9 @@
+name: QuarkusLogFormatter
+description: Format Quarkus console logs.
+metadata:
+  short-name: "log-formatter"
+  categories:
+    - "log"
+  status: "preview"
+  config:
+    - "quarkus.log.console.stacktrace"
