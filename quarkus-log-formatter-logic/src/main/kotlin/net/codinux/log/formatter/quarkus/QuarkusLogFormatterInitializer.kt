@@ -1,6 +1,7 @@
 package net.codinux.log.formatter.quarkus
 
 import io.quarkus.bootstrap.logging.QuarkusDelayedHandler
+import net.codinux.log.formatter.quarkus.config.LogFormatterConfig
 import net.codinux.log.stacktrace.StackTraceFormatter
 import net.codinux.log.stacktrace.StackTraceFormatterOptions
 import net.codinux.log.stacktrace.StackTraceShortener
@@ -17,7 +18,8 @@ import java.util.logging.*
 
 class QuarkusLogFormatterInitializer {
 
-    fun initQuarkusLogFormatter(): Handler? {
+    @JvmOverloads
+    fun initQuarkusLogFormatter(config: LogFormatterConfig = LogFormatterConfig()): Handler? {
         val rootLogger = LogManager.getLogManager().getLogger("")
 
         // the first struggle is to find the ConsoleHandler which is wrapped in a QuarkusDelayedHandler and
@@ -29,7 +31,7 @@ class QuarkusLogFormatterInitializer {
         val formatter = consoleHandler?.let { findPatternFormatter(it) }
 
         // and the last one is to find the field formatters like ExceptionFormatter - which again are anonymous classes
-        formatter?.let { patchFormatters(it) }
+        formatter?.let { patchFormatters(it, config) }
 
         return consoleHandler
     }
@@ -103,12 +105,12 @@ class QuarkusLogFormatterInitializer {
     }
 
 
-    private fun patchFormatters(formatter: PatternFormatter) {
+    private fun patchFormatters(formatter: PatternFormatter, config: LogFormatterConfig) {
         // the step may again is wrapped, e.g. in a ColorPatternFormatter.ColorStep
         val steps = formatter.steps.mapIndexed { index, step -> unwrapStep(step, index) }
 
         steps.forEach { stepInfo ->
-            patchStepWith(stepInfo)?.let { toPatchWith ->
+            patchStepWith(stepInfo, config)?.let { toPatchWith ->
                 if (stepInfo.wrappedStep != null && stepInfo.delegateField != null) { // then replace the wrapped FormatStep
                     stepInfo.delegateField.set(stepInfo.step, toPatchWith)
                 } else {
@@ -122,10 +124,12 @@ class QuarkusLogFormatterInitializer {
         }
     }
 
-    private fun patchStepWith(stepInfo: FormatStepInfo): FormatStep? =
+    private fun patchStepWith(stepInfo: FormatStepInfo, config: LogFormatterConfig): FormatStep? =
         if (stepInfo.type == ItemType.EXCEPTION_TRACE) {
             val options = StackTraceFormatterOptions(rootCauseFirst = true, maxStackTraceStringLength = 500)
             val shortener = StackTraceShortener(StackTraceShortenerOptions(maxFramesPerThrowable = 4, maxNestedThrowables = 0))
+            val options = StackTraceFormatterOptions(rootCauseFirst = config.rootCauseFirst, maxStackTraceStringLength = config.maxStackTraceStringLength)
+            val shortener = StackTraceShortener(StackTraceShortenerOptions(config.maxFramesPerThrowable, config.maxNestedThrowables))
             ExceptionFormatStep(StackTraceFormatter(options, shortener), options.lineSeparator)
         } else {
             null
