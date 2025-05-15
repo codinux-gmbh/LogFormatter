@@ -20,6 +20,10 @@ class QuarkusLogFormatterInitializer {
 
     @JvmOverloads
     fun initQuarkusLogFormatter(config: LogFormatterConfig = LogFormatterConfig()): Handler? {
+        if (config.isDefault) {
+            return null // no need to adjust ConsoleHandler, no values are set
+        }
+
         try {
             val rootLogger = LogManager.getLogManager().getLogger("")
 

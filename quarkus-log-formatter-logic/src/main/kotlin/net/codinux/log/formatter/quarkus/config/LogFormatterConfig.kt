@@ -7,4 +7,7 @@ data class LogFormatterConfig(
     val maxNestedThrowables: Int? = null,
 
     val maxStackTraceStringLength: Int? = null,
-)
+) {
+    val isDefault by lazy { rootCauseFirst == false && maxFramesPerThrowable == null &&
+            maxNestedThrowables == null && maxStackTraceStringLength == null }
+}
