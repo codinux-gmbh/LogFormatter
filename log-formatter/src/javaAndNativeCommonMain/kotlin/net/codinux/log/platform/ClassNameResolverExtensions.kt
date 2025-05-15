@@ -9,7 +9,7 @@ fun ClassNameResolver.getQualifiedClassName(forClass: KClass<*>, getDeclaringCla
     val packageNamePrefix = components.packageNamePrefix
 
     return if (getDeclaringClass) {
-        packageNamePrefix + (components.declaringClass ?: components.className)
+        packageNamePrefix + (components.declaringClassName ?: components.className)
     }
     else {
         packageNamePrefix + components.className

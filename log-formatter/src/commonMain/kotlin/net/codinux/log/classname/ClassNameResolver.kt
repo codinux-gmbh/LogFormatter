@@ -32,14 +32,14 @@ object ClassNameResolver {
         }
 
         // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
-        var declaringClass = if (className.contains('$')) className.substringBefore('$')
+        var declaringClassName = if (className.contains('$')) className.substringBefore('$')
                                 else if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                 else null
-        if (declaringClass?.endsWith(".Companion") == true) {
-            declaringClass = declaringClass.substring(0, declaringClass.length - ".Companion".length)
+        if (declaringClassName?.endsWith(".Companion") == true) {
+            declaringClassName = declaringClassName.substring(0, declaringClassName.length - ".Companion".length)
         }
 
-        return ClassNameComponents(className.replace('$', '.'), packageName, declaringClass)
+        return ClassNameComponents(className.replace('$', '.'), packageName, declaringClassName)
     }
 
     private fun clean(classToString: String): String {

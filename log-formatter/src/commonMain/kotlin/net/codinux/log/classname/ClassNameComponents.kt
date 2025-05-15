@@ -11,10 +11,11 @@ data class ClassNameComponents(
     val packageName: String? = null,
 
     /**
-     * For inner, local, anonymous classes and lambdas: The outmost top level class
-     * that contains this class (if this information is available).
+     * For inner, local, anonymous classes and lambdas: The name of the
+     * outmost top level class that contains this class (if this information
+     * is available).
      */
-    val declaringClass: String? = null
+    val declaringClassName: String? = null,
 
 ) {
     val packageNamePrefix: String = packageName?.let { "$it." } ?: ""
