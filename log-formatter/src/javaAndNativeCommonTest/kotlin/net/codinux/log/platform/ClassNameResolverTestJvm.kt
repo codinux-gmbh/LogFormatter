@@ -6,7 +6,7 @@ import net.codinux.log.classname.ClassNameResolver
 import net.codinux.log.test.TestClasses
 import kotlin.test.Test
 
-class ClassNameResolverTest {
+class ClassNameResolverTestJvm {
 
     @Test
     fun getQualifiedClassName_Object() {
@@ -71,7 +71,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(anonymous::class)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest.getQualifiedClassName_AnonymousClass.anonymous")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm.getQualifiedClassName_AnonymousClass.anonymous")
     }
 
     @Test
@@ -80,7 +80,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(anonymous::class, getDeclaringClass = true)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm")
     }
 
     @Test
@@ -89,7 +89,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(LocalClass::class)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest.getQualifiedClassName_LocalClass.LocalClass")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm.getQualifiedClassName_LocalClass.LocalClass")
     }
 
     @Test
@@ -98,7 +98,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(LocalClass::class, getDeclaringClass = true)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm")
     }
 
     @Test
@@ -107,7 +107,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(lambda::class)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest.getQualifiedClassName_Lambda.lambda")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm.getQualifiedClassName_Lambda.lambda")
     }
 
     @Test
@@ -116,7 +116,7 @@ class ClassNameResolverTest {
 
         val result = ClassNameResolver.getQualifiedClassName(lambda::class, getDeclaringClass = true)
 
-        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTest")
+        assertThat(result).isEqualTo("net.codinux.log.platform.ClassNameResolverTestJvm")
     }
 
 }
