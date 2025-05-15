@@ -10,7 +10,7 @@ Utilities common to loggers like [klf](https://github.com/codinux-gmbh/klf) or [
 ### Gradle
 
 ```
-implementation("net.codinux.log:log-utils:0.5.0")
+implementation("net.codinux.log:log-utils:1.0.0")
 ```
 
 ### Maven
@@ -19,7 +19,7 @@ implementation("net.codinux.log:log-utils:0.5.0")
 <dependency>
    <groupId>net.codinux.log</groupId>
    <artifactId>log-utils-jvm</artifactId>
-   <version>0.5.0</version>
+   <version>1.0.0</version>
 </dependency>
 ```
 
