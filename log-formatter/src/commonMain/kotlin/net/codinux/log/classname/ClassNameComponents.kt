@@ -17,6 +17,13 @@ data class ClassNameComponents(
      */
     val declaringClassName: String? = null,
 
+    /**
+     * If class is a companion object, the name of the class that contains
+     * this companion.
+     *
+     * Not available on JavaScript and WASM.
+     */
+    val companionOwnerClassName: String? = null,
 ) {
     val packageNamePrefix: String = packageName?.let { "$it." } ?: ""
 

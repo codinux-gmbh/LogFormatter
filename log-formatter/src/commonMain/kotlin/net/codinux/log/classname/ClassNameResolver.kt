@@ -31,15 +31,23 @@ object ClassNameResolver {
             className = qualifiedName ?: cleanedClassToString
         }
 
+        if (className.endsWith("\$Companion")) {
+            className = className.substringBeforeLast("\$Companion") + ".Companion"
+        }
+
         // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
         var declaringClassName = if (className.contains('$')) className.substringBefore('$')
-                                else if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                 else null
         if (declaringClassName?.endsWith(".Companion") == true) {
             declaringClassName = declaringClassName.substring(0, declaringClassName.length - ".Companion".length)
         }
 
-        return ClassNameComponents(className.replace('$', '.'), packageName, declaringClassName)
+        className = className.replace('$', '.')
+
+        val companionOwnerClassName = if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
+                                    else null
+
+        return ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName)
     }
 
     private fun clean(classToString: String): String {
