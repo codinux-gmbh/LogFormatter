@@ -80,7 +80,9 @@ class QuarkusLogFormatterInitializer {
                     }
                 }
             } else {
-                return findConsoleHandler(handler)
+                findConsoleHandler(handler)?.let {
+                    return it
+                }
             }
         }
 
@@ -127,16 +129,18 @@ class QuarkusLogFormatterInitializer {
         val steps = formatter.steps.mapIndexed { index, step -> unwrapStep(step, index) }
 
         steps.forEach { stepInfo ->
-            patchStepWith(stepInfo, config)?.let { toPatchWith ->
-                if (stepInfo.wrappedStep != null && stepInfo.delegateField != null) { // then replace the wrapped FormatStep
-                    stepInfo.delegateField.set(stepInfo.step, toPatchWith)
-                } else {
-                    formatter.steps = formatter.steps.apply {
-                        this[stepInfo.index] = toPatchWith
+            try {
+                patchStepWith(stepInfo, config)?.let { toPatchWith ->
+                    if (stepInfo.wrappedStep != null && stepInfo.delegateField != null) { // then replace the wrapped FormatStep
+                        stepInfo.delegateField.set(stepInfo.step, toPatchWith)
+                    } else {
+                        formatter.steps = formatter.steps.apply {
+                            this[stepInfo.index] = toPatchWith
+                        }
                     }
                 }
-
-                println("Replace ${stepInfo.type} step ${stepInfo.wrappedStep ?: stepInfo.step} with $toPatchWith")
+            } catch (e: Throwable) {
+                logError("Could not patch step ${stepInfo.type} ${stepInfo.step} at index ${stepInfo.index}", e)
             }
         }
     }
@@ -172,10 +176,10 @@ class QuarkusLogFormatterInitializer {
         try {
             val stepClass = step.javaClass
 
-            val itemTypeField = stepClass.declaredMethods.firstOrNull { it.name == "getItemType" && it.parameterTypes.isEmpty() && it.returnType == ItemType::class.java }
-            if (itemTypeField != null) {
-                itemTypeField.trySetAccessible()
-                return itemTypeField.invoke(step) as ItemType?
+            val getItemTypeMethod = stepClass.declaredMethods.firstOrNull { it.name == "getItemType" && it.parameterTypes.isEmpty() && it.returnType == ItemType::class.java }
+            if (getItemTypeMethod != null) {
+                getItemTypeMethod.trySetAccessible()
+                return getItemTypeMethod.invoke(step) as? ItemType
             }
 
             val enclosingMethod = stepClass.enclosingMethod
