@@ -10,7 +10,7 @@ actual object LogUtilsPlatform {
 
 
     actual fun <T : Any> getQualifiedClassName(forClass: KClass<T>): String =
-        ClassNameResolver.getQualifiedClassName(forClass, getEnclosingClass = false)
+        ClassNameResolver.getQualifiedClassName(forClass, getDeclaringClass = false)
 
     actual fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents =
         ClassNameResolver.getClassNameComponents(forClass, forClass.qualifiedName)

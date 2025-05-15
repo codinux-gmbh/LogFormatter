@@ -10,7 +10,7 @@ actual object LogUtilsPlatform {
 
 
     actual fun <T : Any> getQualifiedClassName(forClass: KClass<T>): String =
-        ClassNameResolver.getQualifiedClassName(forClass, getEnclosingClass = false)
+        ClassNameResolver.getQualifiedClassName(forClass, getDeclaringClass = false)
 
     // TODO: when supporting Java 9 use forClass.java.packageName and forClass.java.enclosingClass?.simpleName
     actual fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents =

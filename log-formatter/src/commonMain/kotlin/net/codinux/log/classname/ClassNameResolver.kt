@@ -31,14 +31,15 @@ object ClassNameResolver {
             className = qualifiedName ?: cleanedClassToString
         }
 
-        var enclosingClassName = if (className.contains('$')) className.substringBefore('$')
+        // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
+        var declaringClass = if (className.contains('$')) className.substringBefore('$')
                                 else if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                 else null
-        if (enclosingClassName?.endsWith(".Companion") == true) {
-            enclosingClassName = enclosingClassName.substring(0, enclosingClassName.length - ".Companion".length)
+        if (declaringClass?.endsWith(".Companion") == true) {
+            declaringClass = declaringClass.substring(0, declaringClass.length - ".Companion".length)
         }
 
-        return ClassNameComponents(className.replace('$', '.'), packageName, enclosingClassName)
+        return ClassNameComponents(className.replace('$', '.'), packageName, declaringClass)
     }
 
     private fun clean(classToString: String): String {
