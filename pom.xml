@@ -34,6 +34,9 @@
     </modules>
 
 
+    <url>https://github.com/codinux-gmbh/LogFormatter/</url>
+    <description>Quarkus extension to format console logs</description>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
