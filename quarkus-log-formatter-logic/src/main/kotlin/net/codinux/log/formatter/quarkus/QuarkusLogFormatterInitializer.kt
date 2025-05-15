@@ -20,20 +20,25 @@ class QuarkusLogFormatterInitializer {
 
     @JvmOverloads
     fun initQuarkusLogFormatter(config: LogFormatterConfig = LogFormatterConfig()): Handler? {
-        val rootLogger = LogManager.getLogManager().getLogger("")
+        try {
+            val rootLogger = LogManager.getLogManager().getLogger("")
 
-        // the first struggle is to find the ConsoleHandler which is wrapped in a QuarkusDelayedHandler and
-        // in dev and test mode in another anonymous Handler and may in an AsyncHandler if
-        // quarkus.log.console.async is set to true
-        val consoleHandler = findConsoleHandler(rootLogger)
+            // the first struggle is to find the ConsoleHandler which is wrapped in a QuarkusDelayedHandler and
+            // in dev and test mode in another anonymous Handler and may in an AsyncHandler if
+            // quarkus.log.console.async is set to true
+            val consoleHandler = findConsoleHandler(rootLogger)
 
-        // the next struggle is to find the PatternFormatter, which may again is wrapped, e.g. if banner is activated
-        val formatter = consoleHandler?.let { findPatternFormatter(it) }
+            // the next struggle is to find the PatternFormatter, which may again is wrapped, e.g. if banner is activated
+            val formatter = consoleHandler?.let { findPatternFormatter(it) }
 
-        // and the last one is to find the field formatters like ExceptionFormatter - which again are anonymous classes
-        formatter?.let { patchFormatters(it, config) }
+            // and the last one is to find the field formatters like ExceptionFormatter - which again are anonymous classes
+            formatter?.let { patchFormatters(it, config) }
 
-        return consoleHandler
+            return consoleHandler
+        } catch (e: Throwable) {
+            logError("Could not modify ConsoleHandler to format console log output", e)
+            return null
+        }
     }
 
 
@@ -48,22 +53,26 @@ class QuarkusLogFormatterInitializer {
                         return it
                     }
 
-                    val wrappedHandlerClass = wrappedHandler.javaClass
+                    try {
+                        val wrappedHandlerClass = wrappedHandler.javaClass
 
-                    // Quarkus creates ConsoleHandler in LoggingSetupRecorder.configureConsoleHandler() method and
-                    // in dev and test mode wraps it in an anonymous Handler
-                    val enclosingMethod = wrappedHandlerClass.enclosingMethod
-                    if (enclosingMethod != null && enclosingMethod.name == "configureConsoleHandler" &&
-                        enclosingMethod.declaringClass.name == "io.quarkus.runtime.logging.LoggingSetupRecorder") {
-                        val delegateField = wrappedHandlerClass.declaredFields.firstOrNull { it.name.contains("delegate") }
-                        if (delegateField != null) {
-                            if (delegateField.trySetAccessible()) {
-                                val delegate = delegateField.get(wrappedHandler)
-                                if (delegate is ConsoleHandler) {
-                                    return delegate
+                        // Quarkus creates ConsoleHandler in LoggingSetupRecorder.configureConsoleHandler() method and
+                        // in dev and test mode wraps it in an anonymous Handler
+                        val enclosingMethod = wrappedHandlerClass.enclosingMethod
+                        if (enclosingMethod != null && enclosingMethod.name == "configureConsoleHandler" &&
+                            enclosingMethod.declaringClass.name == "io.quarkus.runtime.logging.LoggingSetupRecorder") {
+                            val delegateField = wrappedHandlerClass.declaredFields.firstOrNull { it.name.contains("delegate") }
+                            if (delegateField != null) {
+                                if (delegateField.trySetAccessible()) {
+                                    val delegate = delegateField.get(wrappedHandler)
+                                    if (delegate is ConsoleHandler) {
+                                        return delegate
+                                    }
                                 }
                             }
                         }
+                    } catch (e: Throwable) {
+                        logError("Could not find ConsoleHandler delegate created in LoggingSetupRecorder", e)
                     }
                 }
             } else {
@@ -85,20 +94,24 @@ class QuarkusLogFormatterInitializer {
 
 
     private fun findPatternFormatter(handler: ConsoleHandler): PatternFormatter? {
-        val formatter = handler.formatter
-        if (formatter is PatternFormatter) {
-            return formatter
-        } else if (formatter is ExtFormatter.Delegating) { // e.g. TextBannerFormatter, which is used in case of activated banner, is derived from ExtFormatter.Delegating
-            val delegatingFormatterClass = ExtFormatter.Delegating::class.java
-            val delegateField = delegatingFormatterClass.declaredFields.firstOrNull { it.name == "delegate" }
-            if (delegateField != null) {
-                if (delegateField.trySetAccessible()) {
-                    val delegate = delegateField.get(formatter) as? Formatter
-                    if (delegate is PatternFormatter) {
-                        return delegate
+        try {
+            val formatter = handler.formatter
+            if (formatter is PatternFormatter) {
+                return formatter
+            } else if (formatter is ExtFormatter.Delegating) { // e.g. TextBannerFormatter, which is used in case of activated banner, is derived from ExtFormatter.Delegating
+                val delegatingFormatterClass = ExtFormatter.Delegating::class.java
+                val delegateField = delegatingFormatterClass.declaredFields.firstOrNull { it.name == "delegate" }
+                if (delegateField != null) {
+                    if (delegateField.trySetAccessible()) {
+                        val delegate = delegateField.get(formatter) as? Formatter
+                        if (delegate is PatternFormatter) {
+                            return delegate
+                        }
                     }
                 }
             }
+        } catch (e: Throwable) {
+            logError("Could not find PatternFormatter in ConsoleHandler", e)
         }
 
         return null
@@ -134,38 +147,49 @@ class QuarkusLogFormatterInitializer {
         }
 
     private fun unwrapStep(step: FormatStep, index: Int): FormatStepInfo {
-        val delegateField = step.javaClass.declaredFields.firstOrNull { it.name == "delegate" }
-        if (delegateField != null) {
-            if (delegateField.trySetAccessible()) {
-                val delegate = delegateField.get(step)
-                if (delegate is FormatStep) {
-                    return FormatStepInfo(step, getStepType(delegate), index, delegate, delegateField)
+        try {
+            val delegateField = step.javaClass.declaredFields.firstOrNull { it.name == "delegate" }
+            if (delegateField != null) {
+                if (delegateField.trySetAccessible()) {
+                    val delegate = delegateField.get(step)
+                    if (delegate is FormatStep) {
+                        return FormatStepInfo(step, getStepType(delegate), index, delegate, delegateField)
+                    }
                 }
             }
+        } catch (e: Throwable) {
+            logError("Could not unwrap delegate of step $step at index $index", e)
         }
 
         return FormatStepInfo(step, getStepType(step), index, null, null)
     }
 
     private fun getStepType(step: FormatStep): ItemType? {
-        val stepClass = step.javaClass
+        try {
+            val stepClass = step.javaClass
 
-        val itemTypeField = stepClass.declaredMethods.firstOrNull { it.name == "getItemType" && it.parameterTypes.isEmpty() && it.returnType == ItemType::class.java }
-        if (itemTypeField != null) {
-            itemTypeField.trySetAccessible()
-            return itemTypeField.invoke(step) as ItemType?
-        }
-
-        val fields = stepClass.declaredFields
-
-        val enclosingMethod = stepClass.enclosingMethod
-        if (enclosingMethod != null && enclosingMethod.declaringClass == Formatters::class.java) {
-            if (enclosingMethod.name == "exceptionFormatStep") {
-                return ItemType.EXCEPTION_TRACE
+            val itemTypeField = stepClass.declaredMethods.firstOrNull { it.name == "getItemType" && it.parameterTypes.isEmpty() && it.returnType == ItemType::class.java }
+            if (itemTypeField != null) {
+                itemTypeField.trySetAccessible()
+                return itemTypeField.invoke(step) as ItemType?
             }
+
+            val enclosingMethod = stepClass.enclosingMethod
+            if (enclosingMethod != null && enclosingMethod.declaringClass == Formatters::class.java) {
+                if (enclosingMethod.name == "exceptionFormatStep") {
+                    return ItemType.EXCEPTION_TRACE
+                }
+            }
+        } catch (e: Throwable) {
+            logError("Could not get step type of $step", e)
         }
 
         return null
+    }
+
+
+    private fun logError(message: String, error: Throwable?) {
+        Logger.getLogger(QuarkusLogFormatterInitializer::class.java.name).log(Level.SEVERE, message, error)
     }
 
 }
