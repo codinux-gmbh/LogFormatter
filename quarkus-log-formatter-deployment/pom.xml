@@ -35,6 +35,37 @@
         </dependency>
     </dependencies>
 
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>codinux</id>
+            <name>codinux GmbH &amp; Co. KG</name>
+            <email>git@codinux.net</email>
+            <url>https://codinux.net/</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:codinux-gmbh/LogFormatter.git</connection>
+        <url>scm:git:git@github.com:codinux-gmbh/LogFormatter.git</url>
+        <developerConnection>scm:git:git@github.com:codinux-gmbh/LogFormatter.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/codinux-gmbh/LogFormatter/issues/</url>
+    </issueManagement>
+
+
     <build>
         <plugins>
             <plugin>
@@ -51,6 +82,32 @@
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
