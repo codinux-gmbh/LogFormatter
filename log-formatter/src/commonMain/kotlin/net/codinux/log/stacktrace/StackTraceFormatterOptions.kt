@@ -61,4 +61,59 @@ data class StackTraceFormatterOptions(
     companion object {
         val Default = StackTraceFormatterOptions()
     }
+
+    open class Builder {
+        protected var messageLineIndent: String = ""
+        protected var stackFrameIndent: String = "    "
+
+        protected var causedByIndent: String = ""
+        protected var causedByMessagePrefix: String = "Caused by:"
+
+        protected var ignoreSuppressedExceptions: Boolean = false
+        protected var suppressedExceptionIndent: String = "    "
+        protected var suppressedExceptionMessagePrefix: String = "Suppressed:"
+
+        protected var rootCauseFirst: Boolean = false
+        protected var wrappedByIndent: String = causedByIndent
+        protected var wrappedByMessagePrefix: String = "Wrapped by:"
+
+        protected var lineSeparator: String = LineSeparator.System
+        protected var ellipsis: String = "..."
+        protected var maxStackTraceStringLength: Int? = null
+
+        fun messageLineIndent(value: String) = apply { messageLineIndent = value }
+        fun stackFrameIndent(value: String) = apply { stackFrameIndent = value }
+
+        fun causedByIndent(value: String) = apply { causedByIndent = value }
+        fun causedByMessagePrefix(value: String) = apply { causedByMessagePrefix = value }
+
+        fun ignoreSuppressedExceptions(value: Boolean) = apply { ignoreSuppressedExceptions = value }
+        fun suppressedExceptionIndent(value: String) = apply { suppressedExceptionIndent = value }
+        fun suppressedExceptionMessagePrefix(value: String) = apply { suppressedExceptionMessagePrefix = value }
+
+        fun rootCauseFirst(value: Boolean) = apply { rootCauseFirst = value }
+        fun wrappedByIndent(value: String) = apply { wrappedByIndent = value }
+        fun wrappedByMessagePrefix(value: String) = apply { wrappedByMessagePrefix = value }
+
+        fun lineSeparator(value: String) = apply { lineSeparator = value }
+        fun ellipsis(value: String) = apply { ellipsis = value }
+        fun maxStackTraceStringLength(value: Int?) = apply { maxStackTraceStringLength = value }
+
+        fun build() = StackTraceFormatterOptions(
+            messageLineIndent = messageLineIndent,
+            stackFrameIndent = stackFrameIndent,
+            causedByIndent = causedByIndent,
+            causedByMessagePrefix = causedByMessagePrefix,
+            ignoreSuppressedExceptions = ignoreSuppressedExceptions,
+            suppressedExceptionIndent = suppressedExceptionIndent,
+            suppressedExceptionMessagePrefix = suppressedExceptionMessagePrefix,
+            rootCauseFirst = rootCauseFirst,
+            wrappedByIndent = wrappedByIndent,
+            wrappedByMessagePrefix = wrappedByMessagePrefix,
+            lineSeparator = lineSeparator,
+            ellipsis = ellipsis,
+            maxStackTraceStringLength = maxStackTraceStringLength
+        )
+    }
+
 }
