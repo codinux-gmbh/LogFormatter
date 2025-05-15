@@ -1,6 +1,8 @@
 package net.codinux.log.stacktrace
 
-open class StackTraceShortener(
+import kotlin.jvm.JvmOverloads
+
+open class StackTraceShortener @JvmOverloads constructor(
     protected val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
 ) {

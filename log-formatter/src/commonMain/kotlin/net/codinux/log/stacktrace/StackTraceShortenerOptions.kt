@@ -1,6 +1,8 @@
 package net.codinux.log.stacktrace
 
-data class StackTraceShortenerOptions(
+import kotlin.jvm.JvmOverloads
+
+data class StackTraceShortenerOptions @JvmOverloads constructor(
     /**
      * If set to a value greater 0, adds only the first `maxFramesPerThrowable` stack frames
      * per `Throwable` to stack trace and a line indicating how many frames were omitted.

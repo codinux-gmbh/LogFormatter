@@ -1,8 +1,9 @@
 package net.codinux.log.classname
 
+import kotlin.jvm.JvmOverloads
 import kotlin.math.max
 
-open class ClassNameAbbreviator(
+open class ClassNameAbbreviator @JvmOverloads constructor(
     protected val options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default
 ) {
 

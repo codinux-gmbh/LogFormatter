@@ -1,6 +1,8 @@
 package net.codinux.log.classname
 
-data class ClassNameAbbreviatorOptions(
+import kotlin.jvm.JvmOverloads
+
+data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
     /**
      * The abbreviation strategy that is used if class name exceeds `maxLength`.
      *

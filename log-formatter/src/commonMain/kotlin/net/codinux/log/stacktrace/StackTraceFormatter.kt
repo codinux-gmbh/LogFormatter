@@ -1,16 +1,21 @@
 package net.codinux.log.stacktrace
 
-open class StackTraceFormatter(
+import kotlin.jvm.JvmOverloads
+
+open class StackTraceFormatter @JvmOverloads constructor(
     protected val options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default,
     protected val stackTraceShortener: StackTraceShortener = StackTraceShortener.Default
 ) {
 
+    @JvmOverloads
     open fun format(throwable: Throwable, options: StackTraceFormatterOptions = this.options) =
         format(stackTraceShortener.shorten(throwable), options)
 
+    @JvmOverloads
     open fun format(stackTrace: StackTrace, options: StackTraceFormatterOptions = this.options) =
         format(stackTraceShortener.shorten(stackTrace), options)
 
+    @JvmOverloads
     open fun format(stackTrace: ShortenedStackTrace, options: StackTraceFormatterOptions = this.options): String {
         val builder = StringBuilder()
 
