@@ -24,7 +24,7 @@
 
         <dependency>
             <groupId>net.codinux.log</groupId>
-            <artifactId>quarkus-log-formatter-logic</artifactId>
+            <artifactId>log-formatter-jvm</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

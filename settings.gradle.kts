@@ -27,7 +27,6 @@ rootProject.name = "LogFormatter"
 
 
 include("log-formatter")
-include("quarkus-log-formatter-logic")
 
 include("QuarkusLogFormatterSampleApp")
 project(":QuarkusLogFormatterSampleApp").apply {
