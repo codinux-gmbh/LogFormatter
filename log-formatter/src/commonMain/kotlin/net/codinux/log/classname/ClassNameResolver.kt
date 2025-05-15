@@ -2,7 +2,7 @@ package net.codinux.log.classname
 
 import net.codinux.log.extensions.substringAfterLastOrNull
 import net.codinux.log.extensions.substringBeforeLastOrNull
-import net.codinux.log.platform.LogUtilsPlatform
+import net.codinux.log.platform.LogFormatterPlatform
 import kotlin.reflect.KClass
 
 object ClassNameResolver {
@@ -15,7 +15,7 @@ object ClassNameResolver {
 
         var packageName: String? = null
         var className: String
-        if (LogUtilsPlatform.supportsPackageNames) {
+        if (LogFormatterPlatform.supportsPackageNames) {
             packageName = cleanedClassToString.substringBeforeLastOrNull('.')
             className = cleanedClassToString.substringAfterLast('.')
 

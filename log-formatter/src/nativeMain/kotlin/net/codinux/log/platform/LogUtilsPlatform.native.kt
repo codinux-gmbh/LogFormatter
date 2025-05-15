@@ -4,7 +4,7 @@ import net.codinux.log.classname.ClassNameComponents
 import net.codinux.log.classname.ClassNameResolver
 import kotlin.reflect.KClass
 
-actual object LogUtilsPlatform {
+actual object LogFormatterPlatform {
 
     actual val supportsPackageNames = true
 
