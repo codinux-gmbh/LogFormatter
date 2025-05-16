@@ -1,5 +1,5 @@
 # Log Formatter
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-utils)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-formatter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-formatter)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Utilities common to loggers like [klf](https://github.com/codinux-gmbh/klf) or [LokiLogAppender](https://github.com/codinux-gmbh/LokiLogAppender) like determining and shortening logger name from `KClass` or shortening and formatting stack trace.
@@ -10,7 +10,7 @@ Utilities common to loggers like [klf](https://github.com/codinux-gmbh/klf) or [
 ### Gradle
 
 ```
-implementation("net.codinux.log:log-utils:1.0.0")
+implementation("net.codinux.log:log-formatter:1.0.0")
 ```
 
 ### Maven
@@ -18,7 +18,7 @@ implementation("net.codinux.log:log-utils:1.0.0")
 ```xml
 <dependency>
    <groupId>net.codinux.log</groupId>
-   <artifactId>log-utils-jvm</artifactId>
+   <artifactId>log-formatter-jvm</artifactId>
    <version>1.0.0</version>
 </dependency>
 ```
