@@ -7,8 +7,6 @@
 
 Use it anywhere Kotlin runs (JVM, JS, Native) to produce highly customizable, clean, consistent, and compact log output.
 
-Used e.g. by [Kotlin logging facade](https://github.com/codinux-gmbh/klf) and [LokiLogAppender](https://github.com/codinux-gmbh/LokiLogAppender) for determining and shortening logger name from `KClass` or shortening and formatting stack trace.
-
 
 ## Features
 
@@ -133,6 +131,10 @@ println(formatter.format(throwable, StackTraceFormatterOptions(
     lineSeparator = LineSeparator.System // or Unix or Windows ...
 )))
 ```
+
+## Used by
+
+Used e.g. by [Kotlin logging facade](https://github.com/codinux-gmbh/klf) and [LokiLogAppender](https://github.com/codinux-gmbh/LokiLogAppender) for determining and shortening logger name from `KClass` or shortening and formatting stack trace.
 
 
 ## License
