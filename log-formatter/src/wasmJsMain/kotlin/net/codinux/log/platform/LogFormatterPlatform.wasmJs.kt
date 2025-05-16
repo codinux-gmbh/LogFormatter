@@ -1,6 +1,8 @@
 package net.codinux.log.platform
 
+import net.codinux.log.classname.ClassInfo
 import net.codinux.log.classname.ClassNameComponents
+import net.codinux.log.classname.ClassType
 import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
@@ -17,13 +19,18 @@ actual object LogFormatterPlatform {
 
         val simpleName = forClass.simpleName
 
-        val className = if (simpleName == "<no name provided>") { // anonymous class
-            "<anonymous class>"
+        // on WASM we cannot detect Objects, inner and local classes
+        val (type, className) = if (simpleName == "<no name provided>") { // anonymous class
+            ClassType.AnonymousClass to "<anonymous class>"
+        } else if (simpleName?.contains('$') == true) { // Lambda
+            ClassType.Function to simpleName
+        } else if (simpleName == "Companion") {
+            ClassType.CompanionObject to simpleName
         } else {
-            simpleName
+            ClassType.Class to simpleName
         }
 
-        return ClassInfo(classNameWithoutPackageName = className)
+        return ClassInfo(classNameWithoutPackageName = className, type = type)
     }
 
 }

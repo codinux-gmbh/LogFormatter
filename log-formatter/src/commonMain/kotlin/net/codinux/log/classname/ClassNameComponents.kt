@@ -11,6 +11,13 @@ data class ClassNameComponents(
     val packageName: String? = null,
 
     /**
+     * The type of the class.
+     *
+     * Be aware that it's not fully reliable.
+     */
+    val type: ClassType,
+
+    /**
      * The outmost top level class that contains this (nested) class.
      *
      * Only differs from [className] if it's a inner, local, anonymous class

@@ -14,10 +14,12 @@ object ClassNameResolver {
 
         val classInfo = LogFormatterPlatform.getClassInfo(forClass)
 
-        return getClassNameComponentsFromString(forClass, classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName)
+        return getClassNameComponentsFromString(forClass, classInfo)
     }
 
-    private fun getClassNameComponentsFromString(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
+    private fun getClassNameComponentsFromString(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
+        val qualifiedName = classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName
+
         val classToString = forClass.toString()
         val cleanedClassToString = removeAnonymousClassesNumberSuffixes(clean(classToString))
 
@@ -56,7 +58,7 @@ object ClassNameResolver {
         val companionOwnerClassName = if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                     else null
 
-        return ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName)
+        return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
     }
 
     private fun clean(classToString: String): String {

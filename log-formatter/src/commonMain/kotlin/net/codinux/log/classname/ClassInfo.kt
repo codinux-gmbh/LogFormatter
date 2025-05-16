@@ -13,5 +13,12 @@ data class ClassInfo(
     /**
      * On JS and WASM: The class name without package name.
      */
-    val classNameWithoutPackageName: String? = null
+    val classNameWithoutPackageName: String? = null,
+
+    /**
+     * The type of the class.
+     *
+     * Be aware that it's not fully reliable.
+     */
+    val type: ClassType? = null
 )

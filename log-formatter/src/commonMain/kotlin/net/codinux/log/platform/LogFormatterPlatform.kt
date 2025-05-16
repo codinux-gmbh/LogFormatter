@@ -1,5 +1,6 @@
 package net.codinux.log.platform
 
+import net.codinux.log.classname.ClassInfo
 import net.codinux.log.classname.ClassNameComponents
 import kotlin.reflect.KClass
 

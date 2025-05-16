@@ -1,7 +1,9 @@
 package net.codinux.log.platform
 
+import net.codinux.log.classname.ClassInfo
 import net.codinux.log.classname.ClassNameComponents
 import net.codinux.log.classname.ClassNameResolver
+import net.codinux.log.classname.ClassType
 import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
@@ -28,7 +30,7 @@ actual object LogFormatterPlatform {
         val declaringClassName = if (isCompanionObject == false || declaringClass != javaClass.enclosingClass) declaringClass?.simpleName else null
         val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
 
-        return ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName)
+        return ClassNameComponents(className, packageName, determineType(forClass, javaClass, isCompanionObject), declaringClassName, companionOwnerClassName)
     }
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
@@ -46,5 +48,22 @@ actual object LogFormatterPlatform {
 
         return javaClass.declaringClass ?: javaClass.enclosingClass
     }
+
+    private fun <T : Any> determineType(forClass: KClass<T>, javaClass: Class<T>, isCompanionObject: Boolean): ClassType =
+        if (isCompanionObject) {
+            ClassType.CompanionObject
+        } else if (javaClass.isLocalClass) {
+            ClassType.LocalClass
+        } else if (javaClass.isAnnotation) {
+            ClassType.AnonymousClass
+        } else if (javaClass.declaringClass != null) { // TODO: or add kotlin-reflect and use forClass.isInner
+            ClassType.InnerClass
+        }
+        // only a guess, without certainty // TODO: or add kotlin-reflect and use forClass.isFun
+        else if (javaClass.enclosingMethod != null || javaClass.enclosingConstructor != null || javaClass.enclosingClass != null) {
+            ClassType.Function
+        } else {
+            ClassType.Class
+        }
 
 }
