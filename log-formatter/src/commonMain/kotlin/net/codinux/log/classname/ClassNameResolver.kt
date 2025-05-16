@@ -1,11 +1,12 @@
 package net.codinux.log.classname
 
 import net.codinux.log.extensions.substringAfterLastOrNull
-import net.codinux.log.extensions.substringBeforeLastOrNull
 import net.codinux.log.platform.LogFormatterPlatform
 import kotlin.reflect.KClass
 
-open class ClassNameResolver {
+open class ClassNameResolver(
+    protected open val qualifiedClassNameParser: QualifiedClassNameParser = QualifiedClassNameParser()
+) {
 
     companion object {
         val Default = ClassNameResolver()
@@ -24,9 +25,10 @@ open class ClassNameResolver {
 
     protected open fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
         var (className, packageName) = if (classInfo.qualifiedClassName != null) {
-            extractClassAndPackageNameFromQualifiedClassName(classInfo.qualifiedClassName).let {
-                it.className to it.packageName
-            }
+            val classAndPackageName = qualifiedClassNameParser.extractClassAndPackageName(
+                removeAnonymousClassesNumberSuffixes(clean(classInfo.qualifiedClassName))
+            )
+            classAndPackageName.className to classAndPackageName.packageName
         } else {
             val simpleName = classInfo.classNameWithoutPackageName ?: forClass.toString()
             removeAnonymousClassesNumberSuffixes(clean(simpleName)) to null
@@ -49,24 +51,6 @@ open class ClassNameResolver {
                                     else null
 
         return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
-    }
-
-    protected open fun extractClassAndPackageNameFromQualifiedClassName(qualifiedClassName: String): ClassAndPackageName {
-        val qualifiedName = removeAnonymousClassesNumberSuffixes(clean(qualifiedClassName))
-
-        var packageName = qualifiedName.substringBeforeLastOrNull('.')
-        var className = qualifiedName.substringAfterLast('.')
-
-        // for Companion objects including name of enclosing class in className
-        if ((className == "Companion" || className.startsWith("Companion$")) && packageName != null) {
-            val indexOfSecondLastDot = packageName.lastIndexOf('.')
-            if (indexOfSecondLastDot >= 0) {
-                packageName = packageName.substring(0, indexOfSecondLastDot)
-                className = qualifiedName.substring(indexOfSecondLastDot + 1)
-            }
-        }
-
-        return ClassAndPackageName(className, packageName)
     }
 
     protected open fun clean(classToString: String): String {

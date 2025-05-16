@@ -36,7 +36,7 @@ class ClassNameResolverTest {
         val result = underTest.getClassNameComponents(DeclaringClass.Companion::class)
 
         if (Platform.isJsBrowserOrNodeJs) {
-            assertClassName(result, "Companion_2")
+            assertClassName(result, "Companion_3")
         } else {
             // assert companionOwnerClassName correctly removes ".Companion" from class name
             assertClassName(result, "DeclaringClass.Companion", companionOwnerClassName = "DeclaringClass")
@@ -58,7 +58,7 @@ class ClassNameResolverTest {
         val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.Companion::class)
 
         if (Platform.isJsBrowserOrNodeJs) {
-            assertClassName(result, "Companion_1")
+            assertClassName(result, "Companion_2")
         } else {
             // assert companionOwnerClassName correctly removes ".Companion" from class name and that declaring class
             // differs from companion object owner is detected
