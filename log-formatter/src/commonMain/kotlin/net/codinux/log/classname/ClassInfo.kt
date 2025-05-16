@@ -1,4 +1,4 @@
-package net.codinux.log.platform
+package net.codinux.log.classname
 
 data class ClassInfo(
     /**
