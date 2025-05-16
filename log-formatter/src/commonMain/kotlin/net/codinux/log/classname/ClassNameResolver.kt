@@ -16,9 +16,7 @@ object ClassNameResolver {
         return getClassNameComponentsFromString(forClass, classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName)
     }
 
-    fun getClassNameComponentsFromString(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
-        println("qualifiedName: ${qualifiedName}, simpleName: ${forClass.simpleName}, toString(): ${forClass.toString()}") // TODO: remove again
-
+    private fun getClassNameComponentsFromString(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
         val classToString = forClass.toString()
         val cleanedClassToString = removeAnonymousClassesNumberSuffixes(clean(classToString))
 
@@ -76,7 +74,7 @@ object ClassNameResolver {
     /**
      * Remove anonymous class number suffixes like '$1$2'.
      */
-    private fun removeAnonymousClassesNumberSuffixes(name: String): String {
+    fun removeAnonymousClassesNumberSuffixes(name: String): String {
         var cleaned = name
 
         var stringAfterLastDollarSign = cleaned.substringAfterLastOrNull('$')

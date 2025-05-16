@@ -9,19 +9,17 @@ actual object LogFormatterPlatform {
     actual val supportsPackageNames = true
 
 
-    actual fun <T : Any> getQualifiedClassName(forClass: KClass<T>): String =
-        ClassNameResolver.getQualifiedClassName(forClass, getDeclaringClass = false)
-
     actual fun <T : Any> getClassInfo(forClass: KClass<T>): PlatformClassInfo {
         val javaClass = forClass.java
 
         val packageName = javaClass.`package`?.name
-        val className = (if (packageName != null) javaClass.name.substringAfter("$packageName.") else javaClass.name)
-            .replace('$', '.')
+        var className = if (packageName != null) javaClass.name.substringAfter("$packageName.") else javaClass.name
+        className = ClassNameResolver.removeAnonymousClassesNumberSuffixes(className)
+        className = className.replace('$', '.')
 
-        var declaringClass: Class<*>? = javaClass.declaringClass
-        while (declaringClass?.declaringClass != null) {
-            declaringClass = declaringClass.declaringClass
+        var declaringClass: Class<*>? = getDeclaringClass(javaClass)
+        while (declaringClass != null && getDeclaringClass(declaringClass) != null) {
+            declaringClass = getDeclaringClass(declaringClass)
         }
 
         // TODO: or add kotlin-reflect and use forClass.isCompanion as check (+ use above while on enclosing class to get owner class name)
@@ -31,6 +29,18 @@ actual object LogFormatterPlatform {
         val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
 
         return PlatformClassInfo(ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName))
+    }
+
+    private fun getDeclaringClass(javaClass: Class<*>): Class<*>? {
+        javaClass.enclosingMethod?.let { enclosingMethod ->
+            return enclosingMethod.declaringClass
+        }
+
+        javaClass.enclosingConstructor?.let { enclosingConstructor ->
+            return enclosingConstructor.declaringClass
+        }
+
+        return javaClass.declaringClass ?: javaClass.enclosingClass
     }
 
 }

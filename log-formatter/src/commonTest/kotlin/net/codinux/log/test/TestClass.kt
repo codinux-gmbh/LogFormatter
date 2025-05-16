@@ -2,13 +2,17 @@ package net.codinux.log.test
 
 import kotlin.jvm.JvmInline
 
-object TestObject
+object TestObject {
+    const val packageName = "net.codinux.log.test"
+
+    val AnonymousClass = object : Throwable() {}
+
+    val Lambda = { x: Int -> x * 2 }
+}
 
 class DeclaringClass {
 
-    companion object {
-        const val packageName = "net.codinux.log.test"
-    }
+    companion object
 
     class InnerClass {
         companion object
