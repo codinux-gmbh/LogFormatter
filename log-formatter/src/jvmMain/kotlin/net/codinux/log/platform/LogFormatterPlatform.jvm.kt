@@ -31,8 +31,20 @@ actual object LogFormatterPlatform {
     }
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
-        ClassInfo(forClass.qualifiedName ?: forClass.toString(), forClass.simpleName)
+        ClassInfo(getQualifiedName(forClass), forClass.simpleName)
 
+
+    private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
+        if (forClass.qualifiedName != null) {
+            forClass.qualifiedName
+        } else { // for lambdas, anonymous and local classes qualified name is null
+            val qualifiedName = forClass.toString()
+            if (qualifiedName.startsWith("class ")) {
+                qualifiedName.substring("class ".length)
+            } else {
+                qualifiedName
+            }
+        }
 
     private fun getDeclaringClass(javaClass: Class<*>): Class<*>? {
         javaClass.enclosingMethod?.let { enclosingMethod ->
