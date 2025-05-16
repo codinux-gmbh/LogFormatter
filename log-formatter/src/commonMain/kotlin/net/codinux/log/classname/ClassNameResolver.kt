@@ -35,7 +35,8 @@ object ClassNameResolver {
                 }
             }
         } else {
-            className = qualifiedName ?: cleanedClassToString
+            className = qualifiedName?.let { removeAnonymousClassesNumberSuffixes(clean(it)) }
+                ?: cleanedClassToString
         }
 
         if (className.endsWith("\$Companion")) {

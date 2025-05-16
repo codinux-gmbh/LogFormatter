@@ -2,6 +2,9 @@ package net.codinux.log.classname
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import net.codinux.kotlin.platform.Platform
+import net.codinux.kotlin.platform.PlatformType
+import net.codinux.kotlin.platform.isJavaScript
 import net.codinux.log.test.TestInlineClass
 import net.codinux.log.test.DeclaringClass
 import net.codinux.log.test.TestObject
@@ -77,14 +80,15 @@ class ClassNameResolverTest {
         assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalClass.LocalClass", "ClassNameResolverTest", null, ThisClassPackageName)
     }
 
-
-    // TODO: getting class name components of anonymous classes and lambdas does not work on JS and WASM
-
     @Test
     fun getClassNameComponents_ReferencedAnonymousClass() {
         val result = underTest.getClassNameComponents(TestObject.AnonymousClass::class)
 
-        assertClassName(result, "TestObject.AnonymousClass", "TestObject", null)
+        if (Platform.type == PlatformType.WasmJs) { // for anonymous classes WASM only returns "<no name provided>"
+            assertClassName(result, "<anonymous class>")
+        } else {
+            assertClassName(result, "TestObject.AnonymousClass", "TestObject", null)
+        }
     }
 
     @Test
@@ -93,14 +97,24 @@ class ClassNameResolverTest {
 
         val result = underTest.getClassNameComponents(anonymous::class)
 
-        assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalAnonymousClass.anonymous", "ClassNameResolverTest", null, ThisClassPackageName)
+        if (Platform.type == PlatformType.WasmJs) { // for anonymous classes WASM only returns "<no name provided>"
+            assertClassName(result, "<anonymous class>")
+        } else {
+            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalAnonymousClass.anonymous", "ClassNameResolverTest", null, ThisClassPackageName)
+        }
     }
 
     @Test
     fun getClassNameComponents_ReferencedLambda() {
         val result = underTest.getClassNameComponents(TestObject.Lambda::class)
 
-        assertClassName(result, "TestObject.Lambda", "TestObject", null)
+        if (Platform.type == PlatformType.WasmJs) {
+            assertClassName(result, "TestObject.Lambda.lambda", "TestObject")
+        } else if (Platform.isJavaScript) { // for lambdas JS only returns "Function<index>"
+            assertClassName(result, "Function1")
+        } else {
+            assertClassName(result, "TestObject.Lambda", "TestObject")
+        }
     }
 
     @Test
@@ -109,16 +123,19 @@ class ClassNameResolverTest {
 
         val result = underTest.getClassNameComponents(lambda::class)
 
-        assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalLambda.lambda", "ClassNameResolverTest", null, ThisClassPackageName)
+        if (Platform.type in listOf(PlatformType.JsBrowser, PlatformType.JsNodeJs)) { // for lambdas JS only returns "Function<index>"
+            assertClassName(result, "Function1")
+        } else {
+            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalLambda.lambda", "ClassNameResolverTest", null, ThisClassPackageName)
+        }
     }
 
 
     private fun assertClassName(result: ClassNameComponents, className: String, declaringClassName: String? = null,
                                 companionOwnerClassName: String? = null, packageName: String = TestObject.packageName) {
 
-        println("components = $result") // TODO: remove again
-
-        if (TestPlatform.SupportsDetailedClassName) {
+        // JS supports getting enclosing class only for local and anonymous classes, WASM only for Lambdas
+        if (TestPlatform.SupportsDetailedClassName || result.declaringClassName != null) {
             assertThat(result::className).isEqualTo(className)
 
             assertThat(result::companionOwnerClassName).isEqualTo(companionOwnerClassName)
@@ -126,7 +143,8 @@ class ClassNameResolverTest {
             assertThat(result::className).isEqualTo(className.substringAfterLast('.'))
         }
 
-        if (TestPlatform.SupportsDeterminingDeclaringClassName) {
+        // JS supports getting enclosing class only for local and anonymous classes, WASM only for Lambdas
+        if (TestPlatform.SupportsDeterminingDeclaringClassName || result.declaringClassName != null) {
             assertThat(result::declaringClassName).isEqualTo(declaringClassName)
         }
 
