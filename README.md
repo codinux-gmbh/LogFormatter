@@ -1,24 +1,24 @@
-# Log Formatter for Kotlin Multiplatform
+# Log Formatter for Kotlin (Multiplatform)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-formatter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.codinux.log/log-formatter)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
-**Log Formatter** brings the powerful log formatting capabilities of Logback as a logging framework independent implementation to all Kotlin Multiplatform targets.
+**Log Formatter** brings the powerful `Logback` log formatting capabilities as a logging framework independent implementation to all Kotlin Multiplatform targets.
 
 Use it anywhere Kotlin runs (JVM, JS, Native) to produce highly customizable, clean, consistent, and compact log output.
 
 
 ## Features
 
-* **Class Name Utilities**
+* **Class Name**
 
-    * Extract class name, package, enclosing and declaring class from `KClass` or fully qualified name strings
-    * Shorten class names for compact log output
+  * Shorten class names for compact log output
+  * Extract class name, package, enclosing and declaring class from `KClass` or fully qualified name strings
 
-* **Stack Trace Utilities**
+* **Stack Trace**
 
-    * Shorten stack traces: limit frames per throwable, count nested throwables
-    * Format stack traces: root cause first, max string length, and more
+  * Shorten stack traces: limit frames per throwable, count nested throwables
+  * Format stack traces: root cause first, max string length, and many more
 
 
 ## Setup
