@@ -42,6 +42,17 @@ implementation("net.codinux.log:log-formatter:1.0.0")
 ```
 
 
+## Configuration
+
+Each service class has a matching `<ServiceClassName>Options` class (e.g. `StackTraceFormatterOptions`). 
+Each of these provides a `.Default` object whose values match Logback’s default behavior.
+
+Each service class can be configured in two ways:
+
+  1. **Per instance** – used by default for all method calls (defaults to `.Default`)
+  2. **Per method call** – if provided overrides instance options for that specific call
+
+
 ## Usage
 
 ### Get class name for `KClass`
