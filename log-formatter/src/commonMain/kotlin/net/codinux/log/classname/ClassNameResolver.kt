@@ -18,28 +18,25 @@ object ClassNameResolver {
     }
 
     private fun getClassNameComponentsFromString(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
-        val qualifiedName = classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName
-
-        val classToString = forClass.toString()
-        val cleanedClassToString = removeAnonymousClassesNumberSuffixes(clean(classToString))
-
         var packageName: String? = null
         var className: String
-        if (LogFormatterPlatform.supportsPackageNames) {
-            packageName = cleanedClassToString.substringBeforeLastOrNull('.')
-            className = cleanedClassToString.substringAfterLast('.')
+
+        val qualifiedName = classInfo.qualifiedClassName?.let { removeAnonymousClassesNumberSuffixes(clean(it)) }
+        if (qualifiedName != null) {
+            packageName = qualifiedName.substringBeforeLastOrNull('.')
+            className = qualifiedName.substringAfterLast('.')
 
             // for Companion objects including name of enclosing class in className
             if ((className == "Companion" || className.startsWith("Companion$")) && packageName != null) {
                 val indexOfSecondLastDot = packageName.lastIndexOf('.')
                 if (indexOfSecondLastDot >= 0) {
                     packageName = packageName.substring(0, indexOfSecondLastDot)
-                    className = cleanedClassToString.substring(indexOfSecondLastDot + 1)
+                    className = qualifiedName.substring(indexOfSecondLastDot + 1)
                 }
             }
         } else {
-            className = qualifiedName?.let { removeAnonymousClassesNumberSuffixes(clean(it)) }
-                ?: cleanedClassToString
+            val simpleName = classInfo.classNameWithoutPackageName ?: forClass.toString()
+            className = removeAnonymousClassesNumberSuffixes(clean(simpleName))
         }
 
         if (className.endsWith("\$Companion")) {
