@@ -1,5 +1,6 @@
 package net.codinux.log.platform
 
+import net.codinux.log.classname.ClassNameComponents
 import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
@@ -7,7 +8,9 @@ actual object LogFormatterPlatform {
     actual val supportsPackageNames = false
 
 
-    actual fun <T : Any> getClassInfo(forClass: KClass<T>): PlatformClassInfo {
+    actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? = null // only senseful on JVM
+
+    actual fun <T : Any> getClassInfo(forClass: KClass<T>): ClassInfo {
 
         // unwrapping companion objects is not possible on JS. There as class / logger name "Companion" will be used
         // do not use forClass.qualifiedName on JS, it will produce an error
@@ -27,7 +30,7 @@ actual object LogFormatterPlatform {
             simpleName ?: jsName
         }
 
-        return PlatformClassInfo(classNameWithoutPackageName = className)
+        return ClassInfo(classNameWithoutPackageName = className)
     }
 
 }

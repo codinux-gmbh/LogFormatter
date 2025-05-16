@@ -1,15 +1,8 @@
 package net.codinux.log.platform
 
-import net.codinux.log.classname.ClassNameComponents
-
-data class PlatformClassInfo(
+data class ClassInfo(
     /**
-     * Only available on JVM, the full class name components.
-     */
-    val classNameComponents: ClassNameComponents? = null,
-
-    /**
-     * On native: the full qualified class name including package name.
+     * On Native and JVM: the full qualified class name including package name.
      *
      * The challenge here is to detect what is the class name and what is the package name.
      *

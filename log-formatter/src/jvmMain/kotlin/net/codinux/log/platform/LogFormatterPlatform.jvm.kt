@@ -9,7 +9,7 @@ actual object LogFormatterPlatform {
     actual val supportsPackageNames = true
 
 
-    actual fun <T : Any> getClassInfo(forClass: KClass<T>): PlatformClassInfo {
+    actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? {
         val javaClass = forClass.java
 
         val packageName = javaClass.`package`?.name
@@ -28,8 +28,12 @@ actual object LogFormatterPlatform {
         val declaringClassName = if (isCompanionObject == false || declaringClass != javaClass.enclosingClass) declaringClass?.simpleName else null
         val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
 
-        return PlatformClassInfo(ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName))
+        return ClassNameComponents(className, packageName, declaringClassName, companionOwnerClassName)
     }
+
+    actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
+        ClassInfo(forClass.qualifiedName ?: forClass.toString(), forClass.simpleName)
+
 
     private fun getDeclaringClass(javaClass: Class<*>): Class<*>? {
         javaClass.enclosingMethod?.let { enclosingMethod ->

@@ -8,10 +8,11 @@ import kotlin.reflect.KClass
 object ClassNameResolver {
 
     fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
-        val classInfo = LogFormatterPlatform.getClassInfo(forClass)
-        if (classInfo.classNameComponents != null) {
-            return classInfo.classNameComponents
+        LogFormatterPlatform.getClassComponents(forClass)?.let {
+            return it
         }
+
+        val classInfo = LogFormatterPlatform.getClassInfo(forClass)
 
         return getClassNameComponentsFromString(forClass, classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName)
     }
