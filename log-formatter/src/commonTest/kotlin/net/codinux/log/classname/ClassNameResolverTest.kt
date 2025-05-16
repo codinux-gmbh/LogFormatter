@@ -14,7 +14,7 @@ class ClassNameResolverTest {
     }
 
 
-    private val underTest = ClassNameResolver
+    private val underTest = ClassNameResolver()
 
 
     @Test

@@ -8,12 +8,15 @@ import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
 
+    private val classNameResolver = ClassNameResolver()
+
+
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? {
         val javaClass = forClass.java
 
         val packageName = javaClass.`package`?.name
         var className = if (packageName != null) javaClass.name.substringAfter("$packageName.") else javaClass.name
-        className = ClassNameResolver.removeAnonymousClassesNumberSuffixes(className)
+        className = classNameResolver.removeAnonymousClassesNumberSuffixes(className)
         className = className.replace('$', '.')
 
         var declaringClass: Class<*>? = getDeclaringClass(javaClass)

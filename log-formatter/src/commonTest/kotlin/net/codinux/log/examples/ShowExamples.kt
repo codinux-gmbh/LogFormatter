@@ -12,7 +12,7 @@ class ShowExamples {
     fun getClassNameComponents() {
         // get package name (not available on JavaScript and WASM), class name and enclosing class name
         // (in case of a Companion class, inner class, local class, anonymous function, lambda, ...)
-        val classNameComponents = ClassNameResolver.getClassNameComponents(TestClasses.OuterClass.InnerClass::class)
+        val classNameComponents = ClassNameResolver().getClassNameComponents(TestClasses.InnerClass::class)
     }
 
     fun extractStackTrace() {

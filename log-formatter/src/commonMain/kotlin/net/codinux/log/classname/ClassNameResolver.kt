@@ -5,7 +5,7 @@ import net.codinux.log.extensions.substringBeforeLastOrNull
 import net.codinux.log.platform.LogFormatterPlatform
 import kotlin.reflect.KClass
 
-object ClassNameResolver {
+class ClassNameResolver {
 
     fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
         LogFormatterPlatform.getClassComponents(forClass)?.let {
