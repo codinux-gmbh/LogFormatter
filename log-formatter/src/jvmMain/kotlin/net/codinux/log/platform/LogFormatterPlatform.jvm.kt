@@ -8,9 +8,6 @@ import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
 
-    actual val supportsPackageNames = true
-
-
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? {
         val javaClass = forClass.java
 

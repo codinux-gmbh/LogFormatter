@@ -7,9 +7,6 @@ import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
 
-    actual val supportsPackageNames = false
-
-
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? = null // only senseful on JVM
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>): ClassInfo {
