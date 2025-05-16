@@ -21,8 +21,7 @@ actual object LogFormatterPlatform {
             declaringClass = getDeclaringClass(declaringClass)
         }
 
-        // TODO: or add kotlin-reflect and use forClass.isCompanion as check (+ use above while on enclosing class to get owner class name)
-        val isCompanionObject = javaClass.simpleName == "Companion" && javaClass.enclosingClass != null
+        val isCompanionObject = isCompanionObject(javaClass)
         // only set if class is nested in another class and javaClass.declaringClass is not a Companion object's owner
         val declaringClassName = if (isCompanionObject == false || declaringClass != javaClass.enclosingClass) declaringClass?.simpleName else null
         val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
@@ -31,7 +30,7 @@ actual object LogFormatterPlatform {
     }
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
-        ClassInfo(getQualifiedName(forClass), forClass.simpleName)
+        ClassInfo(getQualifiedName(forClass), forClass.simpleName, determineType(forClass, forClass.java, isCompanionObject(forClass.java)))
 
 
     private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
@@ -45,6 +44,10 @@ actual object LogFormatterPlatform {
                 qualifiedName
             }
         }
+
+    private fun <T : Any> isCompanionObject(javaClass: Class<T>) =
+        // TODO: or add kotlin-reflect and use forClass.isCompanion as check (+ use above while on enclosing class to get owner class name)
+        javaClass.simpleName == "Companion" && javaClass.enclosingClass != null
 
     private fun getDeclaringClass(javaClass: Class<*>): Class<*>? {
         javaClass.enclosingMethod?.let { enclosingMethod ->
