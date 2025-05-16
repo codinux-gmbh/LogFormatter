@@ -5,14 +5,14 @@ package net.codinux.log.examples
 import net.codinux.kotlin.text.LineSeparator
 import net.codinux.log.classname.ClassNameResolver
 import net.codinux.log.stacktrace.*
-import net.codinux.log.test.TestClasses
+import net.codinux.log.test.DeclaringClass
 
 class ShowExamples {
 
     fun getClassNameComponents() {
         // get package name (not available on JavaScript and WASM), class name and enclosing class name
         // (in case of a Companion class, inner class, local class, anonymous function, lambda, ...)
-        val classNameComponents = ClassNameResolver().getClassNameComponents(TestClasses.InnerClass::class)
+        val classNameComponents = ClassNameResolver().getClassNameComponents(DeclaringClass.InnerClass::class)
     }
 
     fun extractStackTrace() {
