@@ -13,7 +13,7 @@ actual object LogFormatterPlatform {
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? = null // only senseful on JVM
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
-        ClassInfo(qualifiedClassName = getQualifiedName(forClass), type = getType(forClass))
+        ClassInfo(getQualifiedName(forClass), forClass.simpleName, getType(forClass))
 
 
     private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
