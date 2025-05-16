@@ -5,9 +5,9 @@ import net.codinux.log.extensions.substringBeforeLastOrNull
 import net.codinux.log.platform.LogFormatterPlatform
 import kotlin.reflect.KClass
 
-class ClassNameResolver {
+open class ClassNameResolver {
 
-    fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
+    open fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
         LogFormatterPlatform.getClassComponents(forClass)?.let {
             return it
         }
@@ -17,7 +17,7 @@ class ClassNameResolver {
         return getClassNameComponents(forClass, classInfo)
     }
 
-    private fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
+    protected open fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
         var (className, packageName) = if (classInfo.qualifiedClassName != null) {
             extractClassAndPackageNameFromQualifiedClassName(classInfo.qualifiedClassName).let {
                 it.className to it.packageName
@@ -46,7 +46,7 @@ class ClassNameResolver {
         return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
     }
 
-    fun extractClassAndPackageNameFromQualifiedClassName(qualifiedClassName: String): ClassAndPackageName {
+    protected open fun extractClassAndPackageNameFromQualifiedClassName(qualifiedClassName: String): ClassAndPackageName {
         val qualifiedName = removeAnonymousClassesNumberSuffixes(clean(qualifiedClassName))
 
         var packageName = qualifiedName.substringBeforeLastOrNull('.')
@@ -64,7 +64,7 @@ class ClassNameResolver {
         return ClassAndPackageName(className, packageName)
     }
 
-    private fun clean(classToString: String): String {
+    protected open fun clean(classToString: String): String {
         var cleaned = classToString
 
         if (cleaned.startsWith("class ")) { // remove 'class ' from beginning to .toString() return value
@@ -81,7 +81,7 @@ class ClassNameResolver {
     /**
      * Remove anonymous class number suffixes like '$1$2'.
      */
-    fun removeAnonymousClassesNumberSuffixes(name: String): String {
+    open fun removeAnonymousClassesNumberSuffixes(name: String): String {
         var cleaned = name
 
         var stringAfterLastDollarSign = cleaned.substringAfterLastOrNull('$')
