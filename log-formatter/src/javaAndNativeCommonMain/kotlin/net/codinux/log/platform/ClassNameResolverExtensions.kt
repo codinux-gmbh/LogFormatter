@@ -4,7 +4,7 @@ import net.codinux.log.classname.ClassNameResolver
 import kotlin.reflect.KClass
 
 fun ClassNameResolver.getQualifiedClassName(forClass: KClass<*>, getDeclaringClass: Boolean = false): String {
-    val components = ClassNameResolver.getClassNameComponents(forClass, forClass.qualifiedName)
+    val components = ClassNameResolver.getClassNameComponentsFromString(forClass, forClass.qualifiedName)
 
     val packageNamePrefix = components.packageNamePrefix
 

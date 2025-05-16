@@ -15,6 +15,9 @@ actual object LogFormatterPlatform {
         forClass.simpleName ?: forClass.toString()
 
     actual fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents =
-        ClassNameResolver.getClassNameComponents(forClass, null)
+        ClassNameResolver.getClassNameComponentsFromString(forClass, null)
+
+    actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
+        PlatformClassInfo(classNameWithoutPackageName = forClass.simpleName ?: forClass.toString())
 
 }

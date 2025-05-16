@@ -15,6 +15,9 @@ actual object LogFormatterPlatform {
         forClass.simpleName ?: forClass.js.name
 
     actual fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents =
-        ClassNameResolver.getClassNameComponents(forClass, forClass.js.name)
+        ClassNameResolver.getClassNameComponentsFromString(forClass, forClass.js.name)
+
+    actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
+        PlatformClassInfo(classNameWithoutPackageName = forClass.simpleName ?: forClass.js.name)
 
 }

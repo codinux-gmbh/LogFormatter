@@ -7,7 +7,16 @@ import kotlin.reflect.KClass
 
 object ClassNameResolver {
 
-    fun getClassNameComponents(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
+    fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
+        val classInfo = LogFormatterPlatform.getClassInfo(forClass)
+        if (classInfo.classNameComponents != null) {
+            return classInfo.classNameComponents
+        }
+
+        return getClassNameComponentsFromString(forClass, classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName)
+    }
+
+    fun getClassNameComponentsFromString(forClass: KClass<*>, qualifiedName: String? = null): ClassNameComponents {
         println("qualifiedName: ${qualifiedName}, simpleName: ${forClass.simpleName}, toString(): ${forClass.toString()}") // TODO: remove again
 
         val classToString = forClass.toString()

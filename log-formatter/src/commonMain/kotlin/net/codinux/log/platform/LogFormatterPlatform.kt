@@ -12,4 +12,10 @@ expect object LogFormatterPlatform {
 
     fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents
 
+    /**
+     * Uses platform specific methods to get details about class name.
+     * Especially useful on JVM where we can get detailed and correct class info data via reflection.
+     */
+    fun <T : Any> getClassInfo(forClass: KClass<T>): PlatformClassInfo
+
 }

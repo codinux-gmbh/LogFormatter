@@ -45,7 +45,7 @@ class ClassNameResolverTest {
     fun getClassNameComponents_InnerClassCompanionObject() {
         val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.Companion::class)
 
-        assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass.InnerClass", "DeclaringClass.InnerClass")
+        assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass", "DeclaringClass.InnerClass")
     }
 
     @Test
