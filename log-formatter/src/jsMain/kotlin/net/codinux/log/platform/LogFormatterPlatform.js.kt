@@ -19,6 +19,8 @@ actual object LogFormatterPlatform {
             jsName
         } else if (jsName.contains('$')) { // anonymous or local classes
             jsName // details about the containing method, ... are separated by '$' from class name then
+        } else if (simpleName == "Companion") { // Companion object
+            jsName // js.name then provides a numeric suffix with the index of the Companion in the declaring class file
         } else if (jsName == "Function") { // Lambda
             simpleName // simpleName then provides a numeric suffix with the index of the function in the declaring class file
         } else {

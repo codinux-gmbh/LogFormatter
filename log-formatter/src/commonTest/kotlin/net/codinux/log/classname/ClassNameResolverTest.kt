@@ -4,11 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
-import net.codinux.kotlin.platform.isJavaScript
-import net.codinux.log.test.TestInlineClass
-import net.codinux.log.test.DeclaringClass
-import net.codinux.log.test.TestObject
-import net.codinux.log.test.TestPlatform
+import net.codinux.log.test.*
 import kotlin.test.Test
 
 class ClassNameResolverTest {
@@ -39,8 +35,12 @@ class ClassNameResolverTest {
     fun getClassNameComponents_CompanionObject() {
         val result = underTest.getClassNameComponents(DeclaringClass.Companion::class)
 
-        // assert companionOwnerClassName correctly removes ".Companion" from class name
-        assertClassName(result, "DeclaringClass.Companion", companionOwnerClassName = "DeclaringClass")
+        if (Platform.isJsBrowserOrNodeJs) {
+            assertClassName(result, "Companion_2")
+        } else {
+            // assert companionOwnerClassName correctly removes ".Companion" from class name
+            assertClassName(result, "DeclaringClass.Companion", companionOwnerClassName = "DeclaringClass")
+        }
     }
 
 
@@ -57,9 +57,13 @@ class ClassNameResolverTest {
     fun getClassNameComponents_InnerClassCompanionObject() {
         val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.Companion::class)
 
-        // assert companionOwnerClassName correctly removes ".Companion" from class name and that declaring class
-        // differs from companion object owner is detected
-        assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass", "DeclaringClass.InnerClass")
+        if (Platform.isJsBrowserOrNodeJs) {
+            assertClassName(result, "Companion_1")
+        } else {
+            // assert companionOwnerClassName correctly removes ".Companion" from class name and that declaring class
+            // differs from companion object owner is detected
+            assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass", "DeclaringClass.InnerClass")
+        }
     }
 
     @Test
@@ -110,7 +114,7 @@ class ClassNameResolverTest {
 
         if (Platform.type == PlatformType.WasmJs) {
             assertClassName(result, "TestObject.Lambda.lambda", "TestObject")
-        } else if (Platform.isJavaScript) { // for lambdas JS only returns "Function<index>"
+        } else if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
             assertClassName(result, "Function1")
         } else {
             assertClassName(result, "TestObject.Lambda", "TestObject")
@@ -123,7 +127,7 @@ class ClassNameResolverTest {
 
         val result = underTest.getClassNameComponents(lambda::class)
 
-        if (Platform.type in listOf(PlatformType.JsBrowser, PlatformType.JsNodeJs)) { // for lambdas JS only returns "Function<index>"
+        if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
             assertClassName(result, "Function1")
         } else {
             assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalLambda.lambda", "ClassNameResolverTest", null, ThisClassPackageName)
