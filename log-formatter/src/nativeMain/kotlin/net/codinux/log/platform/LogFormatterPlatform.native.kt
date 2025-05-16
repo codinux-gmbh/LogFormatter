@@ -13,8 +13,20 @@ actual object LogFormatterPlatform {
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? = null // only senseful on JVM
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
-        ClassInfo(qualifiedClassName = forClass.qualifiedName, type = getType(forClass))
+        ClassInfo(qualifiedClassName = getQualifiedName(forClass), type = getType(forClass))
 
+
+    private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
+        if (forClass.qualifiedName != null) {
+            forClass.qualifiedName
+        } else { // for lambdas, anonymous and local classes qualified name is null
+            val qualifiedName = forClass.toString()
+            if (qualifiedName.startsWith("class ")) {
+                qualifiedName.substring("class ".length)
+            } else {
+                qualifiedName
+            }
+        }
 
     /**
      * On native we cannot detect objects and (reliably) inner classes, and we cannot
