@@ -9,21 +9,26 @@ open class QualifiedClassNameParser {
 
     open fun extractClassAndPackageName(qualifiedClassName: String): ClassAndPackageName {
         val segments = qualifiedClassName.split('.')
+        val lastSegment = segments.last()
+        val secondLastSegment = if (segments.size > 1) segments[segments.size - 2] else null
+        var enclosingClassName: String? = null
 
         val classNameSegments = mutableListOf<String>()
         classNameSegments.add(segments.last())
 
-        val secondLastSegment = if (segments.size > 1) segments[segments.size - 2] else null
-        if (segments.last() == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
+        if (lastSegment == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
             isLocalClassAnonymousClassOrFunction(secondLastSegment) == false) {
-            classNameSegments.add(segments[segments.size - 2])
+            classNameSegments.add(secondLastSegment)
+            enclosingClassName = secondLastSegment
         }
-
+        else if (isLocalClassAnonymousClassOrFunction(lastSegment)) {
+            enclosingClassName = lastSegment.substringBefore('$')
+        }
 
         val className = classNameSegments.reversed().joinToString(".")
         val packageName = qualifiedClassName.substring(0, qualifiedClassName.length - className.length - 1)
 
-        return ClassAndPackageName(className, packageName)
+        return ClassAndPackageName(className.replace('$', '.'), packageName, enclosingClassName)
     }
 
 

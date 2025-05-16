@@ -43,6 +43,13 @@ class ClassNameResolverTest {
         }
     }
 
+    @Test
+    fun getClassNameComponents_InlineClass() {
+        val result = underTest.getClassNameComponents(TestInlineClass::class)
+
+        assertClassName(result, "TestInlineClass")
+    }
+
 
     // TODO: detecting class name and declaring class name does not work on Native
 
@@ -64,13 +71,6 @@ class ClassNameResolverTest {
             // differs from companion object owner is detected
             assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass", "DeclaringClass.InnerClass")
         }
-    }
-
-    @Test
-    fun getClassNameComponents_InlineClass() {
-        val result = underTest.getClassNameComponents(TestInlineClass::class)
-
-        assertClassName(result, "TestInlineClass")
     }
 
 
