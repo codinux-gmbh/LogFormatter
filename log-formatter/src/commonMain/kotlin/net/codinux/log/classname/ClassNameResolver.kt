@@ -7,6 +7,11 @@ import kotlin.reflect.KClass
 
 open class ClassNameResolver {
 
+    companion object {
+        val Default = ClassNameResolver()
+    }
+
+
     open fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
         LogFormatterPlatform.getClassComponents(forClass)?.let {
             return it

@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
 
-    private val classNameResolver = ClassNameResolver()
+    private val classNameResolver = ClassNameResolver.Default
 
 
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? {
