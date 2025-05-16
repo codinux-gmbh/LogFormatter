@@ -25,14 +25,14 @@ class QualifiedClassNameParserTest {
     fun `object`() {
         val result = extractClassAndPackageName(TestObject::class)
 
-        assertClassName(result, "TestObject")
+        assertClassName(result, "TestObject", ClassTypeCategory.TopLevel)
     }
 
     @Test
     fun normalClass() {
         val result = extractClassAndPackageName(DeclaringClass::class)
 
-        assertClassName(result, "DeclaringClass")
+        assertClassName(result, "DeclaringClass", ClassTypeCategory.TopLevel)
     }
 
     @Test
@@ -40,11 +40,12 @@ class QualifiedClassNameParserTest {
         val result = extractClassAndPackageName(DeclaringClass.Companion::class)
 
         if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "Companion")
+            assertClassName(result, "Companion", ClassTypeCategory.Nested)
         } else if (Platform.isJsBrowserOrNodeJs) { // for Companions JS only returns "Companion_<index>"
-            assertClassName(result, "Companion_3")
+            assertClassName(result, "Companion_3", ClassTypeCategory.Nested)
         } else {
-            assertClassName(result, "DeclaringClass.Companion", "DeclaringClass")
+            assertClassName(result, "DeclaringClass.Companion",
+                ClassTypeCategory.Nested, "DeclaringClass")
         }
     }
 
@@ -52,7 +53,7 @@ class QualifiedClassNameParserTest {
     fun inlineClass() {
         val result = extractClassAndPackageName(TestInlineClass::class)
 
-        assertClassName(result, "TestInlineClass")
+        assertClassName(result, "TestInlineClass", ClassTypeCategory.TopLevel)
     }
 
 
@@ -63,9 +64,10 @@ class QualifiedClassNameParserTest {
         val result = extractClassAndPackageName(LocalClass::class)
 
         if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "LocalClass")
+            assertClassName(result, "LocalClass", ClassTypeCategory.TopLevel) // for WASM we have not chance to detect local classes
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.localClass.LocalClass", ThisClassName, ThisClassPackageName)
+            assertClassName(result, "QualifiedClassNameParserTest.localClass.LocalClass",
+                ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
         }
     }
 
@@ -77,9 +79,10 @@ class QualifiedClassNameParserTest {
         val result = extractClassAndPackageName(anonymous::class)
 
         if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "<anonymous class>")
+            assertClassName(result, "<anonymous class>", ClassTypeCategory.LocalClassAnonymousClassOrFunction)
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.anonymousClass.anonymous.1", ThisClassName, ThisClassPackageName)
+            assertClassName(result, "QualifiedClassNameParserTest.anonymousClass.anonymous.1",
+                ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
         }
     }
 
@@ -90,18 +93,22 @@ class QualifiedClassNameParserTest {
         val result = extractClassAndPackageName(lambda::class)
 
         if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
-            assertClassName(result, "Function1")
+            assertClassName(result, "Function1", ClassTypeCategory.LocalClassAnonymousClassOrFunction)
         } else if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda", ThisClassName)
+            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda",
+                ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName)
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda.1", ThisClassName, ThisClassPackageName)
+            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda.1",
+                ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
         }
     }
 
 
-    private fun assertClassName(result: ClassAndPackageName, expectedClassName: String, expectedEnclosingClassName: String? = null,
+    private fun assertClassName(result: ClassAndPackageName, expectedClassName: String, expectedCategory: ClassTypeCategory,
+                                expectedEnclosingClassName: String? = null,
                                 expectedPackageName: String = TestObject.packageName) {
         assertThat(result::className).isEqualTo(expectedClassName)
+        assertThat(result::category).isEqualTo(expectedCategory)
         assertThat(result::enclosingClassName).isEqualTo(expectedEnclosingClassName)
 
         if (TestPlatform.SupportsPackageNames) {
