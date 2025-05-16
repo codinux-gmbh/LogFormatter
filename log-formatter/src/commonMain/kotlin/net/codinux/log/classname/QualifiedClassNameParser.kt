@@ -1,7 +1,5 @@
 package net.codinux.log.classname
 
-import net.codinux.log.extensions.substringBeforeLastOrNull
-
 class QualifiedClassNameParser {
 
     companion object {
@@ -10,19 +8,34 @@ class QualifiedClassNameParser {
 
 
     fun extractClassAndPackageName(qualifiedClassName: String): ClassAndPackageName {
-        var packageName = qualifiedClassName.substringBeforeLastOrNull('.')
-        var className = qualifiedClassName.substringAfterLast('.')
+        val segments = qualifiedClassName.split('.')
 
-        // for Companion objects including name of enclosing class in className
-        if ((className == "Companion" || className.startsWith("Companion$")) && packageName != null) {
-            val indexOfSecondLastDot = packageName.lastIndexOf('.')
-            if (indexOfSecondLastDot >= 0) {
-                packageName = packageName.substring(0, indexOfSecondLastDot)
-                className = qualifiedClassName.substring(indexOfSecondLastDot + 1)
-            }
+        val classNameSegments = mutableListOf<String>()
+        classNameSegments.add(segments.last())
+
+        val secondLastSegment = if (segments.size > 1) segments[segments.size - 2] else null
+        if (segments.last() == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
+            isLocalClassAnonymousClassOrFunction(secondLastSegment) == false) {
+            classNameSegments.add(segments[segments.size - 2])
         }
+
+
+        val className = classNameSegments.reversed().joinToString(".")
+        val packageName = qualifiedClassName.substring(0, qualifiedClassName.length - className.length - 1)
 
         return ClassAndPackageName(className, packageName)
     }
+
+
+    private fun isProbablyClassName(segment: String): Boolean =
+        // If it contains '$' then it's for sure a class name.
+        // If it starts with an upper case letter it's only a convention that it's a class name then
+        segment.first().isUpperCase() || isLocalClassAnonymousClassOrFunction(segment)
+
+    /**
+     * Local classes, anonymous classes and functions are separated by '$' from their enclosing class.
+     */
+    private fun isLocalClassAnonymousClassOrFunction(segment: String): Boolean =
+        segment.contains('$')
 
 }
