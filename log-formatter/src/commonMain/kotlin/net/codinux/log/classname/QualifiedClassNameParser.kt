@@ -1,13 +1,13 @@
 package net.codinux.log.classname
 
-class QualifiedClassNameParser {
+open class QualifiedClassNameParser {
 
     companion object {
         val Default = QualifiedClassNameParser()
     }
 
 
-    fun extractClassAndPackageName(qualifiedClassName: String): ClassAndPackageName {
+    open fun extractClassAndPackageName(qualifiedClassName: String): ClassAndPackageName {
         val segments = qualifiedClassName.split('.')
 
         val classNameSegments = mutableListOf<String>()
@@ -27,7 +27,7 @@ class QualifiedClassNameParser {
     }
 
 
-    private fun isProbablyClassName(segment: String): Boolean =
+    protected open fun isProbablyClassName(segment: String): Boolean =
         // If it contains '$' then it's for sure a class name.
         // If it starts with an upper case letter it's only a convention that it's a class name then
         segment.first().isUpperCase() || isLocalClassAnonymousClassOrFunction(segment)
@@ -35,7 +35,7 @@ class QualifiedClassNameParser {
     /**
      * Local classes, anonymous classes and functions are separated by '$' from their enclosing class.
      */
-    private fun isLocalClassAnonymousClassOrFunction(segment: String): Boolean =
+    protected open fun isLocalClassAnonymousClassOrFunction(segment: String): Boolean =
         segment.contains('$')
 
 }
