@@ -12,9 +12,6 @@ actual object LogFormatterPlatform {
     actual fun <T : Any> getQualifiedClassName(forClass: KClass<T>): String =
         ClassNameResolver.getQualifiedClassName(forClass, getDeclaringClass = false)
 
-    actual fun <T : Any> getClassNameComponents(forClass: KClass<T>): ClassNameComponents =
-        ClassNameResolver.getClassNameComponentsFromString(forClass, forClass.qualifiedName)
-
     actual fun <T : Any> getClassInfo(forClass: KClass<T>): PlatformClassInfo {
         val javaClass = forClass.java
 
