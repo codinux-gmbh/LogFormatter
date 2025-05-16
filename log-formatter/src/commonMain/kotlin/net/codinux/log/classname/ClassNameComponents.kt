@@ -11,9 +11,14 @@ data class ClassNameComponents(
     val packageName: String? = null,
 
     /**
-     * For inner, local, anonymous classes and lambdas: The name of the
-     * outmost top level class that contains this class (if this information
-     * is available).
+     * The outmost top level class that contains this (nested) class.
+     *
+     * Only differs from [className] if it's a inner, local, anonymous class
+     * or lambda.
+     *
+     * Not available on `JS` and `WASM` and cannot be detected reliably on
+     * `Native` (we can only make educated guesses that class names start
+     * with an upper case letter and package names with a lower case letter).
      */
     val declaringClassName: String? = null,
 
