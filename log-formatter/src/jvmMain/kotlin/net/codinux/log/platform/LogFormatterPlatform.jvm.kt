@@ -34,11 +34,8 @@ actual object LogFormatterPlatform {
 
 
     private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
-        if (forClass.qualifiedName != null) {
-            forClass.qualifiedName
-        } else { // for lambdas, anonymous and local classes qualified name is null
-            classNameResolver.clean(forClass.toString())
-        }
+        // for lambdas, anonymous and local classes qualified name is null
+        forClass.qualifiedName ?: classNameResolver.clean(forClass.toString())
 
     private fun <T : Any> isCompanionObject(javaClass: Class<T>) =
         // TODO: or add kotlin-reflect and use forClass.isCompanion as check (+ use above while on enclosing class to get owner class name)

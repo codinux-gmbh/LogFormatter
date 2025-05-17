@@ -18,11 +18,8 @@ actual object LogFormatterPlatform {
 
 
     private fun <T : Any> getQualifiedName(forClass: KClass<T>) =
-        if (forClass.qualifiedName != null) {
-            forClass.qualifiedName
-        } else { // for lambdas, anonymous and local classes qualified name is null
-            classNameResolver.clean(forClass.toString())
-        }
+        // for lambdas, anonymous and local classes qualified name is null
+        forClass.qualifiedName ?: classNameResolver.clean(forClass.toString())
 
     /**
      * On native we cannot detect objects and (reliably) inner classes, and we cannot
