@@ -2,6 +2,12 @@ package net.codinux.log.stacktrace
 
 import kotlin.jvm.JvmOverloads
 
+/**
+ * Note: Common stack frames that reoccur in nested [Throwable] causes are omitted there and
+ * indicated by [ShortenedStackTrace.countSkippedCommonFrames].
+ * This is due to the behavior of [Throwable.stackTraceToString()], which we have to rely on,
+ * as the Kotlin standard library does not expose raw stack trace data (except on the JVM).
+ */
 open class StackTraceShortener @JvmOverloads constructor(
     protected val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
