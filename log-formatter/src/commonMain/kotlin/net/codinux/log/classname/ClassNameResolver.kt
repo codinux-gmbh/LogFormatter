@@ -49,10 +49,6 @@ open class ClassNameResolver(
             removeAnonymousClassesNumberSuffixes(clean(simpleName)) to null
         }
 
-        if (className.endsWith("\$Companion")) {
-            className = className.substringBeforeLast("\$Companion") + ".Companion"
-        }
-
         // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
         var declaringClassName = if (className.contains('$')) className.substringBefore('$')
                                 else null
