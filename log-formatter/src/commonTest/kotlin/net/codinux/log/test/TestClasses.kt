@@ -16,6 +16,8 @@ class DeclaringClass {
 
     class InnerClass {
         companion object
+
+        class InnerClassInInnerClass
     }
 
 }

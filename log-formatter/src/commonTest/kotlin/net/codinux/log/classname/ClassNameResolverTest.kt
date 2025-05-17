@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
+import net.codinux.kotlin.platform.isJavaScript
 import net.codinux.log.test.*
 import kotlin.test.Test
 
@@ -38,7 +39,7 @@ class ClassNameResolverTest {
         if (Platform.isJsBrowserOrNodeJs) {
             assertClassName(result, "Companion_3")
         } else {
-            // assert companionOwnerClassName correctly removes ".Companion" from class name
+            // assert enclosingClassName correctly removes ".Companion" from class name
             assertClassName(result, "DeclaringClass.Companion", "DeclaringClass", "DeclaringClass")
         }
     }
@@ -57,7 +58,7 @@ class ClassNameResolverTest {
     fun getClassNameComponents_InnerClass_GuessClassHierarchy() {
         val result = underTest.getClassNameComponents(DeclaringClass.InnerClass::class, guessClassHierarchy = true)
 
-        assertClassName(result, "DeclaringClass.InnerClass", "DeclaringClass")
+        assertClassName(result, "DeclaringClass.InnerClass", "DeclaringClass", "DeclaringClass")
     }
 
     @Test
@@ -67,9 +68,20 @@ class ClassNameResolverTest {
         if (Platform.isJsBrowserOrNodeJs) {
             assertClassName(result, "Companion_2")
         } else {
-            // assert companionOwnerClassName correctly removes ".Companion" from class name and that declaring class
+            // assert enclosingClassName correctly removes ".Companion" from class name and that declaring class
             // differs from companion object owner is detected
             assertClassName(result, "DeclaringClass.InnerClass.Companion", "DeclaringClass", "DeclaringClass.InnerClass")
+        }
+    }
+
+    @Test
+    fun getClassNameComponents_SecondLevelInnerClass_GuessClassHierarchy() {
+        val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.InnerClassInInnerClass::class, guessClassHierarchy = true)
+
+        if (Platform.isJavaScript) {
+            assertClassName(result, "InnerClassInInnerClass")
+        } else {
+            assertClassName(result, "DeclaringClass.InnerClass.InnerClassInInnerClass", "DeclaringClass", "DeclaringClass.InnerClass")
         }
     }
 
@@ -81,7 +93,7 @@ class ClassNameResolverTest {
 
         val result = underTest.getClassNameComponents(LocalClass::class)
 
-        assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalClass.LocalClass", "ClassNameResolverTest", null, ThisClassPackageName)
+        assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalClass.LocalClass", "ClassNameResolverTest", "ClassNameResolverTest", ThisClassPackageName)
     }
 
     @Test
@@ -91,7 +103,7 @@ class ClassNameResolverTest {
         if (Platform.type == PlatformType.WasmJs) { // for anonymous classes WASM only returns "<no name provided>"
             assertClassName(result, "<anonymous class>")
         } else {
-            assertClassName(result, "TestObject.AnonymousClass", "TestObject", null)
+            assertClassName(result, "TestObject.AnonymousClass", "TestObject", "TestObject")
         }
     }
 
@@ -104,7 +116,7 @@ class ClassNameResolverTest {
         if (Platform.type == PlatformType.WasmJs) { // for anonymous classes WASM only returns "<no name provided>"
             assertClassName(result, "<anonymous class>")
         } else {
-            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalAnonymousClass.anonymous", "ClassNameResolverTest", null, ThisClassPackageName)
+            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalAnonymousClass.anonymous", "ClassNameResolverTest", "ClassNameResolverTest", ThisClassPackageName)
         }
     }
 
@@ -113,11 +125,11 @@ class ClassNameResolverTest {
         val result = underTest.getClassNameComponents(TestObject.Lambda::class)
 
         if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "TestObject.Lambda.lambda", "TestObject")
+            assertClassName(result, "TestObject.Lambda.lambda", "TestObject", "TestObject")
         } else if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
             assertClassName(result, "Function1")
         } else {
-            assertClassName(result, "TestObject.Lambda", "TestObject")
+            assertClassName(result, "TestObject.Lambda", "TestObject", "TestObject")
         }
     }
 
@@ -130,19 +142,19 @@ class ClassNameResolverTest {
         if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
             assertClassName(result, "Function1")
         } else {
-            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalLambda.lambda", "ClassNameResolverTest", null, ThisClassPackageName)
+            assertClassName(result, "ClassNameResolverTest.getClassNameComponents_LocalLambda.lambda", "ClassNameResolverTest", "ClassNameResolverTest", ThisClassPackageName)
         }
     }
 
 
     private fun assertClassName(result: ClassNameComponents, className: String, declaringClassName: String? = null,
-                                companionOwnerClassName: String? = null, packageName: String = TestObject.packageName) {
+                                enclosingClassName: String? = null, packageName: String = TestObject.packageName) {
 
         // JS supports getting enclosing class only for local and anonymous classes, WASM only for Lambdas
         if (TestPlatform.SupportsDetailedClassName || result.declaringClassName != null) {
             assertThat(result::className).isEqualTo(className)
 
-            assertThat(result::companionOwnerClassName).isEqualTo(companionOwnerClassName)
+            assertThat(result::enclosingClassName).isEqualTo(enclosingClassName)
         } else {
             assertThat(result::className).isEqualTo(className.substringAfterLast('.'))
         }

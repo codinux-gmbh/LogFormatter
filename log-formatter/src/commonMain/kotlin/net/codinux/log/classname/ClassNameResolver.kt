@@ -39,25 +39,26 @@ open class ClassNameResolver(
     }
 
     protected open fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo, guessClassHierarchy: Boolean = false): ClassNameComponents {
-        var (className, packageName) = if (classInfo.qualifiedClassName != null) {
-            val classAndPackageName = qualifiedClassNameParser.extractClassAndPackageName(
+        var (className, classAndPackageName) = if (classInfo.qualifiedClassName != null) {
+            qualifiedClassNameParser.extractClassAndPackageName(
                 removeAnonymousClassesNumberSuffixes(clean(classInfo.qualifiedClassName)), guessClassHierarchy
-            )
-            classAndPackageName.className to classAndPackageName.packageName
+            ).let { it.className to it }
         } else {
             val simpleName = classInfo.classNameWithoutPackageName ?: forClass.toString()
             removeAnonymousClassesNumberSuffixes(clean(simpleName)) to null
         }
 
+        val packageName = classAndPackageName?.packageName
         val declaringClassName = determineDeclaringClassName(className)
 
 
         className = className.replace('$', '.')
 
-        val companionOwnerClassName = if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
-                                    else null
+        val enclosingClassName = if (classAndPackageName?.enclosingClassName != null) classAndPackageName.enclosingClassName?.replace('$', '.')
+                                    else if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
+                                    else declaringClassName
 
-        return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
+        return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, enclosingClassName)
     }
 
     protected open fun determineDeclaringClassName(className: String): String? {

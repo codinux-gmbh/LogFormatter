@@ -19,16 +19,14 @@ actual object LogFormatterPlatform {
         className = classNameResolver.removeAnonymousClassesNumberSuffixes(className)
         className = className.replace('$', '.')
 
-        var declaringClass: Class<*>? = getDeclaringClass(javaClass)
-        while (declaringClass != null && getDeclaringClass(declaringClass) != null) {
-            declaringClass = getDeclaringClass(declaringClass)
-        }
+        val classHierarchy = getClassHierarchy(javaClass)
+            .map { it.simpleName.replace('$', '.') }
+        val declaringClassName = classHierarchy.firstOrNull()?.takeUnless { it.isBlank() }
+        val enclosingClassName = classHierarchy.joinToString(".").takeUnless { it.isBlank() }
 
         val isCompanionObject = isCompanionObject(javaClass)
-        val declaringClassName = declaringClass?.simpleName
-        val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
 
-        return ClassNameComponents(className, packageName, determineType(forClass, javaClass, isCompanionObject), declaringClassName, companionOwnerClassName)
+        return ClassNameComponents(className, packageName, determineType(forClass, javaClass, isCompanionObject), declaringClassName, enclosingClassName)
     }
 
     actual fun <T : Any> getClassInfo(forClass: KClass<T>) =
@@ -50,6 +48,19 @@ actual object LogFormatterPlatform {
     private fun <T : Any> isCompanionObject(javaClass: Class<T>) =
         // TODO: or add kotlin-reflect and use forClass.isCompanion as check (+ use above while on enclosing class to get owner class name)
         javaClass.simpleName == "Companion" && javaClass.enclosingClass != null
+
+    private fun getClassHierarchy(javaClass: Class<*>): List<Class<*>> {
+        val reversedHierarchy = mutableListOf<Class<*>>()
+
+        var declaringClass: Class<*>? = getDeclaringClass(javaClass)
+        while (declaringClass != null) {
+            reversedHierarchy.add(declaringClass)
+
+            declaringClass = getDeclaringClass(declaringClass)
+        }
+
+        return reversedHierarchy.reversed()
+    }
 
     private fun getDeclaringClass(javaClass: Class<*>): Class<*>? {
         javaClass.enclosingMethod?.let { enclosingMethod ->

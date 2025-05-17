@@ -29,12 +29,15 @@ data class ClassNameComponents(
     val declaringClassName: String? = null,
 
     /**
-     * If class is a companion object, the name of the class that contains
-     * this companion.
+     * Returns a non-null value if this class is enclosed in another class like
+     * companion objects, inner and local classes and most anonymous class and lambdas.
+     *
+     * Returns the same value as [declaringClassName] if the class is not nested
+     * at least twice in other classes.
      *
      * Not available on JavaScript and WASM.
      */
-    val companionOwnerClassName: String? = null,
+    val enclosingClassName: String? = null,
 ) {
     val packageNamePrefix: String = packageName?.let { "$it." } ?: ""
 
