@@ -18,10 +18,10 @@ data class ClassNameComponents(
     val type: ClassType,
 
     /**
-     * The outmost top level class that contains this (nested) class.
+     * The outermost top-level class that contains this (nested) class.
      *
-     * Only differs from [className] if it's a inner, local, anonymous class
-     * or lambda.
+     * Only differs from [className] if it's an inner, local or anonymous class
+     * or lambda. In the latter cases only strips off the part after the first `$`.
      *
      * Not available on `JS` and `WASM` and cannot be detected reliably on
      * `Native` (we can only make educated guesses that class names start
