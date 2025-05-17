@@ -49,14 +49,8 @@ open class ClassNameResolver(
             removeAnonymousClassesNumberSuffixes(clean(simpleName)) to null
         }
 
-        // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
-        var declaringClassName = if (className.contains('$')) className.substringBefore('$')
-                                else null
-        if (declaringClassName?.contains(".") == true) {
-            declaringClassName = declaringClassName.substringBefore('.')
-        } else if (declaringClassName == null && className.contains('.')) {
-            declaringClassName = className.substringBefore('.')
-        }
+        val declaringClassName = determineDeclaringClassName(className)
+
 
         className = className.replace('$', '.')
 
@@ -64,6 +58,20 @@ open class ClassNameResolver(
                                     else null
 
         return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
+    }
+
+    protected open fun determineDeclaringClassName(className: String): String? {
+        // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
+        var declaringClassName = if (className.contains('$')) className.substringBefore('$')
+                                else null
+
+        // for Companion objects or if guessClassHierarchy is true, remove nested classes
+        if (declaringClassName?.contains(".") == true) { // e.g. local or anonymous classes in an inner class
+            declaringClassName = declaringClassName.substringBefore('.')
+        } else if (declaringClassName == null && className.contains('.')) { // nested classes without e.g. local or anonymous classes
+            declaringClassName = className.substringBefore('.')
+        }
+        return declaringClassName
     }
 
     protected open fun clean(classToString: String): String {
