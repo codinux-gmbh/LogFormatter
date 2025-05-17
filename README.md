@@ -51,17 +51,6 @@ Each service class can be configured in two ways:
   2. **Per method call** – if provided overrides instance options for that specific call
 
 
-## Class name
-
-### Get class name for `KClass`
-
-```kotlin
-// get package name (not available on JavaScript and WASM), class name and enclosing class name 
-// (in case of a Companion class, inner class, local class, anonymous function, lambda, ...)
-val classNameComponents = ClassNameResolver.getClassNameComponents(TestClasses.OuterClass.InnerClass::class)
-```
-
-
 ## Stack trace
 
 ### Extract stack trace from Throwable
@@ -133,6 +122,18 @@ println(formatter.format(throwable, StackTraceFormatterOptions(
     lineSeparator = LineSeparator.System // or Unix or Windows ...
 )))
 ```
+
+
+## Class name
+
+### Get class name for `KClass`
+
+```kotlin
+// get package name (not available on JavaScript and WASM), class name and enclosing class name 
+// (in case of a Companion class, inner class, local class, anonymous function, lambda, ...)
+val classNameComponents = ClassNameResolver.getClassNameComponents(TestClasses.OuterClass.InnerClass::class)
+```
+
 
 ## Used by
 
