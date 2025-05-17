@@ -54,15 +54,15 @@ class ClassNameResolverTest {
     // TODO: detecting class name and declaring class name does not work on Native
 
     @Test
-    fun getClassNameComponents_InnerClass() {
-        val result = underTest.getClassNameComponents(DeclaringClass.InnerClass::class)
+    fun getClassNameComponents_InnerClass_GuessClassHierarchy() {
+        val result = underTest.getClassNameComponents(DeclaringClass.InnerClass::class, guessClassHierarchy = true)
 
         assertClassName(result, "DeclaringClass.InnerClass", "DeclaringClass")
     }
 
     @Test
-    fun getClassNameComponents_InnerClassCompanionObject() {
-        val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.Companion::class)
+    fun getClassNameComponents_InnerClassCompanionObject_GuessClassHierarchy() {
+        val result = underTest.getClassNameComponents(DeclaringClass.InnerClass.Companion::class, guessClassHierarchy = true)
 
         if (Platform.isJsBrowserOrNodeJs) {
             assertClassName(result, "Companion_2")

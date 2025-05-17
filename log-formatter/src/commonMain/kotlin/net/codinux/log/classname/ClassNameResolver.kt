@@ -2,6 +2,7 @@ package net.codinux.log.classname
 
 import net.codinux.log.extensions.substringAfterLastOrNull
 import net.codinux.log.platform.LogFormatterPlatform
+import kotlin.jvm.JvmOverloads
 import kotlin.reflect.KClass
 
 open class ClassNameResolver(
@@ -18,26 +19,29 @@ open class ClassNameResolver(
      *
      * Only accurate on `JVM`.
      *
-     * On `Native` accurate for top-level, local and anonymous classes and functions.
+     * On `Native` accurate for top-level, local and anonymous classes and functions. If for nested
+     * classes class hierarchy should be guessed, set `guessClassHierarchy` to true, but see
+     * [QualifiedClassNameParser.extractClassAndPackageName] for details about the parameter.
      *
      * On `JavaScript including WASM` only the direct class name is returned, no package names,
      * enclosing or top-level classes. E.g. for Companion objects only `"Companion"` is returned.
      * On `JS` returns for functions `"Function"`, on `WASM` for anonymous classes `"<anonymous class>"`.
      */
-    open fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
+    @JvmOverloads
+    open fun getClassNameComponents(forClass: KClass<*>, guessClassHierarchy: Boolean = false): ClassNameComponents {
         LogFormatterPlatform.getClassComponents(forClass)?.let {
             return it
         }
 
         val classInfo = LogFormatterPlatform.getClassInfo(forClass)
 
-        return getClassNameComponents(forClass, classInfo)
+        return getClassNameComponents(forClass, classInfo, guessClassHierarchy)
     }
 
-    protected open fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo): ClassNameComponents {
+    protected open fun getClassNameComponents(forClass: KClass<*>, classInfo: ClassInfo, guessClassHierarchy: Boolean = false): ClassNameComponents {
         var (className, packageName) = if (classInfo.qualifiedClassName != null) {
             val classAndPackageName = qualifiedClassNameParser.extractClassAndPackageName(
-                removeAnonymousClassesNumberSuffixes(clean(classInfo.qualifiedClassName))
+                removeAnonymousClassesNumberSuffixes(clean(classInfo.qualifiedClassName)), guessClassHierarchy
             )
             classAndPackageName.className to classAndPackageName.packageName
         } else {
