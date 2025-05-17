@@ -53,39 +53,6 @@ Each service class can be configured in two ways:
 
 ## Stack trace
 
-### Extract stack trace from Throwable
-
-```kotlin
-fun extractStackTrace() {
-    val throwable = Throwable("Something went wrong", Throwable("Root cause"))
-        .apply { addSuppressed(Throwable("Suppressed exception")) }
-
-    val stackTrace = StackTraceExtractor().extractStackTrace(throwable)
-
-    printStackTrace(stackTrace)
-}
-
-private fun printStackTrace(stackTrace: StackTrace) {
-    println("Message line: ${stackTrace.messageLine}")
-
-    println("Stack frames:")
-    stackTrace.stackTrace.forEach { println(it.line) }
-
-    println("Count skipped common frames: ${stackTrace.countSkippedCommonFrames}")
-
-    stackTrace.suppressed.forEach { suppressed ->
-        println("Suppressed:")
-        printStackTrace(suppressed)
-    }
-
-    if (stackTrace.causedBy != null) {
-        println("Caused by:")
-        printStackTrace(stackTrace.causedBy!!)
-    }
-}
-```
-
-
 ### Shorten stack trace
 
 ```kotlin
@@ -124,15 +91,70 @@ println(formatter.format(throwable, StackTraceFormatterOptions(
 ```
 
 
+### Extract stack trace from Throwable
+
+```kotlin
+fun extractStackTrace() {
+    val throwable = Throwable("Something went wrong", Throwable("Root cause"))
+        .apply { addSuppressed(Throwable("Suppressed exception")) }
+
+    val stackTrace = StackTraceExtractor().extractStackTrace(throwable)
+
+    printStackTrace(stackTrace)
+}
+
+private fun printStackTrace(stackTrace: StackTrace) {
+    println("Message line: ${stackTrace.messageLine}")
+
+    println("Stack frames:")
+    stackTrace.stackTrace.forEach { println(it.line) }
+
+    println("Count skipped common frames: ${stackTrace.countSkippedCommonFrames}")
+
+    stackTrace.suppressed.forEach { suppressed ->
+        println("Suppressed:")
+        printStackTrace(suppressed)
+    }
+
+    if (stackTrace.causedBy != null) {
+        println("Caused by:")
+        printStackTrace(stackTrace.causedBy!!)
+    }
+}
+```
+
+
 ## Class name
 
 ### Get class name for `KClass`
+
+To get the package name, name of the class, enclosing class (if any) and declaring class, call:
 
 ```kotlin
 // get package name (not available on JavaScript and WASM), class name and enclosing class name 
 // (in case of a Companion class, inner class, local class, anonymous function, lambda, ...)
 val classNameComponents = ClassNameResolver.getClassNameComponents(TestClasses.OuterClass.InnerClass::class)
 ```
+
+Be aware:
+- On `native` we can only extract the direct class name with certainty, but not the enclosing and declaring class name, as there we only have the full qualified name (that is a string containing both, the package name and the class name). So we can only make educated guesses which parts belong to the class and with to the package name.
+- On `JS/Browser`, `JS/Node` and `WASM` the package is not available / known and only the direct / last class name component is available. For Companion objects e.g. this is `"Companion"`.
+
+
+## Class components result
+
+| Class type            | Platform | Class name                     | Declaring class name | Companion owner class Name |
+|-----------------------|----------|--------------------------------|----------------------|----------------------------|
+| Companion             | JVM      | TestClass.Companion            | TestClass            | TestClass                  |
+| Companion             | Native   | TestClass.Companion            | null                 | TestClass                  |
+| Companion             | JS       | Companion                      | null                 | null                       |
+| Inner class           | JVM      | TestClass.InnerClass           | TestClass            | null                       |
+| Inner class           | Native   | InnerClass                     | null                 | null                       |
+| Inner class           | JS       | InnerClass                     | null                 | null                       |
+| Inner class Companion | JVM      | TestClass.InnerClass.Companion | TestClass            | null                       |
+| Inner class Companion | Native   | InnerClass.Companion           | null                 | InnerClass                 |
+| Inner class Companion | JS       | Companion                      | null                 | null                       |
+|                       |          |                                |                      |                            |
 
 
 ## Used by
