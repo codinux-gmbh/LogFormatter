@@ -2,6 +2,8 @@ package net.codinux.log.classname
 
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.jvm.JvmOverloads
 
 open class QualifiedClassNameParser {
@@ -39,13 +41,12 @@ open class QualifiedClassNameParser {
         var enclosingClassName: String? = null
         var category = ClassTypeCategory.TopLevel
 
-        val classNameSegments = mutableListOf<String>()
-        classNameSegments.add(segments.last())
+        val reversedClassNameSegments = mutableListOf<String>()
+        reversedClassNameSegments.add(segments.last())
 
         if (guessClassHierarchy == false) {
-            if (lastSegment == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
-                isLocalClassAnonymousClassOrFunction(secondLastSegment) == false) {
-                classNameSegments.add(secondLastSegment)
+            if (isCompanionObject(lastSegment, secondLastSegment)) {
+                reversedClassNameSegments.add(secondLastSegment)
 
                 enclosingClassName = secondLastSegment
                 category = ClassTypeCategory.Nested
@@ -53,7 +54,7 @@ open class QualifiedClassNameParser {
         } else {
             var segmentToCheck = segments.size - 2
             while (segmentToCheck >= 0 && isProbablyClassName(segments[segmentToCheck])) {
-                classNameSegments.add(segments[segmentToCheck])
+                reversedClassNameSegments.add(segments[segmentToCheck])
 
                 enclosingClassName = secondLastSegment
                 category = ClassTypeCategory.Nested
@@ -73,12 +74,22 @@ open class QualifiedClassNameParser {
         }
 
 
-        val className = classNameSegments.reversed().joinToString(".")
+        val className = reversedClassNameSegments.reversed().joinToString(".")
         val packageName = qualifiedClassName.substring(0, qualifiedClassName.length - className.length - 1)
 
         return ClassAndPackageName(className.replace('$', '.'), packageName, category, enclosingClassName)
     }
 
+
+    @OptIn(ExperimentalContracts::class)
+    protected fun isCompanionObject(lastSegment: String, secondLastSegment: String?): Boolean {
+        contract {
+            returns(true) implies (secondLastSegment != null)
+        }
+
+        return lastSegment == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
+                isLocalClassAnonymousClassOrFunction(secondLastSegment) == false
+    }
 
     protected open fun isProbablyClassName(segment: String): Boolean =
         // If it contains '$' then it's for sure a class name.
