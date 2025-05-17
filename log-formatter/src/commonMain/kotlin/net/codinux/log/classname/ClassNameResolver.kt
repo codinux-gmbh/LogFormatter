@@ -52,8 +52,10 @@ open class ClassNameResolver(
         // In Java, a $ in a class name represents nested (inner) or anonymous/local classes
         var declaringClassName = if (className.contains('$')) className.substringBefore('$')
                                 else null
-        if (declaringClassName?.endsWith(".Companion") == true) {
-            declaringClassName = declaringClassName.substring(0, declaringClassName.length - ".Companion".length)
+        if (declaringClassName?.contains(".") == true) {
+            declaringClassName = declaringClassName.substringBefore('.')
+        } else if (declaringClassName == null && className.contains('.')) {
+            declaringClassName = className.substringBefore('.')
         }
 
         className = className.replace('$', '.')
