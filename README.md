@@ -51,7 +51,7 @@ Each service class can be configured in two ways:
   2. **Per method call** – if provided overrides instance options for that specific call
 
 
-## Usage
+## Class name
 
 ### Get class name for `KClass`
 
@@ -61,6 +61,8 @@ Each service class can be configured in two ways:
 val classNameComponents = ClassNameResolver.getClassNameComponents(TestClasses.OuterClass.InnerClass::class)
 ```
 
+
+## Stack trace
 
 ### Extract stack trace from Throwable
 
