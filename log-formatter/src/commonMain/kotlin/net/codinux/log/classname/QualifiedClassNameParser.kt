@@ -77,7 +77,7 @@ open class QualifiedClassNameParser {
         val className = reversedClassNameSegments.reversed().joinToString(".")
         val packageName = qualifiedClassName.substring(0, qualifiedClassName.length - className.length - 1)
 
-        return ClassAndPackageName(className.replace('$', '.'), packageName, category, enclosingClassName)
+        return ClassAndPackageName(className, packageName, category, enclosingClassName)
     }
 
 

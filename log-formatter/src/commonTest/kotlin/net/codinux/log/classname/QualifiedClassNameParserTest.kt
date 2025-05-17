@@ -92,8 +92,9 @@ class QualifiedClassNameParserTest {
         if (Platform.type == PlatformType.WasmJs) {
             assertClassName(result, "LocalClass", ClassTypeCategory.TopLevel) // for WASM we have not chance to detect local classes
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.localClass.LocalClass",
+            assertClassName(result, "QualifiedClassNameParserTest\$localClass\$LocalClass",
                 ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
+            assertThat(result::classNameWithDotSeparatedAnonymousParts).isEqualTo("QualifiedClassNameParserTest.localClass.LocalClass")
         }
     }
 
@@ -107,8 +108,9 @@ class QualifiedClassNameParserTest {
         if (Platform.type == PlatformType.WasmJs) {
             assertClassName(result, "<anonymous class>", ClassTypeCategory.LocalClassAnonymousClassOrFunction)
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.anonymousClass.anonymous.1",
+            assertClassName(result, "QualifiedClassNameParserTest\$anonymousClass\$anonymous\$1",
                 ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
+            assertThat(result::classNameWithDotSeparatedAnonymousParts).isEqualTo("QualifiedClassNameParserTest.anonymousClass.anonymous.1")
         }
     }
 
@@ -121,11 +123,13 @@ class QualifiedClassNameParserTest {
         if (Platform.isJsBrowserOrNodeJs) { // for lambdas JS only returns "Function<index>"
             assertClassName(result, "Function1", ClassTypeCategory.LocalClassAnonymousClassOrFunction)
         } else if (Platform.type == PlatformType.WasmJs) {
-            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda",
+            assertClassName(result, "QualifiedClassNameParserTest\$lambda\$lambda",
                 ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName)
+            assertThat(result::classNameWithDotSeparatedAnonymousParts).isEqualTo("QualifiedClassNameParserTest.lambda.lambda")
         } else {
-            assertClassName(result, "QualifiedClassNameParserTest.lambda.lambda.1",
+            assertClassName(result, "QualifiedClassNameParserTest\$lambda\$lambda\$1",
                 ClassTypeCategory.LocalClassAnonymousClassOrFunction, ThisClassName, ThisClassPackageName)
+            assertThat(result::classNameWithDotSeparatedAnonymousParts).isEqualTo("QualifiedClassNameParserTest.lambda.lambda.1")
         }
     }
 
