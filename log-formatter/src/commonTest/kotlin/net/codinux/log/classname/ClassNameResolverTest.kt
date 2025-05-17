@@ -39,7 +39,7 @@ class ClassNameResolverTest {
             assertClassName(result, "Companion_3")
         } else {
             // assert companionOwnerClassName correctly removes ".Companion" from class name
-            assertClassName(result, "DeclaringClass.Companion", companionOwnerClassName = "DeclaringClass")
+            assertClassName(result, "DeclaringClass.Companion", "DeclaringClass", "DeclaringClass")
         }
     }
 

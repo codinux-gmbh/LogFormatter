@@ -57,8 +57,7 @@ open class ClassNameResolver(
         val companionOwnerClassName = if (className.endsWith(".Companion")) className.substring(0, className.length - ".Companion".length)
                                     else null
 
-        return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class,
-            if (declaringClassName == companionOwnerClassName ) null else declaringClassName, companionOwnerClassName)
+        return ClassNameComponents(className, packageName, classInfo.type ?: ClassType.Class, declaringClassName, companionOwnerClassName)
     }
 
     protected open fun determineDeclaringClassName(className: String): String? {

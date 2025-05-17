@@ -25,8 +25,7 @@ actual object LogFormatterPlatform {
         }
 
         val isCompanionObject = isCompanionObject(javaClass)
-        // only set if class is nested in another class and javaClass.declaringClass is not a Companion object's owner
-        val declaringClassName = if (isCompanionObject == false || declaringClass != javaClass.enclosingClass) declaringClass?.simpleName else null
+        val declaringClassName = declaringClass?.simpleName
         val companionOwnerClassName = if (isCompanionObject) className.substringBeforeLast(".Companion") else null
 
         return ClassNameComponents(className, packageName, determineType(forClass, javaClass, isCompanionObject), declaringClassName, companionOwnerClassName)
