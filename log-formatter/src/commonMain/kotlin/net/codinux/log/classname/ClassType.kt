@@ -18,11 +18,10 @@ enum class ClassType {
     ;
 
 
-    val isClassOrObject by lazy {  this == Class || this == Object }
-
-    val isLocalClassAnonymousClassOrFunction by lazy {  this == LocalClass || this == AnonymousClass || this == Function }
-
-    // it could also be a top level function / lambda, but then compiler creates a class for it
-    val isNestedClass by lazy {  this == InnerClass || this == CompanionObject || isLocalClassAnonymousClassOrFunction }
+    val category: ClassTypeCategory by lazy { when (this) {
+        Class, Object -> ClassTypeCategory.TopLevel
+        CompanionObject, InnerClass -> ClassTypeCategory.Nested
+        LocalClass, AnonymousClass, Function -> ClassTypeCategory.LocalClassAnonymousClassOrFunction
+    } }
 
 }
