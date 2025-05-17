@@ -13,6 +13,17 @@ open class ClassNameResolver(
     }
 
 
+    /**
+     * Get the class name and may package name, enclosing and top-level class from a [KClass].
+     *
+     * Only accurate on `JVM`.
+     *
+     * On `Native` accurate for top-level, local and anonymous classes and functions.
+     *
+     * On `JavaScript including WASM` only the direct class name is returned, no package names,
+     * enclosing or top-level classes. E.g. for Companion objects only `"Companion"` is returned.
+     * On `JS` returns for functions `"Function"`, on `WASM` for anonymous classes `"<anonymous class>"`.
+     */
     open fun getClassNameComponents(forClass: KClass<*>): ClassNameComponents {
         LogFormatterPlatform.getClassComponents(forClass)?.let {
             return it
