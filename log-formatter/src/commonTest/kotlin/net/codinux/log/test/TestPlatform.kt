@@ -14,7 +14,3 @@ object TestPlatform {
     val SupportsPackageNames = Platform.isJavaScript == false
 
 }
-
-
-val Platform.isJsBrowserOrNodeJs
-    get() = type == PlatformType.JsBrowser || type == PlatformType.JsNodeJs

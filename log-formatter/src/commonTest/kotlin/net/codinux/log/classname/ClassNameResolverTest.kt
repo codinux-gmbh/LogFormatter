@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
 import net.codinux.kotlin.platform.isJavaScript
+import net.codinux.kotlin.platform.isJsBrowserOrNodeJs
 import net.codinux.log.test.*
 import kotlin.test.Test
 
