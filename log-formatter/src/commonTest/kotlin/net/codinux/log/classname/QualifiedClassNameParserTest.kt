@@ -78,7 +78,18 @@ class QualifiedClassNameParserTest {
         } else if (Platform.isJsBrowserOrNodeJs) { // for Companions JS only returns "Companion_<index>"
             assertClassName(result, "Companion_2", ClassTypeCategory.Nested)
         } else {
-            assertClassName(result, "DeclaringClass.InnerClass.Companion", ClassTypeCategory.Nested, "InnerClass")
+            assertClassName(result, "DeclaringClass.InnerClass.Companion", ClassTypeCategory.Nested, "DeclaringClass.InnerClass")
+        }
+    }
+
+    @Test
+    fun secondLevelInnerClass_GuessClassHierarchy() {
+        val result = extractClassAndPackageName(DeclaringClass.InnerClass.InnerClassInInnerClass::class, true)
+
+        if (Platform.isJavaScript) {
+            assertClassName(result, "InnerClassInInnerClass", ClassTypeCategory.TopLevel)
+        } else {
+            assertClassName(result, "DeclaringClass.InnerClass.InnerClassInInnerClass", ClassTypeCategory.Nested, "DeclaringClass.InnerClass")
         }
     }
 

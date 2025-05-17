@@ -48,7 +48,6 @@ open class QualifiedClassNameParser {
             if (isCompanionObject(lastSegment, secondLastSegment)) {
                 reversedClassNameSegments.add(secondLastSegment)
 
-                enclosingClassName = secondLastSegment
                 category = ClassTypeCategory.Nested
             }
         } else {
@@ -56,7 +55,6 @@ open class QualifiedClassNameParser {
             while (segmentToCheck >= 0 && isProbablyClassName(segments[segmentToCheck])) {
                 reversedClassNameSegments.add(segments[segmentToCheck])
 
-                enclosingClassName = secondLastSegment
                 category = ClassTypeCategory.Nested
 
                 segmentToCheck--
@@ -76,6 +74,10 @@ open class QualifiedClassNameParser {
 
         val className = reversedClassNameSegments.reversed().joinToString(".")
         val packageName = qualifiedClassName.substring(0, qualifiedClassName.length - className.length - 1)
+        if (reversedClassNameSegments.size > 1) {
+            enclosingClassName = (if (enclosingClassName == null) "" else "$enclosingClassName.") +
+                    reversedClassNameSegments.drop(1).reversed().joinToString(".")
+        }
 
         return ClassAndPackageName(className, packageName, category, enclosingClassName)
     }
