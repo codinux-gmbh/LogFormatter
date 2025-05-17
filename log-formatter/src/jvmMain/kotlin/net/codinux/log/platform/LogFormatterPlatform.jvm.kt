@@ -37,12 +37,7 @@ actual object LogFormatterPlatform {
         if (forClass.qualifiedName != null) {
             forClass.qualifiedName
         } else { // for lambdas, anonymous and local classes qualified name is null
-            val qualifiedName = forClass.toString()
-            if (qualifiedName.startsWith("class ")) {
-                qualifiedName.substring("class ".length)
-            } else {
-                qualifiedName
-            }
+            classNameResolver.clean(forClass.toString())
         }
 
     private fun <T : Any> isCompanionObject(javaClass: Class<T>) =

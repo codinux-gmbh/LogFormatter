@@ -76,7 +76,7 @@ open class ClassNameResolver(
         return declaringClassName
     }
 
-    protected open fun clean(classToString: String): String {
+    open fun clean(classToString: String): String {
         var cleaned = classToString
 
         if (cleaned.startsWith("class ")) { // remove 'class ' from beginning to .toString() return value

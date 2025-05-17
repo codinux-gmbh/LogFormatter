@@ -2,10 +2,14 @@ package net.codinux.log.platform
 
 import net.codinux.log.classname.ClassInfo
 import net.codinux.log.classname.ClassNameComponents
+import net.codinux.log.classname.ClassNameResolver
 import net.codinux.log.classname.ClassType
 import kotlin.reflect.KClass
 
 actual object LogFormatterPlatform {
+
+    private val classNameResolver = ClassNameResolver.Default
+
 
     actual fun <T : Any> getClassComponents(forClass: KClass<T>): ClassNameComponents? = null // only senseful on JVM
 
@@ -17,12 +21,7 @@ actual object LogFormatterPlatform {
         if (forClass.qualifiedName != null) {
             forClass.qualifiedName
         } else { // for lambdas, anonymous and local classes qualified name is null
-            val qualifiedName = forClass.toString()
-            if (qualifiedName.startsWith("class ")) {
-                qualifiedName.substring("class ".length)
-            } else {
-                qualifiedName
-            }
+            classNameResolver.clean(forClass.toString())
         }
 
     /**
