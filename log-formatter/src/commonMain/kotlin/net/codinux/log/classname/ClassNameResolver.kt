@@ -29,7 +29,7 @@ open class ClassNameResolver(
      */
     @JvmOverloads
     open fun getClassNameComponents(forClass: KClass<*>, guessClassHierarchy: Boolean = false): ClassNameComponents {
-        LogFormatterPlatform.getClassComponents(forClass)?.let {
+        LogFormatterPlatform.getClassComponents(forClass)?.let { // only on JVM class components can be determined directly via reflection
             return it
         }
 
