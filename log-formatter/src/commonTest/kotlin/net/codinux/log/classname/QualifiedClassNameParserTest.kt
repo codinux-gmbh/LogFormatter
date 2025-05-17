@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
+import net.codinux.kotlin.platform.isJavaScript
 import net.codinux.log.platform.LogFormatterPlatform
 import net.codinux.log.test.*
 import kotlin.reflect.KClass
@@ -54,6 +55,31 @@ class QualifiedClassNameParserTest {
         val result = extractClassAndPackageName(TestInlineClass::class)
 
         assertClassName(result, "TestInlineClass", ClassTypeCategory.TopLevel)
+    }
+
+
+    @Test
+    fun innerClass_GuessClassHierarchy() {
+        val result = extractClassAndPackageName(DeclaringClass.InnerClass::class, true)
+
+        if (Platform.isJavaScript) {
+            assertClassName(result, "InnerClass", ClassTypeCategory.TopLevel)
+        } else {
+            assertClassName(result, "DeclaringClass.InnerClass", ClassTypeCategory.Nested, "DeclaringClass")
+        }
+    }
+
+    @Test
+    fun innerClassCompanion_GuessClassHierarchy() {
+        val result = extractClassAndPackageName(DeclaringClass.InnerClass.Companion::class, true)
+
+        if (Platform.type == PlatformType.WasmJs) {
+            assertClassName(result, "Companion", ClassTypeCategory.Nested)
+        } else if (Platform.isJsBrowserOrNodeJs) { // for Companions JS only returns "Companion_<index>"
+            assertClassName(result, "Companion_2", ClassTypeCategory.Nested)
+        } else {
+            assertClassName(result, "DeclaringClass.InnerClass.Companion", ClassTypeCategory.Nested, "InnerClass")
+        }
     }
 
 
@@ -117,10 +143,10 @@ class QualifiedClassNameParserTest {
     }
 
 
-    private fun <T : Any> extractClassAndPackageName(kClass: KClass<T>): ClassAndPackageName {
+    private fun <T : Any> extractClassAndPackageName(kClass: KClass<T>, guessClassHierarchy: Boolean = false): ClassAndPackageName {
         val classInfo = LogFormatterPlatform.getClassInfo(kClass)
 
-        return underTest.extractClassAndPackageName(classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName ?: kClass.toString())
+        return underTest.extractClassAndPackageName(classInfo.qualifiedClassName ?: classInfo.classNameWithoutPackageName ?: kClass.toString(), guessClassHierarchy)
     }
 
 }

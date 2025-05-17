@@ -2,6 +2,7 @@ package net.codinux.log.classname
 
 import net.codinux.kotlin.platform.Platform
 import net.codinux.kotlin.platform.PlatformType
+import kotlin.jvm.JvmOverloads
 
 open class QualifiedClassNameParser {
 
@@ -10,7 +11,27 @@ open class QualifiedClassNameParser {
     }
 
 
-    open fun extractClassAndPackageName(qualifiedClassName: String): ClassAndPackageName {
+    /**
+     * Extracts the class name and package name from a full qualified name (FQN), that is a
+     * dot separated string in form `<package_name>.<class_name>`, may including anonymous or
+     * inner classes separated by `$` from enclosing class.
+     *
+     * The parameter `guessClassHierarchy` is only relevant when dealing with nested / inner classes,
+     * e.g. `OuterClass.InnerClass.NextInnerClass`, and you need to retrieve the full class hierarchy,
+     * for example to identify the outermost top-level (declaring) class.
+     *
+     * The class hierarchy detection is based on heuristics and **not guaranteed to be accurate**.
+     * It assumes that:
+     * - Segments starting with an uppercase letter are class names
+     * - Segments starting with a lowercase letter are package names
+     * - All trailing segments with an uppercase start are treated as the class hierarchy
+     * - The first segment from the end starting with a lowercase letter marks the package boundary
+     *
+     * @param qualifiedClassName The full qualified name (FQN) in form `<package_name>.<class_name>`.
+     * @param guessClassHierarchy Enables heuristic-based detection of the class hierarchy for nested or inner classes.
+     */
+    @JvmOverloads
+    open fun extractClassAndPackageName(qualifiedClassName: String, guessClassHierarchy: Boolean = false): ClassAndPackageName {
         val segments = qualifiedClassName.split('.')
         val lastSegment = segments.last()
         val secondLastSegment = if (segments.size > 1) segments[segments.size - 2] else null
@@ -21,12 +42,24 @@ open class QualifiedClassNameParser {
         val classNameSegments = mutableListOf<String>()
         classNameSegments.add(segments.last())
 
-        if (lastSegment == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
-            isLocalClassAnonymousClassOrFunction(secondLastSegment) == false) {
-            classNameSegments.add(secondLastSegment)
+        if (guessClassHierarchy == false) {
+            if (lastSegment == "Companion" && secondLastSegment != null && isProbablyClassName(secondLastSegment) &&
+                isLocalClassAnonymousClassOrFunction(secondLastSegment) == false) {
+                classNameSegments.add(secondLastSegment)
 
-            enclosingClassName = secondLastSegment
-            category = ClassTypeCategory.Nested
+                enclosingClassName = secondLastSegment
+                category = ClassTypeCategory.Nested
+            }
+        } else {
+            var segmentToCheck = segments.size - 2
+            while (segmentToCheck >= 0 && isProbablyClassName(segments[segmentToCheck])) {
+                classNameSegments.add(segments[segmentToCheck])
+
+                enclosingClassName = secondLastSegment
+                category = ClassTypeCategory.Nested
+
+                segmentToCheck--
+            }
         }
 
 
