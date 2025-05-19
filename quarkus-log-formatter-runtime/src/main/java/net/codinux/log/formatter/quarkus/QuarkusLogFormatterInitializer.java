@@ -27,6 +27,9 @@ import java.util.stream.IntStream;
 
 public class QuarkusLogFormatterInitializer {
 
+    public static String ExtFormatterDelegatingClassName = "org.jboss.logmanager.ExtFormatter$Delegating";
+
+
     public Handler initQuarkusLogFormatter() {
         return initQuarkusLogFormatter(new LogFormatterConfig());
     }
@@ -118,10 +121,12 @@ public class QuarkusLogFormatterInitializer {
     private PatternFormatter findPatternFormatter(ConsoleHandler handler) {
         try {
             Formatter formatter = handler.getFormatter();
+            Class<?> formatterDelegatingClass = getExtFormatterDelegatingClass();
+
             if (formatter instanceof PatternFormatter) {
                 return (PatternFormatter) formatter;
-            } else if (formatter instanceof ExtFormatter.Delegating) { // e.g. TextBannerFormatter, which is used in case of activated banner, is derived from ExtFormatter.Delegating
-                Field delegateField = getDeclaredFieldOrNull(ExtFormatter.Delegating.class, "delegate");
+            } else if (formatterDelegatingClass != null && formatterDelegatingClass.isInstance(formatter)) { // e.g. TextBannerFormatter, which is used in case of activated banner, is derived from ExtFormatter.Delegating
+                Field delegateField = getDeclaredFieldOrNull(formatterDelegatingClass, "delegate");
 
                 if (delegateField != null) {
                     if (delegateField.trySetAccessible()) {
@@ -251,6 +256,15 @@ public class QuarkusLogFormatterInitializer {
         }
 
         return null;
+    }
+
+
+    private Class<?> getExtFormatterDelegatingClass() {
+        try {
+            return Class.forName(ExtFormatterDelegatingClassName);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
 }

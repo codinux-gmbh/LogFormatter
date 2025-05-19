@@ -7,8 +7,6 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.runtime.RuntimeValue;
 import net.codinux.log.formatter.quarkus.config.QuarkusLogFormatterConfig;
-import org.jboss.logmanager.ExtFormatter;
-import org.jboss.logmanager.formatters.FormatStep;
 
 import java.util.Optional;
 import java.util.logging.Handler;
@@ -26,8 +24,8 @@ public class QuarkusLogFormatterSteps {
     @BuildStep
     ReflectiveClassBuildItem lokiLoggerClasses() { // register classes QuarkusLogFormatterInitializer introspects via reflection
         return ReflectiveClassBuildItem.builder(
-                ExtFormatter.Delegating.class,
-                FormatStep.class
+                "org.jboss.logmanager.formatters.FormatStep",
+                QuarkusLogFormatterInitializer.ExtFormatterDelegatingClassName
         )
         .fields(true)
         .methods(true)
