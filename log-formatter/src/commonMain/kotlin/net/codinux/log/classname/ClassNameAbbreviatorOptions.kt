@@ -28,7 +28,7 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
     val classNameAbbreviationEllipsis: String = "..."
 ) {
     companion object {
-        val Default = ClassNameAbbreviatorOptions()
+        val Default by lazy { ClassNameAbbreviatorOptions() }
 
         /**
          * Mimics the same behavior of Logback: Fill package segments from the end and keep class name and

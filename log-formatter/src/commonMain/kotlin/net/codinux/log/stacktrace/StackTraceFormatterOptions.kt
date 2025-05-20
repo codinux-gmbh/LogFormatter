@@ -59,7 +59,7 @@ data class StackTraceFormatterOptions(
     val maxStackTraceStringLength: Int? = null,
 ) {
     companion object {
-        val Default = StackTraceFormatterOptions()
+        val Default by lazy { StackTraceFormatterOptions() }
     }
 
     open class Builder {

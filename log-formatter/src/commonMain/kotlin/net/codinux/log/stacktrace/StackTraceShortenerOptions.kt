@@ -20,6 +20,6 @@ data class StackTraceShortenerOptions @JvmOverloads constructor(
     val maxNestedThrowables: Int? = null,
 ) {
     companion object {
-        val Default = StackTraceShortenerOptions()
+        val Default by lazy { StackTraceShortenerOptions() }
     }
 }

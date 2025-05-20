@@ -9,7 +9,7 @@ import kotlin.jvm.JvmOverloads
 open class QualifiedClassNameParser {
 
     companion object {
-        val Default = QualifiedClassNameParser()
+        val Default by lazy { QualifiedClassNameParser() }
     }
 
 

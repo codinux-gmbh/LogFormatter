@@ -8,7 +8,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
 ) {
 
     companion object {
-        val Default = ClassNameAbbreviator()
+        val Default by lazy { ClassNameAbbreviator() }
     }
 
 

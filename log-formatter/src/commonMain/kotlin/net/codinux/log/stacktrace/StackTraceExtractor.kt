@@ -14,7 +14,7 @@ open class StackTraceExtractor {
         // all others:     ... and 13 more common stack frames skipped
         val SkippedCommonStackFramesIndicatorRegex = Regex("""^\s*\.\.\. (?:and )?(\d+) more\s*(?:common stack frames skipped)?""")
 
-        val Default = StackTraceExtractor()
+        val Default by lazy { StackTraceExtractor() }
     }
 
     open fun extractStackTrace(throwable: Throwable): StackTrace =

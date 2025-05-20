@@ -8,7 +8,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
 ) {
 
     companion object {
-        val Default = StackTraceFormatter()
+        val Default by lazy { StackTraceFormatter() }
     }
 
 

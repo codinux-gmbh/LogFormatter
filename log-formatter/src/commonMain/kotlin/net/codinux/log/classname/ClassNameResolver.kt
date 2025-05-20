@@ -10,7 +10,7 @@ open class ClassNameResolver(
 ) {
 
     companion object {
-        val Default = ClassNameResolver()
+        val Default by lazy { ClassNameResolver() }
     }
 
 

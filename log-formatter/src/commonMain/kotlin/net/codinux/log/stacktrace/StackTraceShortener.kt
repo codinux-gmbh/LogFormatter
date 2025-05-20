@@ -13,7 +13,7 @@ open class StackTraceShortener @JvmOverloads constructor(
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
 ) {
     companion object {
-        val Default = StackTraceShortener()
+        val Default by lazy { StackTraceShortener() }
     }
 
 
