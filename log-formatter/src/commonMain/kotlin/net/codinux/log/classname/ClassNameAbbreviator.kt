@@ -7,6 +7,11 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
     protected val options: ClassNameAbbreviatorOptions = ClassNameAbbreviatorOptions.Default
 ) {
 
+    companion object {
+        val Default = ClassNameAbbreviator()
+    }
+
+
     open fun abbreviate(qualifiedClassName: String, maxLength: Int, options: ClassNameAbbreviatorOptions = this.options): String {
         if (qualifiedClassName.length <= maxLength) {
             return qualifiedClassName

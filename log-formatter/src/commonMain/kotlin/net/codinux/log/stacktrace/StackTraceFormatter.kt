@@ -7,6 +7,11 @@ open class StackTraceFormatter @JvmOverloads constructor(
     protected val stackTraceShortener: StackTraceShortener = StackTraceShortener.Default
 ) {
 
+    companion object {
+        val Default = StackTraceFormatter()
+    }
+
+
     @JvmOverloads
     open fun format(throwable: Throwable, options: StackTraceFormatterOptions = this.options) =
         format(stackTraceShortener.shorten(throwable), options)
