@@ -2,8 +2,11 @@ package net.codinux.log.formatter
 
 import net.codinux.kotlin.text.LineSeparator
 import net.codinux.log.LogEvent
+import net.codinux.log.stacktrace.StackTraceFormatter
 
-open class DefaultLogEventFormatter : LogEventFormatter {
+open class DefaultLogEventFormatter(
+    protected open val stackTraceFormatter: StackTraceFormatter = StackTraceFormatter.Default
+) : LogEventFormatter {
 
     override fun formatEvent(event: LogEvent): String =
         "${event.level.toString().padEnd(5, ' ')} ${event.loggerName} " +
@@ -11,7 +14,7 @@ open class DefaultLogEventFormatter : LogEventFormatter {
 
     open fun formatMessage(message: String, exception: Throwable?): String =
         if (exception != null) {
-            "$message:${LineSeparator.System}${exception.stackTraceToString()}"
+            "$message:${LineSeparator.System}${stackTraceFormatter.format(exception)}"
         } else {
             message
         }
