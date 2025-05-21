@@ -21,7 +21,7 @@ class FieldsLogEventFormatterTest {
     fun defaultFields_WithoutThrowable() {
         val result = FieldsLogEventFormatter().formatEvent(EventWithoutThrowable)
 
-        assertThat(result).isEqualTo("Info UserService [main] Just a test message${LineSeparator.System}")
+        assertThat(result).isEqualTo("Info  UserService [main] Just a test message${LineSeparator.System}")
     }
 
     @Test
@@ -30,7 +30,7 @@ class FieldsLogEventFormatterTest {
 
         val lines = result.lines()
         assertThat(lines.size).isGreaterThan(2)
-        assertThat(lines.first()).isEqualTo("Info UserService [main] Just a test message")
+        assertThat(lines.first()).isEqualTo("Info  UserService [main] Just a test message")
         assertThat(lines[1]).endsWith("Throwable: No animals have been harmed")
         assertThat(result).endsWith(LineSeparator.System)
     }

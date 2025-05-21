@@ -9,7 +9,7 @@ open class FieldsLogEventFormatter(
 
     companion object {
         private val DefaultFields = listOf(
-            LogLevelFormatter(),
+            LogLevelFormatter(FieldFormat(minWidth = 5, pad = FieldFormat.Padding.End)),
             LiteralFormatter.Whitespace,
             LoggerNameFormatter(),
             LiteralFormatter(" ["),
