@@ -10,7 +10,7 @@ open class FieldsLogEventFormatter(
     companion object {
         private val DefaultFields = listOf(
             LogLevelFormatter(),
-            WhitespaceFormatter,
+            LiteralFormatter.Whitespace,
             LoggerNameFormatter(),
             LiteralFormatter(" ["),
             ThreadNameFormatter(),

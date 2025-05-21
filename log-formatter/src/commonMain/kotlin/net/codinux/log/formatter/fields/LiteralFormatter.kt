@@ -6,6 +6,11 @@ open class LiteralFormatter(
     open val literal: String
 ) : LogLinePartFormatter {
 
+    companion object {
+        val Whitespace = LiteralFormatter(" ")
+    }
+
+
     override fun convertTo(event: LogEvent) = literal
 
 
