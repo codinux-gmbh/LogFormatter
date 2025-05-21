@@ -3,7 +3,7 @@ package net.codinux.log.formatter.fields
 import net.codinux.log.LogEvent
 
 abstract class FieldFormatter(
-    protected open val format: FieldFormat? = null
+    open val format: FieldFormat? = null
 ) : LogLinePartFormatter {
 
     companion object {

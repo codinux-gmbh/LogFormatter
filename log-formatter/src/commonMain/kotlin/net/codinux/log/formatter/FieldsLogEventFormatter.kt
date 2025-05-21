@@ -31,4 +31,7 @@ open class FieldsLogEventFormatter(
         }
     }
 
+
+    override fun toString() = "Fields LogEventFormatter with fields: $fields"
+
 }
