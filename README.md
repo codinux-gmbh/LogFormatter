@@ -124,6 +124,78 @@ private fun printStackTrace(stackTrace: StackTrace) {
 ```
 
 
+## Message formatter
+
+We provide different implementations of the `LogEventFormatter` interface to format a `LogEvent`, e.g. to output it on the console.
+
+### DefaultLogEventFormatter
+
+The one to take if you don't know which one to take. Provides a sensible default log pattern (explanation see below): 
+```
+"%-5level %logger [%thread] - %message%n%exception"
+```
+
+### FieldsLogEventFormatter
+
+You can specify which fields to log directly in code. E.g. to get the same pattern as above:
+
+```kotlin
+val formatter = FieldsLogEventFormatter(listOf(
+  LogLevelFormatter(FieldFormat(minWidth = 5, pad = FieldFormat.Padding.End)),
+  LiteralFormatter.Whitespace,
+  LoggerNameFormatter(),
+  LiteralFormatter(" ["),
+  ThreadNameFormatter(),
+  LiteralFormatter("] "),
+  MessageFormatter(),
+  LineSeparatorFormatter(),
+  ThrowableFormatter()
+))
+```
+
+
+### PatternLogEventFormatter
+
+Provides the ability to specify the log output as a string pattern like `"%-5level [%logger] (%thread) %message%n%exception"`.
+It follows the same pattern format of Logback and JBoss Logging except that we do not support all of their fields.
+
+Each conversion specifier starts with a percent sign `%` and is followed by optional _format modifiers_, a _conversion word_ and optional parameters between braces. 
+
+The conversion word controls the data field to convert, e.g. logger name, level, date or thread name. 
+
+The format modifiers control field width, padding, and left or right justification.
+
+#### Format modifiers
+
+E.g. `%-10.-20logger` specifies:
+
+- Min field width = `10`
+- Padded with white spaces at end (first `-`, default is padding at start) if field value is shorter than `10`
+- Max field width = `20`
+- Truncated at end (second `-`, default is truncation at start) if field value is longer than `20`
+
+For a detailed explanation see:
+https://logback.qos.ch/manual/layouts.html#formatModifiers
+
+#### Conversion words
+
+Implemented conversion words are:
+
+| Conversion word                         | Description                                                                                                                                                  |
+|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `%level`, `%le`, `%l`                   | Log level (like `Info`, `Error`, ...).                                                                                                                       |
+| `%logger`, `%lo`, `%c`                  | Logger (category) name that issued this log event.                                                                                                           |
+| `%thread`, `%th`, `%t`                  | Name of the thread that generated the event. May not available on all systems.                                                                               |
+| `%message`, `%msg`, `%m`                | The message of this log event.                                                                                                                               |
+| `%exception`, `%throwable`, `%ex`, `%e` | The exception message and stack trace, if any.                                                                                                               |
+| `%rootException`, `%rEx`                | The same as `%exception`, but the root cause first = inverts the order of the nested exceptions, as the root cause is in most cases the most meaningful one. |
+| `$n`                                    | Platform dependent line separator, e.g. `\r\n` on Windows or `\n` on Unix systems.                                                                           |
+
+
+As they follow Logback's and JBoss Logging's implementation, for more information see:
+https://logback.qos.ch/manual/layouts.html#conversionWord
+
+
 ## Class name
 
 ### Get class name for `KClass`
