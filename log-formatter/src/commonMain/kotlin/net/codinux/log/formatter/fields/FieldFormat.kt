@@ -16,7 +16,7 @@ open class FieldFormat(
         End
     }
 
-    open val minAndMaxWidthNotSet: Boolean
-        get() = (minWidth == null || (minWidth ?: -1) < 0)
-                && (maxWidth == null || maxWidth == Int.MAX_VALUE)
+    open val isMinWidthOrMaxWidthSet: Boolean
+        get() = (minWidth != null && (minWidth ?: -1) > 0)
+                || (maxWidth != null && maxWidth!! > 0)
 }
