@@ -5,8 +5,7 @@ import assertk.assertions.*
 import net.codinux.kotlin.text.LineSeparator
 import net.codinux.log.LogEvent
 import net.codinux.log.LogLevel
-import net.codinux.log.formatter.fields.LiteralFormatter
-import net.codinux.log.formatter.fields.ThreadNameFormatter
+import net.codinux.log.formatter.fields.*
 import kotlin.test.Test
 
 class FieldsLogEventFormatterTest {
@@ -34,6 +33,64 @@ class FieldsLogEventFormatterTest {
         assertThat(lines.first()).isEqualTo("Info UserService [main] Just a test message")
         assertThat(lines[1]).endsWith("Throwable: No animals have been harmed")
         assertThat(result).endsWith(LineSeparator.System)
+    }
+
+
+    /*      Formatting          */
+
+    @Test
+    fun padStart() {
+        val underTest = FieldsLogEventFormatter(LogLevelFormatter(FieldFormat(minWidth = 6, pad = FieldFormat.Padding.Start)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("  Info")
+    }
+
+    @Test
+    fun padEnd() {
+        val underTest = FieldsLogEventFormatter(LogLevelFormatter(FieldFormat(minWidth = 6, pad = FieldFormat.Padding.End)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("Info  ")
+    }
+
+    @Test
+    fun minWidthNotSet_NoPadding() {
+        val underTest = FieldsLogEventFormatter(LogLevelFormatter(FieldFormat(minWidth = null, pad = FieldFormat.Padding.End)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("Info")
+    }
+
+
+    @Test
+    fun truncateStart() {
+        val underTest = FieldsLogEventFormatter(LoggerNameFormatter(FieldFormat(maxWidth = 6, truncate = FieldFormat.Truncate.Start)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("ervice")
+    }
+
+    @Test
+    fun truncateEnd() {
+        val underTest = FieldsLogEventFormatter(LoggerNameFormatter(FieldFormat(maxWidth = 6, truncate = FieldFormat.Truncate.End)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("UserSe")
+    }
+
+    @Test
+    fun maxWidthNotSet_NoTruncation() {
+        val underTest = FieldsLogEventFormatter(LoggerNameFormatter(FieldFormat(maxWidth = null, truncate = FieldFormat.Truncate.End)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("UserService")
     }
 
 
