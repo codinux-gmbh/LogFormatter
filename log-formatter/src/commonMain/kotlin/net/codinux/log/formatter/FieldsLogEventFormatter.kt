@@ -22,6 +22,9 @@ open class FieldsLogEventFormatter(
     }
 
 
+    constructor(vararg fields: LogLinePartFormatter) : this(fields.toList())
+
+
     override fun formatEvent(event: LogEvent): String = buildString {
         fields.forEach { field ->
             append(field.convertTo(event))

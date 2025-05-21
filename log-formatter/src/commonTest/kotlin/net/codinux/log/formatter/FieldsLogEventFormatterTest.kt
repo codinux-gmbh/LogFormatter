@@ -5,6 +5,8 @@ import assertk.assertions.*
 import net.codinux.kotlin.text.LineSeparator
 import net.codinux.log.LogEvent
 import net.codinux.log.LogLevel
+import net.codinux.log.formatter.fields.LiteralFormatter
+import net.codinux.log.formatter.fields.ThreadNameFormatter
 import kotlin.test.Test
 
 class FieldsLogEventFormatterTest {
@@ -32,6 +34,23 @@ class FieldsLogEventFormatterTest {
         assertThat(lines.first()).isEqualTo("Info UserService [main] Just a test message")
         assertThat(lines[1]).endsWith("Throwable: No animals have been harmed")
         assertThat(result).endsWith(LineSeparator.System)
+    }
+
+
+    /*      Single fields       */
+
+    @Test
+    fun threadNameIsNull() {
+        val event = LogEvent(LogLevel.Info, "Just a test message", "UserService", threadName = null)
+
+        val result = FieldsLogEventFormatter(
+            LiteralFormatter(" ["),
+            ThreadNameFormatter(),
+            LiteralFormatter("] ")
+        ).formatEvent(event)
+
+
+        assertThat(result).isEqualTo(" [] ")
     }
 
 }
