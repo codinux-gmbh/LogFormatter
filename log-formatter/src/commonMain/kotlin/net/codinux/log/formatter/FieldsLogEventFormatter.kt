@@ -27,7 +27,7 @@ open class FieldsLogEventFormatter(
 
     override fun formatEvent(event: LogEvent): String = buildString {
         fields.forEach { field ->
-            append(field.convertTo(event))
+            append(field.format(event))
         }
     }
 

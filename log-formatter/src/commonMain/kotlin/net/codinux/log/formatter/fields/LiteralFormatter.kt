@@ -11,7 +11,7 @@ open class LiteralFormatter(
     }
 
 
-    override fun convertTo(event: LogEvent) = literal
+    override fun format(event: LogEvent) = literal
 
 
     override fun toString() = "Literal: '$literal'"

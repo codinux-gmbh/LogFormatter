@@ -83,7 +83,7 @@ class PatternParserTest {
         assertThat(fieldFormatter.format!!.maxWidth).isEqualTo(maxWidth)
         assertThat(fieldFormatter.format!!.truncate).isEqualTo(truncate)
 
-        return fieldFormatter.convertTo(Event)
+        return fieldFormatter.format(Event)
     }
 
 }

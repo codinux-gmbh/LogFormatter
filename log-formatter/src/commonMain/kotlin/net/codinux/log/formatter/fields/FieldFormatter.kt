@@ -14,7 +14,7 @@ abstract class FieldFormatter(
     protected abstract fun getField(event: LogEvent): String
 
 
-    override fun convertTo(event: LogEvent): String {
+    override fun format(event: LogEvent): String {
         val value = getField(event)
 
         val format = format

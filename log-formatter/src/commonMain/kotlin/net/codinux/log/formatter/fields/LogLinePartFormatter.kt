@@ -4,6 +4,6 @@ import net.codinux.log.LogEvent
 
 interface LogLinePartFormatter {
 
-    fun convertTo(event: LogEvent): String
+    fun format(event: LogEvent): String
 
 }
