@@ -10,6 +10,12 @@ open class ThrowableFormatter(
         StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true))
 ) : FieldFormatter(format) {
 
+    constructor(options: StackTraceFormatterOptions) : this(null, options)
+
+    constructor(format: FieldFormat? = null, options: StackTraceFormatterOptions)
+            : this(format, StackTraceFormatter(options))
+
+
     override fun getField(event: LogEvent): String =
         event.exception?.let { stackTraceFormatter.format(it) }
             ?: FieldValueNotAvailable
