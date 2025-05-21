@@ -11,23 +11,23 @@ import kotlin.test.Test
 
 class FieldsLogEventFormatterTest {
 
+    companion object {
+        private val EventWithoutThrowable = LogEvent(LogLevel.Info, "Just a test message", "UserService", "main")
+
+        private val EventWithThrowable = LogEvent(LogLevel.Info, "Just a test message", "UserService", "main", Throwable("No animals have been harmed"))
+    }
+
+
     @Test
     fun defaultFields_WithoutThrowable() {
-        val event = LogEvent(LogLevel.Info, "Just a test message", "UserService", "main")
-
-
-        val result = FieldsLogEventFormatter().formatEvent(event)
-
+        val result = FieldsLogEventFormatter().formatEvent(EventWithoutThrowable)
 
         assertThat(result).isEqualTo("Info UserService [main] Just a test message${LineSeparator.System}")
     }
 
     @Test
     fun defaultFields_WithThrowable() {
-        val event = LogEvent(LogLevel.Info, "Just a test message", "UserService", "main", Throwable("No animals have been harmed"))
-
-
-        val result = FieldsLogEventFormatter().formatEvent(event)
+        val result = FieldsLogEventFormatter().formatEvent(EventWithThrowable)
 
         val lines = result.lines()
         assertThat(lines.size).isGreaterThan(2)
@@ -41,13 +41,14 @@ class FieldsLogEventFormatterTest {
 
     @Test
     fun threadNameIsNull() {
-        val event = LogEvent(LogLevel.Info, "Just a test message", "UserService", threadName = null)
-
-        val result = FieldsLogEventFormatter(
+        val underTest = FieldsLogEventFormatter(
             LiteralFormatter(" ["),
             ThreadNameFormatter(),
             LiteralFormatter("] ")
-        ).formatEvent(event)
+        )
+        val event = LogEvent(LogLevel.Info, "Just a test message", "UserService", threadName = null)
+
+        val result = underTest.formatEvent(event)
 
 
         assertThat(result).isEqualTo(" [] ")
