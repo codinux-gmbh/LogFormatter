@@ -65,6 +65,15 @@ class FieldsLogEventFormatterTest {
         assertThat(result).isEqualTo("Info")
     }
 
+    @Test
+    fun minWidthZero_NoPadding() {
+        val underTest = FieldsLogEventFormatter(LogLevelFormatter(FieldFormat(minWidth = 0)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("Info")
+    }
+
 
     @Test
     fun truncateStart() {
@@ -87,6 +96,15 @@ class FieldsLogEventFormatterTest {
     @Test
     fun maxWidthNotSet_NoTruncation() {
         val underTest = FieldsLogEventFormatter(LoggerNameFormatter(FieldFormat(maxWidth = null, truncate = FieldFormat.Truncate.End)))
+
+        val result = underTest.formatEvent(EventWithoutThrowable)
+
+        assertThat(result).isEqualTo("UserService")
+    }
+
+    @Test
+    fun maxWidthZero_NoTruncation() {
+        val underTest = FieldsLogEventFormatter(LoggerNameFormatter(FieldFormat(maxWidth = 0)))
 
         val result = underTest.formatEvent(EventWithoutThrowable)
 

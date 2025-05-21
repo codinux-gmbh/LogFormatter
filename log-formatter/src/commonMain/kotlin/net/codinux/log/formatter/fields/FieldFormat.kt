@@ -2,7 +2,7 @@ package net.codinux.log.formatter.fields
 
 open class FieldFormat(
     open val minWidth: Int? = null,
-    open val maxWidth: Int? = null,
+    maxWidth: Int? = null,
     open val pad: Padding = Padding.Start, // don't like this default, but it's the default value of Logback
     open val truncate: Truncate = Truncate.Start, // don't like this default, but it's the default value of Logback
 ) {
@@ -15,6 +15,9 @@ open class FieldFormat(
         Start,
         End
     }
+
+
+    open val maxWidth: Int? = if (maxWidth == 0) null else maxWidth
 
     open val isMinWidthOrMaxWidthSet: Boolean
         get() = (minWidth != null && (minWidth ?: -1) > 0)
