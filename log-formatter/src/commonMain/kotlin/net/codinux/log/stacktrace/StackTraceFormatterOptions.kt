@@ -41,6 +41,13 @@ data class StackTraceFormatterOptions(
     val lineSeparator: String = LineSeparator.System,
 
     /**
+     * By default the last stack frame does not end with a line separator.
+     *
+     * Set to `true` to add a line separator at the end of the last stack frame.
+     */
+    val addLineSeparatorAtEnd: Boolean = false,
+
+    /**
      * The ellipsis string to show for skipped common frames, truncated frames when
      * [StackTraceShortenerOptions.maxFramesPerThrowable] is set or if stack trace
      * string exceeds [maxStackTraceStringLength].
@@ -78,6 +85,8 @@ data class StackTraceFormatterOptions(
         protected var wrappedByMessagePrefix: String = "Wrapped by:"
 
         protected var lineSeparator: String = LineSeparator.System
+        protected var addLineSeparatorAtEnd: Boolean = false
+
         protected var ellipsis: String = "..."
         protected var maxStackTraceStringLength: Int? = null
 
@@ -96,21 +105,29 @@ data class StackTraceFormatterOptions(
         fun wrappedByMessagePrefix(value: String) = apply { wrappedByMessagePrefix = value }
 
         fun lineSeparator(value: String) = apply { lineSeparator = value }
+        fun addLineSeparatorAtEnd(value: Boolean) = apply { addLineSeparatorAtEnd = value }
+
         fun ellipsis(value: String) = apply { ellipsis = value }
         fun maxStackTraceStringLength(value: Int?) = apply { maxStackTraceStringLength = value }
 
         fun build() = StackTraceFormatterOptions(
             messageLineIndent = messageLineIndent,
             stackFrameIndent = stackFrameIndent,
+
             causedByIndent = causedByIndent,
             causedByMessagePrefix = causedByMessagePrefix,
+
             ignoreSuppressedExceptions = ignoreSuppressedExceptions,
             suppressedExceptionIndent = suppressedExceptionIndent,
             suppressedExceptionMessagePrefix = suppressedExceptionMessagePrefix,
+
             rootCauseFirst = rootCauseFirst,
             wrappedByIndent = wrappedByIndent,
             wrappedByMessagePrefix = wrappedByMessagePrefix,
+
             lineSeparator = lineSeparator,
+            addLineSeparatorAtEnd = addLineSeparatorAtEnd,
+
             ellipsis = ellipsis,
             maxStackTraceStringLength = maxStackTraceStringLength
         )

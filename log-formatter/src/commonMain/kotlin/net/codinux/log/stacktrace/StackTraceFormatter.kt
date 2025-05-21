@@ -30,6 +30,10 @@ open class StackTraceFormatter @JvmOverloads constructor(
             appendStackTraceAndChildrenRootCauseLast(stackTrace, builder, options)
         }
 
+        if (options.addLineSeparatorAtEnd) {
+            builder.append(options.lineSeparator)
+        }
+
         if (exceedsMaxLength(builder, options)) {
             cropToMaxLength(builder, options)
         }
