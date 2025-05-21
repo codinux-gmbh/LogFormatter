@@ -77,6 +77,7 @@ kotlin {
 
     val kotlinxSerializationVersion: String by project
 
+    val logDataVersion: String by project
     val kmpBaseVersion: String by project
 
     val assertKVersion: String by project
@@ -85,6 +86,7 @@ kotlin {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
+            implementation("net.codinux.log:log-data:$logDataVersion")
             implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
         }
         commonTest.dependencies {
