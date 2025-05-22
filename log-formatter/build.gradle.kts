@@ -86,8 +86,8 @@ kotlin {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
-            implementation("net.codinux.log:log-data:$logDataVersion")
-            implementation("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
+            api("net.codinux.log:log-data:$logDataVersion")
+            api("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
