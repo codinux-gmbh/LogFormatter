@@ -9,7 +9,14 @@ open class PatternParser(
 ) {
 
     companion object {
-        val DefaultPattern = "%-5level [%logger{36}] (%thread) %msg%n%ex" // "%d{HH:mm:ss.SSS} %-5level [%logger{36}] (%thread) %msg%n%ex"
+
+        // original: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"; Logback adds exception automatically
+        val LogbackDefaultPattern = "[%thread] %-5level %logger{36} - %msg%n%ex"
+
+        // original: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n"; error message gets really written right after the log message
+        val QuarkusDefaultPattern = "%-5p [%c{3.}] (%t) %msg%n%ex"
+
+        val DefaultPattern = "%-5level [%logger{36}] (%thread) %msg%n%ex"
 
         val DefaultParsePatternRegex = Regex(
             "([^%]+)|" + // matches all parts that do not start with format specifier '%' = literal text
