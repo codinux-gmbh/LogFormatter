@@ -3,6 +3,9 @@ package net.codinux.log.formatter
 import net.codinux.log.LogEvent
 import net.codinux.log.formatter.pattern.PatternParser
 
+/**
+ * Formats log events according to the format pattern passed to the constructor.
+ */
 open class PatternLogEventFormatter(
     val pattern: String,
     parser: PatternParser = PatternParser.Default

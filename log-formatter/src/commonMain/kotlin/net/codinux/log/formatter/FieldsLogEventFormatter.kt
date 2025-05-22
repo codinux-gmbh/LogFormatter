@@ -3,6 +3,9 @@ package net.codinux.log.formatter
 import net.codinux.log.LogEvent
 import net.codinux.log.formatter.fields.*
 
+/**
+ * Formats log events according to the [LogLinePartFormatter] fields passed to the constructor.
+ */
 open class FieldsLogEventFormatter(
     protected open val fields: List<LogLinePartFormatter> = DefaultFields
 ) : LogEventFormatter {
