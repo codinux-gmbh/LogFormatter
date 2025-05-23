@@ -7,7 +7,7 @@ import net.codinux.log.formatter.pattern.PatternParser
 interface LogEventFormatter {
 
     companion object {
-        val Default by lazy { DefaultLogEventFormatter.Default }
+        val Simple by lazy { SimpleLogEventFormatter.Default }
 
         fun fields(vararg fields: LogLinePartFormatter) = FieldsLogEventFormatter(*fields)
 
