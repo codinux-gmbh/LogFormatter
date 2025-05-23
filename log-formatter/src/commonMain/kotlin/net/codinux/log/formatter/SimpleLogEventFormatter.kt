@@ -13,12 +13,12 @@ import net.codinux.log.stacktrace.StackTraceFormatter
  * <stacktrace>
  * ```
  */
-open class DefaultLogEventFormatter(
+open class SimpleLogEventFormatter(
     protected open val stackTraceFormatter: StackTraceFormatter = StackTraceFormatter.Default
 ) : LogEventFormatter {
 
     companion object {
-        val Default by lazy { DefaultLogEventFormatter() }
+        val Default by lazy { SimpleLogEventFormatter() }
     }
 
 
