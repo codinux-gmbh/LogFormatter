@@ -11,7 +11,7 @@ open class FieldsLogEventFormatter(
 ) : LogEventFormatter {
 
     companion object {
-        private val DefaultFields = listOf(
+        private val DefaultFields by lazy { listOf(
             LogLevelFormatter(FieldFormat(minWidth = 5, pad = FieldFormat.Padding.End)),
             LiteralFormatter.Whitespace,
             LoggerNameFormatter(),
@@ -21,7 +21,7 @@ open class FieldsLogEventFormatter(
             MessageFormatter(),
             LineSeparatorFormatter(),
             ThrowableFormatter()
-        )
+        ) }
     }
 
 

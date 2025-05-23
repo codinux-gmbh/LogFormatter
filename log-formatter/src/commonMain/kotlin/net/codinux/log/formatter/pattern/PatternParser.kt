@@ -29,7 +29,7 @@ open class PatternParser(
         )
 
 
-        val Default = PatternParser()
+        val Default by lazy { PatternParser() }
     }
 
 
