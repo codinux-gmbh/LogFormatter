@@ -65,30 +65,30 @@ class ClassNameAbbreviatorTest {
             options(ClassNameAbbreviationStrategy.EllipsisStart))
 
         assertThat(result).hasLength(maxLength)
-        assertThat(result).isEqualTo("...sName")
+        assertThat(result).isEqualTo("..ssName")
     }
 
     @Test
     fun classNameShorterThanMaxLength_EllipsisMiddle_EvenPartsLength() {
+        val maxLength = 18
+
+        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
+            options(ClassNameAbbreviationStrategy.EllipsisMiddle))
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("ServiceW..lassName")
+    }
+
+    @Test
+    fun classNameShorterThanMaxLength_EllipsisMiddle_OddPartsLength() {
         val maxLength = 19
 
         val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
             options(ClassNameAbbreviationStrategy.EllipsisMiddle))
 
         assertThat(result).hasLength(maxLength)
-        assertThat(result).isEqualTo("ServiceW...lassName")
-    }
-
-    @Test
-    fun classNameShorterThanMaxLength_EllipsisMiddle_OddPartsLength() {
-        val maxLength = 20
-
-        val result = underTest.abbreviate(LongPackageName + LongClassName, maxLength,
-            options(ClassNameAbbreviationStrategy.EllipsisMiddle))
-
-        assertThat(result).hasLength(maxLength)
         // if length of start and end parts is odd, start part is supposed to get the additional char
-        assertThat(result).isEqualTo("ServiceWi...lassName")
+        assertThat(result).isEqualTo("ServiceWi..lassName")
     }
 
     @Test
@@ -99,7 +99,7 @@ class ClassNameAbbreviatorTest {
             options(ClassNameAbbreviationStrategy.EllipsisEnd))
 
         assertThat(result).hasLength(maxLength)
-        assertThat(result).isEqualTo("Servi...")
+        assertThat(result).isEqualTo("Servic..")
     }
 
 

@@ -25,7 +25,7 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
      *
      * Defaults to `"..."`.
      */
-    val classNameAbbreviationEllipsis: String = "..."
+    val classNameAbbreviationEllipsis: String = ".."
 ) {
     companion object {
         val Default by lazy { ClassNameAbbreviatorOptions() }
