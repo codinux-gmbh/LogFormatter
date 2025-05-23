@@ -18,7 +18,7 @@ open class PatternParser(
 
         const val DefaultPattern = "%-5level [%logger{36}] (%thread) %msg%n%ex"
 
-        val DefaultParsePatternRegex = Regex(
+        val DefaultParsePatternRegex by lazy { Regex(
             "([^%]+)|" + // matches all parts that do not start with format specifier '%' = literal text
                     "(?:%" + // matches the format specifier '%' and therefore a format string...
                     "(?:(-)?(\\d+))?" + // optional minimum field width and pad field at end flag ('-')
@@ -26,7 +26,7 @@ open class PatternParser(
                     "(\\w+)" + // the actual conversion word, like 'level', 'message', 'msg', ...
                     "(?:\\{([^}]*)\\})?" + // and optionally conversion parameters in curly braces
                     ")"
-        )
+        ) }
 
 
         val Default by lazy { PatternParser() }
