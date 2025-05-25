@@ -22,8 +22,15 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val className = parts.last()
         val packageParts = parts.dropLast(1)
 
+        if (className.length == maxLength) {
+            return if (options.classNameAbbreviation == ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger) {
+                combine(firstCharOfEachPackageSegment(packageParts), className)
+            } else {
+                className
+            }
+        }
         // class name alone exceeds already maxLength
-        if (className.length >= maxLength) {
+        else if (className.length > maxLength) {
             return abbreviateClassName(className, packageParts, maxLength, options)
         }
 

@@ -102,6 +102,26 @@ class ClassNameAbbreviatorTest {
         assertThat(result).isEqualTo("Servic..")
     }
 
+    @Test
+    fun classNameLengthEqualsMaxLength_AnyOtherOptionThanToKeepFirstCharacterOfEachPackageSegment() {
+        val maxLength = 23
+
+        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength)
+
+        assertThat(result).hasLength(maxLength)
+        assertThat(result).isEqualTo("ClassWithoutPackageName")
+    }
+
+    @Test
+    fun classNameLengthEqualsMaxLength_KeepFirstCharacterOfEachPackageSegment() {
+        val maxLength = 23
+
+        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength, options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+
+        assertThat(result).hasLength(maxLength + 3 * 2)
+        assertThat(result).isEqualTo("n.c.l.ClassWithoutPackageName")
+    }
+
 
     @Test
     fun classNameAndMinPackageSegmentLengthShorterThanMaxLength_KeepClassNameEvenIfLonger() {
