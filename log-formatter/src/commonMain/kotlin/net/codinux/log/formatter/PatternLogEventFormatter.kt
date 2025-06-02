@@ -20,6 +20,8 @@ open class PatternLogEventFormatter(
     }
 
 
+    override fun formatMessage(event: LogEvent) = fieldsFormatter.formatMessage(event)
+
     override fun formatEvent(event: LogEvent) = fieldsFormatter.formatEvent(event)
 
 

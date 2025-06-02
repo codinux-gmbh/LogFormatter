@@ -17,6 +17,18 @@ interface LogEventFormatter {
     }
 
 
+    /**
+     * Formats only the message and exception (may separated by literals) part of a LogEvent.
+     *
+     * Some logging backends like OSLog (Apple systems) and Logcat (Android) output the log level
+     * and logger name themselves and we can only format the message and exception.
+     */
+    fun formatMessage(event: LogEvent): String
+
+    /**
+     * Formats the whole [LogEvent], that is - depending on formatter - next to message the
+     * exception, log level, logger name, thread name, timestamp, ...
+     */
     fun formatEvent(event: LogEvent): String
 
 }

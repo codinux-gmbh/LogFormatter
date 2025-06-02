@@ -28,9 +28,36 @@ open class FieldsLogEventFormatter(
     constructor(vararg fields: LogLinePartFormatter) : this(fields.toList())
 
 
-    override fun formatEvent(event: LogEvent): String = buildString {
+    protected open val messageFields: List<LogLinePartFormatter> = getMessageFields(fields)
+
+
+    override fun formatMessage(event: LogEvent): String = formatFields(messageFields, event)
+
+    override fun formatEvent(event: LogEvent): String = formatFields(fields, event)
+
+    protected open fun formatFields(fields: Collection<LogLinePartFormatter>, event: LogEvent): String = buildString {
         fields.forEach { field ->
             append(field.format(event))
+        }
+    }
+
+
+    protected open fun getMessageFields(fields: List<LogLinePartFormatter>): List<LogLinePartFormatter> {
+        val messageIndex = fields.indexOfFirst { it is MessageFormatter }
+        val throwableIndex = fields.indexOfFirst { it is ThrowableFormatter }
+
+        if (messageIndex == -1 && throwableIndex == -1) {
+            return emptyList()
+        } else if (messageIndex == -1) {
+            return listOf(fields[throwableIndex])
+        } else if (throwableIndex == -1) {
+            return listOf(fields[messageIndex])
+        }
+
+        val messageAndThrowablePart = fields.subList(messageIndex, throwableIndex)
+
+        return messageAndThrowablePart.filter {
+            it is MessageFormatter || it is ThrowableFormatter || it is LineSeparatorFormatter || it is LiteralFormatter
         }
     }
 

@@ -36,6 +36,42 @@ class FieldsLogEventFormatterTest {
     }
 
 
+    @Test
+    fun formatMessage_MessageOnly() {
+        val formatter = FieldsLogEventFormatter(MessageFormatter())
+
+        val result = formatter.formatEvent(EventWithThrowable) // Throwable may not be formatted
+
+        assertThat(result).isEqualTo(EventWithThrowable.message)
+    }
+
+    @Test
+    fun formatMessage_ThrowableOnly() {
+        val formatter = FieldsLogEventFormatter(ThrowableFormatter())
+
+        val result = formatter.formatEvent(EventWithThrowable) // message may not be formatted
+
+        assertThat(result).doesNotContain(EventWithThrowable.message)
+        val lines = result.lines()
+        assertThat(lines.first()).endsWith("Throwable: " + EventWithThrowable.exception!!.message!!)
+        assertThat(lines.size).isGreaterThan(1)
+    }
+
+    @Test
+    fun formatMessage_MesssageAndThrowableGetExtractedCorrectly() {
+        val literal = " - willingly inserted for test -"
+        val lineSeparator = LineSeparator.Unix
+        val formatter = FieldsLogEventFormatter(MessageFormatter(), LiteralFormatter(literal), LineSeparatorFormatter(lineSeparator), ThrowableFormatter())
+
+        val result = formatter.formatEvent(EventWithThrowable)
+
+        assertThat(result).startsWith(EventWithThrowable.message + literal + lineSeparator)
+        val lines = result.lines()
+        assertThat(lines[1]).endsWith("Throwable: " + EventWithThrowable.exception!!.message!!)
+        assertThat(lines.size).isGreaterThan(2)
+    }
+
+
     /*      Formatting          */
 
     @Test

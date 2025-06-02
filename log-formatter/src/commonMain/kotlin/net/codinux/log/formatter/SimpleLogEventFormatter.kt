@@ -24,14 +24,17 @@ open class SimpleLogEventFormatter(
 
     override fun formatEvent(event: LogEvent): String = with(event) {
         "${level.toString().padEnd(5, ' ')} $loggerName " +
-                "${threadName?.let { "[$it] " } ?: ""}- ${formatMessage(message, exception)}"
+                "${threadName?.let { "[$it] " } ?: ""}- ${formatMessage(event)}"
     }
 
-    open fun formatMessage(message: String, exception: Throwable?): String =
+    override fun formatMessage(event: LogEvent): String = with(event) {
+        val exception = event.exception
+
         if (exception != null) {
             "$message:${LineSeparator.System}${stackTraceFormatter.format(exception)}"
         } else {
             message
         }
+    }
 
 }
