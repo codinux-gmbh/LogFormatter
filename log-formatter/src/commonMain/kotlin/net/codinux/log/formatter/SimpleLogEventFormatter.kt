@@ -30,10 +30,10 @@ open class SimpleLogEventFormatter(
     override fun formatMessage(event: LogEvent): String = with(event) {
         val exception = event.exception
 
-        if (exception != null) {
-            "$message:${LineSeparator.System}${stackTraceFormatter.format(exception)}"
-        } else {
+        if (exception == null) {
             message
+        } else {
+            "$message:${LineSeparator.System}${stackTraceFormatter.format(exception)}"
         }
     }
 
