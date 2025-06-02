@@ -22,9 +22,10 @@ open class SimpleLogEventFormatter(
     }
 
 
-    override fun formatEvent(event: LogEvent): String =
-        "${event.level.toString().padEnd(5, ' ')} ${event.loggerName} " +
-                "${event.threadName?.let { "[$it] " } ?: ""}- ${formatMessage(event.message, event.exception)}"
+    override fun formatEvent(event: LogEvent): String = with(event) {
+        "${level.toString().padEnd(5, ' ')} $loggerName " +
+                "${threadName?.let { "[$it] " } ?: ""}- ${formatMessage(message, exception)}"
+    }
 
     open fun formatMessage(message: String, exception: Throwable?): String =
         if (exception != null) {
