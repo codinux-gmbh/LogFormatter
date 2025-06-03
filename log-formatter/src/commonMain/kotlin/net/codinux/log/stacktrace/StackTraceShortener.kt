@@ -28,7 +28,7 @@ open class StackTraceShortener @JvmOverloads constructor(
 
     open fun shorten(stackTrace: StackTrace, options: StackTraceShortenerOptions = this.options): ShortenedStackTrace {
         val shortened = if (options.maxNestedThrowables == null || options.maxNestedThrowables < 0) {
-            ShortenedStackTrace(stackTrace)
+            createShortenedStackTrace(stackTrace)
         } else {
             shortenedStackTraceWithMaxDepth(stackTrace, options.maxNestedThrowables)
         }
@@ -45,13 +45,17 @@ open class StackTraceShortener @JvmOverloads constructor(
         shortenedStackTraceWithMaxDepth(stackTrace, maxNestedThrowables, 0)
 
     protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, maxNestedThrowables: Int, countAddedNestedThrowables: Int): ShortenedStackTrace =
-        ShortenedStackTrace(stackTrace,
+        createShortenedStackTrace(stackTrace,
             if (countAddedNestedThrowables < maxNestedThrowables && stackTrace.causedBy != null) {
                 shortenedStackTraceWithMaxDepth(stackTrace.causedBy, maxNestedThrowables, countAddedNestedThrowables + 1)
             } else {
                 null
             }
         )
+
+    protected open fun createShortenedStackTrace(stackTrace: StackTrace,
+                                                 causedBy: ShortenedStackTrace? = stackTrace.causedBy?.let { createShortenedStackTrace(it) }) =
+        ShortenedStackTrace(stackTrace, causedBy)
 
 
     protected open fun truncateToMaxFramesPerThrowable(shortened: ShortenedStackTrace, maxFramesPerThrowable: Int) {
