@@ -117,6 +117,67 @@ class StackTraceShortenerTest {
     }
 
 
+    @Test
+    fun maxSuppressedThrowables_0() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = 0))
+
+        assertThat(result.suppressed).hasSize(0)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+    @Test
+    fun maxSuppressedThrowables_1() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = 1))
+
+        assertThat(result.suppressed).hasSize(1)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+    @Test
+    fun maxSuppressedThrowables_2() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = 2))
+
+        assertThat(result.suppressed).hasSize(2)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+    @Test
+    fun maxSuppressedThrowables_MoreThanNumberOfSuppressedExceptions() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = 3))
+
+        assertThat(result.suppressed).hasSize(2)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+    @Test
+    fun maxSuppressedThrowables_Null_MaxNumberOfSuppressedExceptionsIsReturned() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = null))
+
+        assertThat(result.suppressed).hasSize(2)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+    @Test
+    fun maxSuppressedThrowables_LessThanZero_MaxNumberOfSuppressedExceptionsIsReturned() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.shorten(throwable, options(maxSuppressedThrowables = -1))
+
+        assertThat(result.suppressed).hasSize(2)
+        assertThat(throwable.suppressedExceptions).hasSize(2)
+    }
+
+
     private fun assertMaxFramesPerThrowable(stackTrace: ShortenedStackTrace, maxFramesPerThrowable: Int, countMinSkippedCommonFrames: Int = 0) {
         assertThat(stackTrace.framesToDisplay).hasSize(maxFramesPerThrowable)
         assertThat(stackTrace.originalStackTrace).hasSize(maxFramesPerThrowable + stackTrace.countTruncatedFrames)
@@ -137,7 +198,7 @@ class StackTraceShortenerTest {
     }
 
 
-    private fun options(maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null) =
-        StackTraceShortenerOptions(maxFramesPerThrowable, maxNestedThrowables)
+    private fun options(maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null, maxSuppressedThrowables: Int? = null) =
+        StackTraceShortenerOptions(maxFramesPerThrowable, maxNestedThrowables, maxSuppressedThrowables)
 
 }

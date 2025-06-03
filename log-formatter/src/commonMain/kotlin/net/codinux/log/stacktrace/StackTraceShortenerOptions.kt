@@ -18,6 +18,8 @@ data class StackTraceShortenerOptions @JvmOverloads constructor(
      * Return the full hierarchy with all nested caused by Throwables.
      */
     val maxNestedThrowables: Int? = null,
+
+    val maxSuppressedThrowables: Int? = null,
 ) {
     companion object {
         val Default by lazy { StackTraceShortenerOptions() }

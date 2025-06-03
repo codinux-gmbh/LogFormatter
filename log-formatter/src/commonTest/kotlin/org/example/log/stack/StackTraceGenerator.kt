@@ -99,6 +99,11 @@ object StackTraceGenerator {
         e
     }
 
+    fun generateTwoSuppressed(): Throwable = Throwable().apply {
+        addSuppressed(SuppressedException("Suppressed #1"))
+        addSuppressed(SuppressedException("Suppressed #2"))
+    }
+
     private fun oneSuppressed() {
         twoSuppressed()
     }
