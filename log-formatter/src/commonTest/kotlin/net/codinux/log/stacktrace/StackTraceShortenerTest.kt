@@ -54,6 +54,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.causedBy).isNull()
         assertThat(throwable.cause).isNotNull()
+
+        assertThat(result.countSkippedNestedThrowables).isEqualTo(3)
     }
 
     @Test
@@ -65,6 +67,8 @@ class StackTraceShortenerTest {
         assertThat(result.causedBy).isNotNull()
 
         assertThat(result.causedBy!!.causedBy).isNull()
+
+        assertThat(result.causedBy!!.countSkippedNestedThrowables).isEqualTo(2)
     }
 
     @Test
@@ -78,6 +82,8 @@ class StackTraceShortenerTest {
         assertThat(result.causedBy!!.causedBy).isNotNull()
 
         assertThat(result.causedBy!!.causedBy!!.causedBy).isNull()
+
+        assertThat(result.causedBy!!.causedBy!!.countSkippedNestedThrowables).isEqualTo(1)
     }
 
     @Test
@@ -125,6 +131,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(0)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(2)
     }
 
     @Test
@@ -135,6 +143,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(1)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(1)
     }
 
     @Test
@@ -145,6 +155,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(2)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(0)
     }
 
     @Test
@@ -155,6 +167,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(2)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(0)
     }
 
     @Test
@@ -165,6 +179,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(2)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(0)
     }
 
     @Test
@@ -175,6 +191,8 @@ class StackTraceShortenerTest {
 
         assertThat(result.suppressed).hasSize(2)
         assertThat(throwable.suppressedExceptions).hasSize(2)
+
+        assertThat(result.countSkippedSuppressedThrowables).isEqualTo(0)
     }
 
 
@@ -195,6 +213,11 @@ class StackTraceShortenerTest {
         assertThat(result.causedBy!!.causedBy!!.causedBy).isNotNull()
 
         assertThat(result.causedBy!!.causedBy!!.causedBy!!.causedBy).isNull()
+
+        assertThat(result.countSkippedNestedThrowables).isEqualTo(0)
+        assertThat(result.causedBy!!.countSkippedNestedThrowables).isEqualTo(0)
+        assertThat(result.causedBy!!.causedBy!!.countSkippedNestedThrowables).isEqualTo(0)
+        assertThat(result.causedBy!!.causedBy!!.causedBy!!.countSkippedNestedThrowables).isEqualTo(0)
     }
 
 

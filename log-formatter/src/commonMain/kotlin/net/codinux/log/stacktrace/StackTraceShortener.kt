@@ -44,18 +44,32 @@ open class StackTraceShortener @JvmOverloads constructor(
     protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, options: StackTraceShortenerOptions, maxNestedThrowables: Int) =
         shortenedStackTraceWithMaxDepth(stackTrace, options, maxNestedThrowables, 0)
 
-    protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, options: StackTraceShortenerOptions, maxNestedThrowables: Int, countAddedNestedThrowables: Int): ShortenedStackTrace =
+    protected open fun shortenedStackTraceWithMaxDepth(stackTrace: StackTrace, options: StackTraceShortenerOptions, maxNestedThrowables: Int,
+                                                       countAddedNestedThrowables: Int, countSkippedNestedThrowables: Int = 0): ShortenedStackTrace =
         createShortenedStackTrace(stackTrace, options,
             if (countAddedNestedThrowables < maxNestedThrowables && stackTrace.causedBy != null) {
                 shortenedStackTraceWithMaxDepth(stackTrace.causedBy, options, maxNestedThrowables, countAddedNestedThrowables + 1)
             } else {
                 null
-            }
+            },
+            if (countAddedNestedThrowables == maxNestedThrowables) countSkippedNestedThrowables(stackTrace.causedBy) else 0
         )
 
+    protected open fun countSkippedNestedThrowables(causedBy: StackTrace?, visitedCauses: MutableSet<StackTrace> = mutableSetOf()): Int =
+        if (causedBy == null) 0
+        else if (visitedCauses.contains(causedBy)) 0 // circle detected
+        else {
+            visitedCauses.add(causedBy)
+            1 + countSkippedNestedThrowables(causedBy.causedBy, visitedCauses)
+        }
+
     protected open fun createShortenedStackTrace(stackTrace: StackTrace, options: StackTraceShortenerOptions,
-                                                 causedBy: ShortenedStackTrace? = stackTrace.causedBy?.let { createShortenedStackTrace(it, options) }) =
-        ShortenedStackTrace(stackTrace, causedBy, mapSuppressedExceptions(stackTrace, options))
+                                                 causedBy: ShortenedStackTrace? = stackTrace.causedBy?.let { createShortenedStackTrace(it, options) },
+                                                 countSkippedNestedThrowables: Int = 0): ShortenedStackTrace {
+        val suppressed = mapSuppressedExceptions(stackTrace, options)
+
+        return ShortenedStackTrace(stackTrace, causedBy, suppressed, countSkippedNestedThrowables, countSkippedSuppressedThrowables = stackTrace.suppressed.size - suppressed.size)
+    }
 
     protected open fun mapSuppressedExceptions(stackTrace: StackTrace, options: StackTraceShortenerOptions): List<ShortenedStackTrace> {
         val maxSuppressedThrowables = options.maxSuppressedThrowables
