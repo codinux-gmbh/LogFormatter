@@ -59,11 +59,14 @@ open class StackTraceFormatter @JvmOverloads constructor(
                 return // no need to add even more characters, maximum length already reached
             }
         }
+        appendCountSkippedSuppressedThrowables(stackTrace, builder, options, additionalIndent + options.suppressedExceptionIndent)
 
         stackTrace.causedBy?.let { causedBy ->
             builder.append(options.lineSeparator)
             appendStackTraceAndChildrenRootCauseLast(causedBy, builder, options, additionalIndent + options.causedByIndent, options.causedByMessagePrefix)
         }
+
+        appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + options.causedByIndent)
     }
 
     protected open fun appendStackTraceAndChildrenRootCauseFirst(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
@@ -96,6 +99,9 @@ open class StackTraceFormatter @JvmOverloads constructor(
                 return // no need to add even more characters, maximum length already reached
             }
         }
+        appendCountSkippedSuppressedThrowables(stackTrace, builder, options, additionalIndent + options.suppressedExceptionIndent)
+
+        appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + options.wrappedByIndent)
     }
 
     protected open fun appendStackTrace(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
@@ -114,6 +120,18 @@ open class StackTraceFormatter @JvmOverloads constructor(
         } else if (stackTrace.countSkippedCommonFrames > 0) {
             // TODO: Kotlin uses "... and 18 more common stack frames skipped", what is better?
             builder.append(options.lineSeparator + additionalIndent + options.stackFrameIndent + options.ellipsis + " ${stackTrace.countSkippedCommonFrames} common frames omitted")
+        }
+    }
+
+    protected open fun appendCountSkippedNestedThrowables(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions, additionalIndent: String) {
+        if (stackTrace.countSkippedNestedThrowables > 0) {
+            builder.append(options.lineSeparator + additionalIndent + options.ellipsis + " ${stackTrace.countSkippedNestedThrowables} nested cause(s) omitted")
+        }
+    }
+
+    protected open fun appendCountSkippedSuppressedThrowables(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions, additionalIndent: String) {
+        if (stackTrace.countSkippedSuppressedThrowables > 0) {
+            builder.append(options.lineSeparator + additionalIndent + options.ellipsis + " ${stackTrace.countSkippedSuppressedThrowables} suppressed exception(s) omitted")
         }
     }
 

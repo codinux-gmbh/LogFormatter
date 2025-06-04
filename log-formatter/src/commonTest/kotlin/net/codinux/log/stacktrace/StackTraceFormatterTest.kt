@@ -150,6 +150,43 @@ class StackTraceFormatterTest {
     }
 
 
+    @Test
+    fun maxNestedThrowables_1() {
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+        val stackTrace = shortenStackTrace(throwable, maxNestedThrowables = 1)
+        val options = StackTraceFormatterOptions()
+
+
+        val result = underTest.format(stackTrace, options)
+
+
+        assertThat(result).contains("ParentException: Wrapper #3")
+        assertThat(result).contains(options.lineSeparator + options.causedByIndent + options.causedByMessagePrefix)
+        assertThat(result).contains("Wrapper #2")
+        assertThat(result).doesNotContain("Wrapper #1")
+        assertThat(result).doesNotContain("Root cause")
+
+        assertThat(result).endsWith(options.lineSeparator + options.causedByIndent + options.ellipsis + " 2 nested cause(s) omitted")
+    }
+
+    @Test
+    fun maxSuppressedThrowables_1() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+        val stackTrace = shortenStackTrace(throwable, maxSuppressedThrowables = 1)
+        val options = StackTraceFormatterOptions()
+
+
+        val result = underTest.format(stackTrace, options)
+
+
+        assertThat(result).contains(options.lineSeparator + options.suppressedExceptionIndent + options.suppressedExceptionMessagePrefix)
+        assertThat(result).contains("Suppressed #1")
+        assertThat(result).doesNotContain("Suppressed #2")
+
+        assertThat(result).endsWith(options.lineSeparator + options.suppressedExceptionIndent + options.ellipsis + " 1 suppressed exception(s) omitted")
+    }
+
+
     private fun assertTruncatedStackTrace(lines: List<String>, stackTrace: ShortenedStackTrace, unqualifiedMessageLine: String,
                                           options: StackTraceFormatterOptions, maxFramesPerThrowable: Int, messageLinePrefix: String = "", additionalIndent: String = "") {
         assertThat(lines.size).isGreaterThanOrEqualTo(2 + maxFramesPerThrowable)
@@ -181,5 +218,9 @@ class StackTraceFormatterTest {
     private fun assertDoesNotEndWithLineSeparator(result: String, options: StackTraceFormatterOptions = StackTraceFormatterOptions.Default) {
         assertThat(result.endsWith(options.lineSeparator)).isFalse()
     }
+
+
+    private fun shortenStackTrace(throwable: Throwable, maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null, maxSuppressedThrowables: Int? = null) =
+        stackTraceShortener.shorten(throwable, StackTraceShortenerOptions(maxFramesPerThrowable, maxNestedThrowables, maxSuppressedThrowables))
 
 }
