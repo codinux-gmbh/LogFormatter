@@ -99,7 +99,7 @@ object StackTraceGenerator {
         e
     }
 
-    fun generateTwoSuppressed(): Throwable = Throwable().apply {
+    fun generateTwoSuppressed(): Throwable = RootCauseException("Root cause").apply {
         addSuppressed(SuppressedException("Suppressed #1"))
         addSuppressed(SuppressedException("Suppressed #2"))
     }

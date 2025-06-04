@@ -94,12 +94,26 @@ open class StackTraceExtractor {
 
             Pair(causedBy, emptyList())
         } else if (isSuppressedExceptionLine(messageLine)) {
+            val prefix = messageLine.substringBefore(SuppressedPrefix) + SuppressedPrefix
             messageLine = messageLine.substringAfter(SuppressedPrefix)
 
-            val remainingLines = listOf(messageLine) + stackTraceLines.drop(1)
+            val remainingStackTraceLines = stackTraceLines.drop(1)
+            val endIndex = remainingStackTraceLines.indexOfFirst { it.startsWith(prefix) }.takeUnless { it == -1 }
+                ?: remainingStackTraceLines.lastIndex
+
+            val remainingLines = listOf(messageLine) + remainingStackTraceLines.take(endIndex)
             val suppressed = extractStackTrace(remainingLines)
 
-            Pair(suppressed.causedBy, listOf(suppressed) + suppressed.suppressed)
+            val indicesOfSameLevelSuppressedExceptions = remainingStackTraceLines.mapIndexedNotNull { index, line ->
+                if (line.startsWith(prefix)) index else null
+            }
+            val sameLevelSuppressedExceptions = indicesOfSameLevelSuppressedExceptions.mapIndexed { index, lineIndex ->
+                val lines = remainingStackTraceLines.subList(lineIndex, if (index < indicesOfSameLevelSuppressedExceptions.size - 1) indicesOfSameLevelSuppressedExceptions[index + 1] - 1 else remainingStackTraceLines.lastIndex)
+                val sameLevelSuppressedExceptionMessageLine = lines.first().substringAfter(prefix)
+                extractStackTrace(listOf(sameLevelSuppressedExceptionMessageLine) + lines.drop(1))
+            }
+
+            Pair(null, listOf(suppressed) + sameLevelSuppressedExceptions)
         } else {
             ErrorReporter.reportError("Cannot extract causedBy or suppressed Stack Trace. " +
                     "Unexpected stack trace line '${stackTraceLines.first()}' in stack trace, expected to start with '$CausedByPrefix' or '$SuppressedPrefix'")

@@ -79,6 +79,30 @@ class StackTraceExtractorTest {
         assertThat(firstSuppressedException.countSkippedCommonFrames).isGreaterThanOrEqualTo(13)
     }
 
+    @Test
+    fun twoSuppressedThrowables() {
+        val throwable = StackTraceGenerator.generateTwoSuppressed()
+
+        val result = underTest.extractStackTrace(throwable)
+
+        assertIsRootCause(result, 2)
+        assertThat(result::countSkippedCommonFrames).isEqualTo(0)
+
+        assertThat(result::suppressed).hasSize(2)
+
+        val firstSuppressedException = result.suppressed.first()
+        assertThat(firstSuppressedException::messageLine).isIn("SuppressedException: Suppressed #1", "org.example.log.stack.SuppressedException: Suppressed #1")
+        assertThat(firstSuppressedException.stackTrace.size).isGreaterThanOrEqualTo(1) // on JVM there's really only on frame left
+        assertThat(firstSuppressedException::suppressed).isEmpty()
+        assertThat(firstSuppressedException::countSkippedCommonFrames).isGreaterThanOrEqualTo(11)
+
+        val secondSuppressedException = result.suppressed[1]
+        assertThat(secondSuppressedException::messageLine).isIn("SuppressedException: Suppressed #2", "org.example.log.stack.SuppressedException: Suppressed #2")
+        assertThat(secondSuppressedException.stackTrace.size).isGreaterThanOrEqualTo(1) // on JVM there's really only on frame left
+        assertThat(secondSuppressedException::suppressed).isEmpty()
+        assertThat(secondSuppressedException::countSkippedCommonFrames).isGreaterThanOrEqualTo(11)
+    }
+
 
     @Test
     fun isCausedByLine_CausedByLine() {
@@ -264,17 +288,17 @@ class StackTraceExtractorTest {
 
 
     private fun assertIsRootCause(stackTrace: StackTrace, countSuppressedExceptions: Int = 0) {
-        assertThat(stackTrace.messageLine).isIn("RootCauseException: Root cause", "org.example.log.stack.RootCauseException: Root cause")
+        assertThat(stackTrace::messageLine).isIn("RootCauseException: Root cause", "org.example.log.stack.RootCauseException: Root cause")
         assertThat(stackTrace.stackTrace.size).isGreaterThanOrEqualTo(5)
-        assertThat(stackTrace.causedBy).isNull()
-        assertThat(stackTrace.suppressed).hasSize(countSuppressedExceptions)
+        assertThat(stackTrace::causedBy).isNull()
+        assertThat(stackTrace::suppressed).hasSize(countSuppressedExceptions)
     }
 
     private fun assertIsFirstParentException(stackTrace: StackTrace) {
-        assertThat(stackTrace.messageLine).isIn("ParentException: Wrapper #1", "org.example.log.stack.ParentException: Wrapper #1")
+        assertThat(stackTrace::messageLine).isIn("ParentException: Wrapper #1", "org.example.log.stack.ParentException: Wrapper #1")
         assertThat(stackTrace.stackTrace.size).isGreaterThanOrEqualTo(4)
-        assertThat(stackTrace.causedBy).isNotNull()
-        assertThat(stackTrace.suppressed).isEmpty()
+        assertThat(stackTrace::causedBy).isNotNull()
+        assertThat(stackTrace::suppressed).isEmpty()
     }
 
 }

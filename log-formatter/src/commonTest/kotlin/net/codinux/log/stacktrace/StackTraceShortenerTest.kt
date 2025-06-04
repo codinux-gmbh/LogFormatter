@@ -144,6 +144,8 @@ class StackTraceShortenerTest {
         assertThat(result.suppressed).hasSize(1)
         assertThat(throwable.suppressedExceptions).hasSize(2)
 
+        assertThat(result.suppressed.first().suppressed).isEmpty()
+
         assertThat(result.countSkippedSuppressedThrowables).isEqualTo(1)
     }
 
