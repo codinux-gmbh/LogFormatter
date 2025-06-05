@@ -5,6 +5,7 @@ import assertk.assertions.*
 import net.codinux.kotlin.text.LineSeparator
 import net.codinux.log.LogEvent
 import net.codinux.log.LogLevel
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class ThrowableFormatterTest {
@@ -53,13 +54,37 @@ class ThrowableFormatterTest {
     fun maxStackFrames_rootCauseFirst() {
         val result = ThrowableFormatter(null, "2", true).format(event())
 
-        println(result)
-
         val lines = result.lines()
         assertThat(lines.size).isIn(7, 9)
 
         assertThat(lines.first()).endsWith("Throwable: Root cause")
         assertThat(lines.any { it.endsWith("Throwable: Outer Exception") }).isTrue()
+
+        assertThat(result).endsWith(LineSeparator.System)
+    }
+
+
+    @Test
+    fun maxNestedThrowables() {
+        val result = ThrowableFormatter(null, "-1,0").format(event())
+
+        val lines = result.lines()
+
+        assertThat(lines.first()).endsWith("Throwable: Outer Exception")
+        assertThat(result).doesNotContain("Throwable: Root cause")
+
+        assertThat(result).endsWith(LineSeparator.System)
+    }
+
+    @Ignore // TODO: does currently not work, fix StackTraceFormatter first
+    @Test
+    fun maxNestedThrowables_rootCauseFirst() {
+        val result = ThrowableFormatter(null, "-1,0", true).format(event())
+
+        val lines = result.lines()
+
+        assertThat(lines.first()).endsWith("Throwable: Root cause")
+        assertThat(result).doesNotContain("Throwable: Outer Exception")
 
         assertThat(result).endsWith(LineSeparator.System)
     }

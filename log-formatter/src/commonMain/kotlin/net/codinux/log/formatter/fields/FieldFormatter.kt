@@ -29,6 +29,8 @@ abstract class FieldFormatter(
         }
     }
 
+    open val secondOptionAsInt: Int? by lazy { secondOption?.toIntOrNull() }
+
     protected open fun unwrapOption(option: String?): String? =
         if (option == null) {
             null

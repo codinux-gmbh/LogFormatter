@@ -12,6 +12,11 @@ open class StackTraceFormatter @JvmOverloads constructor(
     }
 
 
+    constructor(options: StackTraceFormatterOptions,
+                shortenerOptions: StackTraceShortenerOptions = StackTraceShortenerOptions.Default)
+            : this(options, StackTraceShortener(shortenerOptions))
+
+
     @JvmOverloads
     open fun format(throwable: Throwable, options: StackTraceFormatterOptions = this.options) =
         format(stackTraceShortener.shorten(throwable), options)

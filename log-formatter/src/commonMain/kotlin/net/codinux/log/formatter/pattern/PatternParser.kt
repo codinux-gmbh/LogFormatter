@@ -55,8 +55,8 @@ open class PatternParser(
         "level", "le", "l" -> LogLevelFormatter(format)
         "logger", "lo", "c" -> LoggerNameFormatter(format) // TODO: option is: length (-> abbreviate logger name)
         "message", "msg", "m" -> MessageFormatter(format)
-        "exception", "throwable", "ex", "e" -> ThrowableFormatter(format) // TODO: option is: short, full or number of stack frames (per Throwable?)
-        "rootException", "rEx" -> ThrowableFormatter(format, StackTraceFormatterOptions(rootCauseFirst = true)) // TODO: option is: short, full or number of stack frames (per Throwable?)
+        "exception", "throwable", "ex", "e" -> ThrowableFormatter(format, options) // other values for first option would be "short" and "full", but "full" is senseful and "short" is equal to '1'
+        "rootException", "rEx" -> ThrowableFormatter(format, options, true) // other values for first option would be "short" and "full", but "full" is senseful and "short" is equal to '1'
         "date", "d" -> DateTimeFormatter(format, options) // TODO: third option is locale
         "thread", "th", "t" -> ThreadNameFormatter(format)
         "n" -> LineSeparatorFormatter(format = format)
