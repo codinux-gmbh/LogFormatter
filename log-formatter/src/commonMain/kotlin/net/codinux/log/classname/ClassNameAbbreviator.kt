@@ -99,8 +99,14 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
 
             val candidate = combine(abbreviatedParts, className)
             if (candidate.length > maxLength) {
-                // Revert the last expansion since it caused overflow
-                abbreviatedParts[i] = packageParts[i].first().toString()
+                // the last expansion caused an overflow, truncate it to optimal length
+                val countTooManyChars = candidate.length - maxLength
+                if (abbreviatedParts[i].length - countTooManyChars <= 0) {
+                    abbreviatedParts[i] = packageParts[i].first().toString() // keep at least one character
+                } else {
+                    abbreviatedParts[i] = abbreviatedParts[i].dropLast(countTooManyChars)
+                }
+
                 break
             }
         }

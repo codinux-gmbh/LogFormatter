@@ -186,6 +186,24 @@ class ClassNameAbbreviatorTest {
         assertThat(result).isEqualTo("org.company.project.module.s.f.s." + ShortClassName)
     }
 
+    @Test
+    fun fillPackageSegmentsFromTheStart_FirstSegmentGetsFilledTillMaxLength() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName,
+            ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 1,
+            options(PackageAbbreviationStrategy.FillSegmentsFromStart))
+
+        assertThat(result).isEqualTo("or.c.p.m.s.f.s." + ShortClassName)
+    }
+
+    @Test
+    fun fillPackageSegmentsFromTheStart_LastSegmentGetsFilledTillMaxLength() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName,
+            ShortClassName.length + LongPackageName.length - 1,
+            options(PackageAbbreviationStrategy.FillSegmentsFromStart))
+
+        assertThat(result).isEqualTo("org.company.project.module.submodule.feature.servic." + ShortClassName)
+    }
+
 
     @Test
     fun fillPackageSegmentsFromTheEnd_LastSegmentOnly() {
@@ -203,6 +221,24 @@ class ClassNameAbbreviatorTest {
             options(PackageAbbreviationStrategy.FillSegmentsFromEnd))
 
         assertThat(result).isEqualTo("o.c.p.m.submodule.feature.service." + ShortClassName)
+    }
+
+    @Test
+    fun fillPackageSegmentsFromTheEnd_LastSegmentGetsFilledTillMaxLength() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName,
+            ShortClassName.length + LongPackageNameFirstCharPerSegmentOnly.length + 5,
+            options(PackageAbbreviationStrategy.FillSegmentsFromEnd))
+
+        assertThat(result).isEqualTo("o.c.p.m.s.f.servic." + ShortClassName)
+    }
+
+    @Test
+    fun fillPackageSegmentsFromTheEnd_FirstSegmentGetsFilledTillMaxLength() {
+        val result = underTest.abbreviate(LongPackageName + ShortClassName,
+            ShortClassName.length + LongPackageName.length - 1,
+            options(PackageAbbreviationStrategy.FillSegmentsFromEnd))
+
+        assertThat(result).isEqualTo("or.company.project.module.submodule.feature.service." + ShortClassName)
     }
 
 
