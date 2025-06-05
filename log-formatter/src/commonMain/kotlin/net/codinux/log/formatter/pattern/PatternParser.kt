@@ -57,7 +57,7 @@ open class PatternParser(
         "message", "msg", "m" -> MessageFormatter(format)
         "exception", "throwable", "ex", "e" -> ThrowableFormatter(format) // TODO: option is: short, full or number of stack frames (per Throwable?)
         "rootException", "rEx" -> ThrowableFormatter(format, StackTraceFormatterOptions(rootCauseFirst = true)) // TODO: option is: short, full or number of stack frames (per Throwable?)
-        "date", "d" -> DateTimeFormatter(format) // TODO: options are: date time pattern, timezone and locale
+        "date", "d" -> DateTimeFormatter(format, options) // TODO: third option is locale
         "thread", "th", "t" -> ThreadNameFormatter(format)
         "n" -> LineSeparatorFormatter(format = format)
         else -> customFieldsParser?.invoke(fieldSpecifier, format, options)

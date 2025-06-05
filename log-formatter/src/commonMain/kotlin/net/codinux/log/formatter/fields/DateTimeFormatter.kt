@@ -6,14 +6,18 @@ import net.dankito.datetime.format.pattern.DateTimeComponentFormatter
 
 open class DateTimeFormatter(
     format: FieldFormat? = null,
-    protected val dateTimePattern: String? = null,
-    protected val timeZone: String? = null,
+    options: String? = null,
     protected val formatter: DateTimeComponentFormatter = DateTimeComponentFormatter.Default
-) : FieldFormatter(format) {
+) : FieldFormatter(format, options) {
 
     companion object {
         const val DefaultDateTimeFormat = "yyyy-MM-dd HH:mm:ss,SSS" // the same default as in Logback and JBoss Logging
     }
+
+
+    protected open val dateTimePattern: String? by lazy { firstOption }
+
+    protected open val timeZone: String? by lazy { secondOption }
 
 
     override fun getField(event: LogEvent): String =

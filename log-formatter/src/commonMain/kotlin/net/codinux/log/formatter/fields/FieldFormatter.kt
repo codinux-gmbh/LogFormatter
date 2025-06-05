@@ -3,7 +3,8 @@ package net.codinux.log.formatter.fields
 import net.codinux.log.LogEvent
 
 abstract class FieldFormatter(
-    open val format: FieldFormat? = null
+    open val format: FieldFormat? = null,
+    options: String? = null,
 ) : LogLinePartFormatter {
 
     companion object {
@@ -12,6 +13,19 @@ abstract class FieldFormatter(
 
 
     protected abstract fun getField(event: LogEvent): String
+
+
+    protected open val optionsList: List<String> by lazy { options?.split(",") ?: emptyList() }
+
+    open val firstOption: String? by lazy { optionsList.firstOrNull() }
+
+    open val secondOption: String? by lazy {
+        if (optionsList.size >= 2) {
+            optionsList[1]
+        } else {
+            null
+        }
+    }
 
 
     override fun format(event: LogEvent): String {
