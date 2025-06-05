@@ -44,7 +44,7 @@ class QualifiedClassNameParserTest {
         if (Platform.type == PlatformType.WasmJs) {
             assertClassName(result, "Companion", ClassTypeCategory.Nested)
         } else if (Platform.isJsBrowserOrNodeJs) { // for Companions JS only returns "Companion_<index>"
-            assertClassName(result, "Companion_6", ClassTypeCategory.Nested)
+            assertClassName(result, DeclaringClass.Companion.JsName, ClassTypeCategory.Nested)
         } else {
             assertClassName(result, "DeclaringClass.Companion",
                 ClassTypeCategory.Nested, "DeclaringClass")
@@ -77,7 +77,7 @@ class QualifiedClassNameParserTest {
         if (Platform.type == PlatformType.WasmJs) {
             assertClassName(result, "Companion", ClassTypeCategory.Nested)
         } else if (Platform.isJsBrowserOrNodeJs) { // for Companions JS only returns "Companion_<index>"
-            assertClassName(result, "Companion_5", ClassTypeCategory.Nested)
+            assertClassName(result, DeclaringClass.InnerClass.Companion.JsName, ClassTypeCategory.Nested)
         } else {
             assertClassName(result, "DeclaringClass.InnerClass.Companion", ClassTypeCategory.Nested, "DeclaringClass.InnerClass")
         }
