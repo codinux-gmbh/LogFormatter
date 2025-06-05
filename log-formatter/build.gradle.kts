@@ -78,6 +78,7 @@ kotlin {
     val kotlinxSerializationVersion: String by project
 
     val logDataVersion: String by project
+    val kmpDateTimeVersion: String by project
     val kmpBaseVersion: String by project
 
     val assertKVersion: String by project
@@ -87,6 +88,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
             api("net.codinux.log:log-data:$logDataVersion")
+            implementation("net.dankito.datetime:kmp-datetime:$kmpDateTimeVersion")
             api("net.codinux.kotlin:kmp-base:$kmpBaseVersion")
         }
         commonTest.dependencies {
