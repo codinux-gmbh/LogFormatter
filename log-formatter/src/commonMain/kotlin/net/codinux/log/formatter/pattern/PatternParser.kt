@@ -54,10 +54,10 @@ open class PatternParser(
     protected open fun mapFieldFormatter(fieldSpecifier: String, format: FieldFormat?, options: String?): FieldFormatter = when (fieldSpecifier) {
         "level", "le", "l" -> LogLevelFormatter(format)
         "logger", "lo", "c" -> LoggerNameFormatter(format) // TODO: option is: length (-> abbreviate logger name)
-        "thread", "th", "t" -> ThreadNameFormatter(format)
         "message", "msg", "m" -> MessageFormatter(format)
         "exception", "throwable", "ex", "e" -> ThrowableFormatter(format) // TODO: option is: short, full or number of stack frames (per Throwable?)
         "rootException", "rEx" -> ThrowableFormatter(format, StackTraceFormatterOptions(rootCauseFirst = true)) // TODO: option is: short, full or number of stack frames (per Throwable?)
+        "thread", "th", "t" -> ThreadNameFormatter(format)
         "n" -> LineSeparatorFormatter(format = format)
         else -> customFieldsParser?.invoke(fieldSpecifier, format, options)
                 ?: throw IllegalArgumentException("Unknown field specifier: $fieldSpecifier")
