@@ -17,15 +17,26 @@ abstract class FieldFormatter(
 
     protected open val optionsList: List<String> by lazy { options?.split(",") ?: emptyList() }
 
-    open val firstOption: String? by lazy { optionsList.firstOrNull() }
+    open val firstOption: String? by lazy { unwrapOption(optionsList.firstOrNull()) }
 
     open val secondOption: String? by lazy {
         if (optionsList.size >= 2) {
-            optionsList[1]
+            unwrapOption(optionsList[1])
         } else {
             null
         }
     }
+
+    protected open fun unwrapOption(option: String?): String? =
+        if (option == null) {
+            null
+        } else if (option.startsWith('"') && option.endsWith('"')) {
+            option.substring(1, option.length - 1)
+        } else if (option.startsWith('\'') && option.endsWith('\'')) {
+            option.substring(1, option.length - 1)
+        } else {
+            option
+        }
 
 
     override fun format(event: LogEvent): String {

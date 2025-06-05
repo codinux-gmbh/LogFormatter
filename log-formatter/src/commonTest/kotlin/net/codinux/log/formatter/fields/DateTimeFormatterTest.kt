@@ -41,6 +41,25 @@ class DateTimeFormatterTest {
 
 
     @Test
+    fun patternEnclosingInQuotes() {
+        val pattern = "\"dd.MM.yyyy\""
+
+        val result = DateTimeFormatter(null, pattern).format(event())
+
+        assertThat(result).isEqualTo("21.10.2015")
+    }
+
+    @Test
+    fun patternEnclosingInApostrophes() {
+        val pattern = "'dd.MM.yyyy'"
+
+        val result = DateTimeFormatter(null, pattern).format(event())
+
+        assertThat(result).isEqualTo("21.10.2015")
+    }
+
+
+    @Test
     fun timeOnly() {
         val pattern = "HH:mm:ss"
 
