@@ -3,17 +3,17 @@ package net.codinux.log.formatter.fields
 import net.codinux.log.LogEvent
 import net.codinux.log.stacktrace.StackTraceFormatter
 import net.codinux.log.stacktrace.StackTraceFormatterOptions
+import net.codinux.log.stacktrace.StackTraceShortenerOptions
 
 open class ThrowableFormatter(
     format: FieldFormat? = null,
-    protected open val stackTraceFormatter: StackTraceFormatter =
-        StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true))
-) : FieldFormatter(format) {
+    options: String? = null,
+    protected open val rootCauseFirst: Boolean = false,
+) : FieldFormatter(format, options) {
 
-    constructor(options: StackTraceFormatterOptions) : this(null, options)
-
-    constructor(format: FieldFormat? = null, options: StackTraceFormatterOptions)
-            : this(format, StackTraceFormatter(options))
+    protected open val stackTraceFormatter: StackTraceFormatter by lazy {
+        StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true, rootCauseFirst = rootCauseFirst),
+            StackTraceShortenerOptions(maxFramesPerThrowable = firstOptionAsInt)) }
 
 
     override fun getField(event: LogEvent): String =

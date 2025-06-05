@@ -19,6 +19,8 @@ abstract class FieldFormatter(
 
     open val firstOption: String? by lazy { unwrapOption(optionsList.firstOrNull()) }
 
+    open val firstOptionAsInt: Int? by lazy { firstOption?.toIntOrNull() }
+
     open val secondOption: String? by lazy {
         if (optionsList.size >= 2) {
             unwrapOption(optionsList[1])
