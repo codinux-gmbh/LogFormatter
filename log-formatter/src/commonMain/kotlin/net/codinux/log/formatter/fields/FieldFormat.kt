@@ -22,4 +22,8 @@ open class FieldFormat(
     open val isMinWidthOrMaxWidthSet: Boolean
         get() = (minWidth != null && (minWidth ?: -1) > 0)
                 || (maxWidth != null && maxWidth!! > 0)
+
+
+    override fun toString() = "minWidth=$minWidth, maxWidth=$maxWidth, pad=$pad, truncate=$truncate"
+
 }
