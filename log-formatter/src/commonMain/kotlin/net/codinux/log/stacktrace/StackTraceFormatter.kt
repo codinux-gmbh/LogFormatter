@@ -29,11 +29,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
     open fun format(stackTrace: ShortenedStackTrace, options: StackTraceFormatterOptions = this.options): String {
         val builder = StringBuilder()
 
-        if (options.rootCauseFirst) {
-            appendStackTraceAndChildrenRootCauseFirst(stackTrace, builder, options)
-        } else {
-            appendStackTraceAndChildrenRootCauseLast(stackTrace, builder, options)
-        }
+        appendStackTraceAndChildren(stackTrace, builder, options)
 
         if (options.addLineSeparatorAtEnd) {
             builder.append(options.lineSeparator)
@@ -46,37 +42,8 @@ open class StackTraceFormatter @JvmOverloads constructor(
         return builder.toString()
     }
 
-    protected open fun appendStackTraceAndChildrenRootCauseLast(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
-                                                                additionalIndent: String = "", messageLinePrefix: String = "") {
-        appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefix)
-
-        if (exceedsMaxLength(builder, options)) {
-            return // no need to add even more characters, maximum length already reached
-        }
-
-        if (options.ignoreSuppressedExceptions == false) {
-            stackTrace.suppressed.forEach { suppressed ->
-                builder.append(options.lineSeparator)
-                appendStackTraceAndChildrenRootCauseLast(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
-            }
-
-            if (exceedsMaxLength(builder, options)) {
-                return // no need to add even more characters, maximum length already reached
-            }
-        }
-        appendCountSkippedSuppressedThrowables(stackTrace, builder, options, additionalIndent + options.suppressedExceptionIndent)
-
-        stackTrace.causedBy?.let { causedBy ->
-            builder.append(options.lineSeparator)
-            appendStackTraceAndChildrenRootCauseLast(causedBy, builder, options, additionalIndent + options.causedByIndent, options.causedByMessagePrefix)
-        }
-
-        appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + options.causedByIndent)
-    }
-
-    protected open fun appendStackTraceAndChildrenRootCauseFirst(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
+    protected open fun appendStackTraceAndChildren(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
                                                    additionalIndent: String = "", messageLinePrefix: String = "") {
-
         appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefix)
 
         if (exceedsMaxLength(builder, options)) {
@@ -86,7 +53,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
         if (options.ignoreSuppressedExceptions == false) {
             stackTrace.suppressed.forEach { suppressed ->
                 builder.append(options.lineSeparator)
-                appendStackTraceAndChildrenRootCauseFirst(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
+                appendStackTraceAndChildren(suppressed, builder, options, additionalIndent + options.suppressedExceptionIndent, options.suppressedExceptionMessagePrefix)
             }
 
             if (exceedsMaxLength(builder, options)) {
@@ -95,11 +62,14 @@ open class StackTraceFormatter @JvmOverloads constructor(
         }
         appendCountSkippedSuppressedThrowables(stackTrace, builder, options, additionalIndent + options.suppressedExceptionIndent)
 
+        val (nestedThrowableIndent, nestedThrowablePrefix) = if (stackTrace.isRootCauseFirst) options.wrappedByIndent to options.wrappedByMessagePrefix
+                                                            else options.causedByIndent to options.causedByMessagePrefix
         stackTrace.causedBy?.let { causedBy ->
             builder.append(options.lineSeparator)
-            appendStackTraceAndChildrenRootCauseFirst(causedBy, builder, options, additionalIndent + options.wrappedByIndent, options.wrappedByMessagePrefix)
+            appendStackTraceAndChildren(causedBy, builder, options, additionalIndent + nestedThrowableIndent, nestedThrowablePrefix)
         }
-        appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + options.wrappedByIndent)
+
+        appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + nestedThrowableIndent)
     }
 
     protected open fun appendStackTrace(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,

@@ -70,7 +70,8 @@ open class StackTraceShortener @JvmOverloads constructor(
                                                  countSkippedNestedThrowables: Int = 0): ShortenedStackTrace {
         val suppressed = mapSuppressedExceptions(stackTrace, options)
 
-        return ShortenedStackTrace(stackTrace, causedBy, suppressed, countSkippedNestedThrowables, countSkippedSuppressedThrowables = stackTrace.suppressed.size - suppressed.size)
+        return ShortenedStackTrace(stackTrace, causedBy, suppressed, countSkippedNestedThrowables,
+            countSkippedSuppressedThrowables = stackTrace.suppressed.size - suppressed.size, isRootCauseFirst = options.rootCauseFirst)
     }
 
     protected open fun mapSuppressedExceptions(stackTrace: StackTrace, options: StackTraceShortenerOptions): List<ShortenedStackTrace> {
@@ -108,13 +109,15 @@ open class StackTraceShortener @JvmOverloads constructor(
         return if (causedBy == null) {
             stackTrace
         } else {
-            val outermostThrowable = StackTrace(stackTrace.messageLine, stackTrace.stackTrace, null, stackTrace.suppressed, stackTrace.countSkippedCommonFrames)
+            val outermostThrowable = StackTrace(stackTrace.messageLine, stackTrace.stackTrace, null,
+                stackTrace.suppressed, stackTrace.countSkippedCommonFrames, isRootCauseFirst = true)
             reverseOrder(causedBy, outermostThrowable)
         }
     }
 
     protected open fun reverseOrder(cause: StackTrace, wrappedBy: StackTrace): StackTrace {
-        val reversed = StackTrace(cause.messageLine, cause.stackTrace, wrappedBy, cause.suppressed, cause.countSkippedCommonFrames)
+        val reversed = StackTrace(cause.messageLine, cause.stackTrace, wrappedBy, cause.suppressed,
+            cause.countSkippedCommonFrames, isRootCauseFirst = true)
 
         val innerCause = cause.causedBy
         return if (innerCause == null) {

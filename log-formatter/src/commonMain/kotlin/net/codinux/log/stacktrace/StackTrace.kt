@@ -21,6 +21,8 @@ data class StackTrace(
      * Count frames common with parent stack trace, that therefore have been omitted here.
      */
     val countSkippedCommonFrames: Int = 0,
+
+    val isRootCauseFirst: Boolean = false,
 ) {
     override fun toString() = "$messageLine, ${stackTrace.size} stack frames"
 }

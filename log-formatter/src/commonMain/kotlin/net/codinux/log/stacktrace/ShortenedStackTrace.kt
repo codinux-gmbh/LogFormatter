@@ -10,6 +10,8 @@ data class ShortenedStackTrace(
 
     val countSkippedNestedThrowables: Int = 0,
     val countSkippedSuppressedThrowables: Int = 0,
+
+    val isRootCauseFirst: Boolean = false,
 ) {
     var framesToDisplay: List<StackFrame> = originalStackTrace
         internal set
@@ -22,14 +24,15 @@ data class ShortenedStackTrace(
 
     constructor(stackTrace: StackTrace, causedBy: ShortenedStackTrace?,
                 suppressed: List<ShortenedStackTrace> = stackTrace.suppressed.map { ShortenedStackTrace(it) },
-                countSkippedNestedThrowables: Int = 0, countSkippedSuppressedThrowables: Int = 0) : this(
+                countSkippedNestedThrowables: Int = 0, countSkippedSuppressedThrowables: Int = 0, isRootCauseFirst: Boolean = false) : this(
         stackTrace.messageLine,
         stackTrace.stackTrace,
         causedBy,
         suppressed,
         stackTrace.countSkippedCommonFrames,
         countSkippedNestedThrowables,
-        countSkippedSuppressedThrowables
+        countSkippedSuppressedThrowables,
+        isRootCauseFirst
     )
 
     override fun toString() = "$messageLine, ${framesToDisplay.size} of ${originalStackTrace.size} stack frames displayed"
