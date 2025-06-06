@@ -76,7 +76,6 @@ class ThrowableFormatterTest {
         assertThat(result).endsWith(LineSeparator.System)
     }
 
-    @Ignore // TODO: does currently not work, fix StackTraceFormatter first
     @Test
     fun maxNestedThrowables_rootCauseFirst() {
         val result = ThrowableFormatter(null, "-1,0", true).format(event())

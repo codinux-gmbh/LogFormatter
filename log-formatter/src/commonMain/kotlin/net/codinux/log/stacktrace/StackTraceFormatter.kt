@@ -13,7 +13,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
 
 
     constructor(options: StackTraceFormatterOptions,
-                shortenerOptions: StackTraceShortenerOptions = StackTraceShortenerOptions.Default)
+                shortenerOptions: StackTraceShortenerOptions = StackTraceShortenerOptions.Default.copy(rootCauseFirst = options.rootCauseFirst))
             : this(options, StackTraceShortener(shortenerOptions))
 
 
@@ -77,18 +77,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
     protected open fun appendStackTraceAndChildrenRootCauseFirst(stackTrace: ShortenedStackTrace, builder: StringBuilder, options: StackTraceFormatterOptions,
                                                    additionalIndent: String = "", messageLinePrefix: String = "") {
 
-        var messageLinePrefixToUse = messageLinePrefix
-        stackTrace.causedBy?.let { causedBy ->
-            appendStackTraceAndChildrenRootCauseFirst(causedBy, builder, options, additionalIndent + options.wrappedByIndent)
-            builder.append(options.lineSeparator)
-
-            if (messageLinePrefixToUse.isBlank()) {
-                messageLinePrefixToUse = options.wrappedByMessagePrefix
-            }
-        }
-
-
-        appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefixToUse)
+        appendStackTrace(stackTrace, builder, options, additionalIndent, messageLinePrefix)
 
         if (exceedsMaxLength(builder, options)) {
             return // no need to add even more characters, maximum length already reached
@@ -106,6 +95,10 @@ open class StackTraceFormatter @JvmOverloads constructor(
         }
         appendCountSkippedSuppressedThrowables(stackTrace, builder, options, additionalIndent + options.suppressedExceptionIndent)
 
+        stackTrace.causedBy?.let { causedBy ->
+            builder.append(options.lineSeparator)
+            appendStackTraceAndChildrenRootCauseFirst(causedBy, builder, options, additionalIndent + options.wrappedByIndent, options.wrappedByMessagePrefix)
+        }
         appendCountSkippedNestedThrowables(stackTrace, builder, options, additionalIndent + options.wrappedByIndent)
     }
 

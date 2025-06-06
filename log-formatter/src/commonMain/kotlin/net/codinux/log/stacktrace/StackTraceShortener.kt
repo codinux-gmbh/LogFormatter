@@ -27,10 +27,12 @@ open class StackTraceShortener @JvmOverloads constructor(
         shorten(stackTrace, options.copy(maxFramesPerThrowable = maxFramesPerThrowable))
 
     open fun shorten(stackTrace: StackTrace, options: StackTraceShortenerOptions = this.options): ShortenedStackTrace {
+        val stackTraceToShorten = if (options.rootCauseFirst) rootCauseFirst(stackTrace) else stackTrace
+
         val shortened = if (options.maxNestedThrowables == null || options.maxNestedThrowables < 0) {
-            createShortenedStackTrace(stackTrace, options)
+            createShortenedStackTrace(stackTraceToShorten, options)
         } else {
-            shortenedStackTraceWithMaxDepth(stackTrace, options, options.maxNestedThrowables)
+            shortenedStackTraceWithMaxDepth(stackTraceToShorten, options, options.maxNestedThrowables)
         }
 
         if (options.maxFramesPerThrowable != null && options.maxFramesPerThrowable >= 0) {
@@ -96,6 +98,29 @@ open class StackTraceShortener @JvmOverloads constructor(
 
         shortened.causedBy?.let {
             truncateToMaxFramesPerThrowable(it, maxFramesPerThrowable)
+        }
+    }
+
+
+    protected open fun rootCauseFirst(stackTrace: StackTrace): StackTrace {
+        val causedBy = stackTrace.causedBy
+
+        return if (causedBy == null) {
+            stackTrace
+        } else {
+            val outermostThrowable = StackTrace(stackTrace.messageLine, stackTrace.stackTrace, null, stackTrace.suppressed, stackTrace.countSkippedCommonFrames)
+            reverseOrder(causedBy, outermostThrowable)
+        }
+    }
+
+    protected open fun reverseOrder(cause: StackTrace, wrappedBy: StackTrace): StackTrace {
+        val reversed = StackTrace(cause.messageLine, cause.stackTrace, wrappedBy, cause.suppressed, cause.countSkippedCommonFrames)
+
+        val innerCause = cause.causedBy
+        return if (innerCause == null) {
+            reversed
+        } else {
+            reverseOrder(innerCause, reversed)
         }
     }
 

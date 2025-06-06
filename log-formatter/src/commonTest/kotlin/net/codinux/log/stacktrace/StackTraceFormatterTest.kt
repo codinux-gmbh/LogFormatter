@@ -144,7 +144,7 @@ class StackTraceFormatterTest {
 
         val maxFramesPerThrowable = 2
         val options = StackTraceFormatterOptions(rootCauseFirst = true)
-        val stackTrace = stackTraceShortener.shorten(throwable, maxFramesPerThrowable = maxFramesPerThrowable)
+        val stackTrace = stackTraceShortener.shorten(throwable, StackTraceShortenerOptions(maxFramesPerThrowable = maxFramesPerThrowable, rootCauseFirst = true))
 
 
         val result = underTest.format(stackTrace, options)
@@ -189,6 +189,26 @@ class StackTraceFormatterTest {
         assertThat(result).doesNotContain("Root cause")
 
         assertThat(result).endsWith(options.lineSeparator + options.causedByIndent + options.ellipsis + " 2 nested cause(s) omitted")
+    }
+
+    @Test
+    fun maxNestedThrowables_1_RootCauseFirst() {
+        val rootCauseFirst = true
+        val throwable = StackTraceGenerator.generateThreeCausedBy()
+        val stackTrace = shortenStackTrace(throwable, maxNestedThrowables = 1, rootCauseFirst = rootCauseFirst)
+        val options = StackTraceFormatterOptions(rootCauseFirst = rootCauseFirst)
+
+
+        val result = underTest.format(stackTrace, options)
+
+
+        assertThat(result).contains("RootCauseException: Root cause")
+        assertThat(result).contains(options.lineSeparator + options.wrappedByIndent + options.wrappedByMessagePrefix)
+        assertThat(result).contains("ParentException: Wrapper #1")
+        assertThat(result).doesNotContain("Wrapper #2")
+        assertThat(result).doesNotContain("Wrapper #3")
+
+        assertThat(result).endsWith(options.lineSeparator + options.wrappedByIndent + options.ellipsis + " 2 nested cause(s) omitted")
     }
 
     @Test
@@ -242,7 +262,8 @@ class StackTraceFormatterTest {
     }
 
 
-    private fun shortenStackTrace(throwable: Throwable, maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null, maxSuppressedThrowables: Int? = null) =
-        stackTraceShortener.shorten(throwable, StackTraceShortenerOptions(maxFramesPerThrowable, maxNestedThrowables, maxSuppressedThrowables))
+    private fun shortenStackTrace(throwable: Throwable, maxFramesPerThrowable: Int? = null, maxNestedThrowables: Int? = null,
+                                  maxSuppressedThrowables: Int? = null, rootCauseFirst: Boolean = false) =
+        stackTraceShortener.shorten(throwable, StackTraceShortenerOptions(maxFramesPerThrowable, maxNestedThrowables, maxSuppressedThrowables, rootCauseFirst))
 
 }

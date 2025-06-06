@@ -13,7 +13,7 @@ open class ThrowableFormatter(
 
     protected open val stackTraceFormatter: StackTraceFormatter by lazy {
         StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true, rootCauseFirst = rootCauseFirst),
-            StackTraceShortenerOptions(maxFramesPerThrowable = firstOptionAsInt, maxNestedThrowables = secondOptionAsInt)) }
+            StackTraceShortenerOptions(maxFramesPerThrowable = firstOptionAsInt, maxNestedThrowables = secondOptionAsInt, rootCauseFirst = rootCauseFirst)) }
 
 
     override fun getField(event: LogEvent): String =
