@@ -147,9 +147,16 @@ open class StackTraceFormatter @JvmOverloads constructor(
     protected open fun cropToMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions) {
         val maxLength = options.maxStackTraceStringLength ?: return
 
-        // TODO: may also show ... 1234 characters truncated
-        builder.setLength(maxLength - options.ellipsis.length)
-        builder.append(options.ellipsis)
+        if (maxLength <= 0) {
+            // don't do anything then
+        } else if (maxLength > options.ellipsis.length) {
+            // TODO: may also show ... 1234 characters truncated
+            builder.setLength(maxLength - options.ellipsis.length)
+            builder.append(options.ellipsis)
+        } else { // maxLength shorter than ellipsis string
+            builder.setLength(0)
+            builder.append(options.ellipsis.take(maxLength))
+        }
     }
 
     protected open fun exceedsMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions): Boolean {

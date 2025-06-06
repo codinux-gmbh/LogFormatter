@@ -23,6 +23,28 @@ class StackTraceFormatterTest {
         assertDoesNotEndWithLineSeparator(result, options)
     }
 
+    @Test
+    fun maxStackTraceStringLength_Zero() {
+        val options = StackTraceFormatterOptions(maxStackTraceStringLength = 0)
+
+        val result = underTest.format(StackTraceGenerator.generateTwoCausedBy(), options)
+
+        // assert full stack trace is returned
+        val lines = result.lines()
+        assertThat(lines.size).isGreaterThan(10)
+        assertThat(lines.first()).endsWith("ParentException: Wrapper #2")
+        assertThat(lines.count { it.startsWith("Caused by: ") }).isEqualTo(2)
+    }
+
+    @Test
+    fun maxStackTraceStringLength_LessThanEllipsisLength() {
+        val options = StackTraceFormatterOptions(maxStackTraceStringLength = 2)
+
+        val result = underTest.format(StackTraceGenerator.generateTwoCausedBy(), options)
+
+        assertThat(result).isEqualTo("..")
+    }
+
 
     @Test
     fun maxFramesPerThrowable_2_SingleThrowable() {
