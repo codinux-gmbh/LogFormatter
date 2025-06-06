@@ -10,7 +10,8 @@ import kotlin.jvm.JvmOverloads
  */
 open class StackTraceShortener @JvmOverloads constructor(
     protected val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
-    protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default
+    protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default,
+    protected val inverter: StackTraceInverter = StackTraceInverter.Default
 ) {
     companion object {
         val Default by lazy { StackTraceShortener() }
@@ -103,29 +104,8 @@ open class StackTraceShortener @JvmOverloads constructor(
     }
 
 
-    protected open fun rootCauseFirst(stackTrace: StackTrace): StackTrace {
-        val causedBy = stackTrace.causedBy
-
-        return if (causedBy == null) {
-            stackTrace
-        } else {
-            val outermostThrowable = StackTrace(stackTrace.messageLine, stackTrace.stackTrace, null,
-                stackTrace.suppressed, stackTrace.countSkippedCommonFrames, isRootCauseFirst = true)
-            reverseOrder(causedBy, outermostThrowable)
-        }
-    }
-
-    protected open fun reverseOrder(cause: StackTrace, wrappedBy: StackTrace): StackTrace {
-        val reversed = StackTrace(cause.messageLine, cause.stackTrace, wrappedBy, cause.suppressed,
-            cause.countSkippedCommonFrames, isRootCauseFirst = true)
-
-        val innerCause = cause.causedBy
-        return if (innerCause == null) {
-            reversed
-        } else {
-            reverseOrder(innerCause, reversed)
-        }
-    }
+    protected open fun rootCauseFirst(stackTrace: StackTrace): StackTrace =
+        inverter.rootCauseFirst(stackTrace)
 
 
     protected open fun extractStackTrace(throwable: Throwable) =
