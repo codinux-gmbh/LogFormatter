@@ -104,11 +104,10 @@ open class StackTraceShortener @JvmOverloads constructor(
     }
 
 
-    protected open fun rootCauseFirst(stackTrace: StackTrace): StackTrace =
-        inverter.rootCauseFirst(stackTrace)
-
-
     protected open fun extractStackTrace(throwable: Throwable) =
         stackTraceExtractor.extractStackTrace(throwable)
+
+    protected open fun rootCauseFirst(stackTrace: StackTrace): StackTrace =
+        inverter.rootCauseFirst(stackTrace)
 
 }
