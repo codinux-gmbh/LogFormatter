@@ -152,7 +152,10 @@ open class StackTraceFormatter @JvmOverloads constructor(
         builder.append(options.ellipsis)
     }
 
-    protected open fun exceedsMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions): Boolean =
-        (options.maxStackTraceStringLength ?: -1) > 0 && builder.length > options.maxStackTraceStringLength!!
+    protected open fun exceedsMaxLength(builder: StringBuilder, options: StackTraceFormatterOptions): Boolean {
+        val maxLength = options.maxStackTraceStringLength ?: return false
+
+        return maxLength > 0 && builder.length > maxLength
+    }
 
 }
