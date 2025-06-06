@@ -26,7 +26,7 @@ Use it anywhere Kotlin runs (JVM, JS, Native) to produce highly customizable, cl
 ### Gradle
 
 ```
-implementation("net.codinux.log:log-formatter:1.6.1")
+implementation("net.codinux.log:log-formatter:1.7.0")
 ```
 
 ### Maven
@@ -35,7 +35,7 @@ implementation("net.codinux.log:log-formatter:1.6.1")
 <dependency>
    <groupId>net.codinux.log</groupId>
    <artifactId>log-formatter-jvm</artifactId>
-   <version>1.6.1</version>
+   <version>1.7.0</version>
 </dependency>
 ```
 
