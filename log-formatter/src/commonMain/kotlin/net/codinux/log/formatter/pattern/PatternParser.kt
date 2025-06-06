@@ -53,7 +53,7 @@ open class PatternParser(
 
     protected open fun mapFieldFormatter(fieldSpecifier: String, format: FieldFormat?, options: String?): FieldFormatter = when (fieldSpecifier) {
         "level", "le", "l" -> LogLevelFormatter(format)
-        "logger", "lo", "c" -> LoggerNameFormatter(format) // TODO: option is: length (-> abbreviate logger name)
+        "logger", "lo", "c" -> LoggerNameFormatter(format, options)
         "message", "msg", "m" -> MessageFormatter(format)
         "exception", "throwable", "ex", "e" -> ThrowableFormatter(format, options) // other values for first option would be "short" and "full", but "full" is senseful and "short" is equal to '1'
         "rootException", "rEx" -> ThrowableFormatter(format, options, true) // other values for first option would be "short" and "full", but "full" is senseful and "short" is equal to '1'

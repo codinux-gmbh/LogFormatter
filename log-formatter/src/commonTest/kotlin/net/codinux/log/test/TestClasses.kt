@@ -13,12 +13,12 @@ object TestObject {
 class DeclaringClass {
 
     companion object {
-        const val JsName = "Companion_6"
+        const val JsName = "Companion_7"
     }
 
     class InnerClass {
         companion object {
-            const val JsName = "Companion_5"
+            const val JsName = "Companion_6"
         }
 
         class InnerClassInInnerClass
