@@ -9,7 +9,7 @@ import kotlin.jvm.JvmOverloads
  * as the Kotlin standard library does not expose raw stack trace data (except on the JVM).
  */
 open class StackTraceShortener @JvmOverloads constructor(
-    protected val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
+    val options: StackTraceShortenerOptions = StackTraceShortenerOptions.Default,
     protected val stackTraceExtractor: StackTraceExtractor = StackTraceExtractor.Default,
     protected val inverter: StackTraceInverter = StackTraceInverter.Default
 ) {

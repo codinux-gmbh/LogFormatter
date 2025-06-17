@@ -18,12 +18,14 @@ open class StackTraceFormatter @JvmOverloads constructor(
 
 
     @JvmOverloads
-    open fun format(throwable: Throwable, options: StackTraceFormatterOptions = this.options) =
-        format(stackTraceShortener.shorten(throwable), options)
+    open fun format(throwable: Throwable, options: StackTraceFormatterOptions = this.options,
+                    shortenerOptions: StackTraceShortenerOptions = stackTraceShortener.options) =
+        format(stackTraceShortener.shorten(throwable, shortenerOptions), options)
 
     @JvmOverloads
-    open fun format(stackTrace: StackTrace, options: StackTraceFormatterOptions = this.options) =
-        format(stackTraceShortener.shorten(stackTrace), options)
+    open fun format(stackTrace: StackTrace, options: StackTraceFormatterOptions = this.options,
+                    shortenerOptions: StackTraceShortenerOptions = stackTraceShortener.options) =
+        format(stackTraceShortener.shorten(stackTrace, shortenerOptions), options)
 
     @JvmOverloads
     open fun format(stackTrace: ShortenedStackTrace, options: StackTraceFormatterOptions = this.options): String {
