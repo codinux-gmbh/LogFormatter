@@ -174,7 +174,7 @@ public class QuarkusLogFormatterInitializer {
                     .maxStackTraceStringLength(config.getMaxStackTraceStringLength())
                     .build();
             StackTraceShortener shortener = new StackTraceShortener(new StackTraceShortenerOptions(
-                    config.getMaxFramesPerThrowable(), config.getMaxNestedThrowables()));
+                    config.getMaxFramesPerThrowable(), config.getMaxNestedThrowables(), null, config.isRootCauseFirst()));
 
             return new ExceptionFormatStep(new StackTraceFormatter(options, shortener), options.getLineSeparator());
         }
