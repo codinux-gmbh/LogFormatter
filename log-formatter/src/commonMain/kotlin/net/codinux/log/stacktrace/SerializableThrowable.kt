@@ -2,6 +2,7 @@ package net.codinux.log.stacktrace
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import net.codinux.kotlin.annotation.JsonIgnore
 
 @Serializable
 data class SerializableThrowable(
@@ -10,6 +11,7 @@ data class SerializableThrowable(
     val stackTrace: String? = null,
     val cause: SerializableThrowable? = null,
     @Transient
+    @JsonIgnore
     val originalException: Throwable? = null,
 
 ) {
