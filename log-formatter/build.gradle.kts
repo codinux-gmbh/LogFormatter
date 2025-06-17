@@ -81,6 +81,8 @@ kotlin {
     val kmpDateTimeVersion: String by project
     val kmpBaseVersion: String by project
 
+    val jacksonVersion: String by project
+
     val assertKVersion: String by project
 
     sourceSets {
@@ -109,6 +111,10 @@ kotlin {
 
             jvmTest.get().dependsOn(this)
             nativeTest.get().dependsOn(this)
+        }
+
+        jvmMain.dependencies {
+            compileOnly("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
         }
     }
 }
