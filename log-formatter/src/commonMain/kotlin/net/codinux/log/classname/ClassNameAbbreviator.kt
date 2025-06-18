@@ -58,16 +58,28 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
 
     protected open fun abbreviatePackageName(packageParts: List<String>, maxLength: Int, classNameLength: Int, options: ClassNameAbbreviatorOptions): String? {
         val minPackageNameLength = packageParts.size * 2
-        val minClassNameWithPackageSegmentsLength = classNameLength + minPackageNameLength
+        val minPackageSegmentsWithClassNameLength = classNameLength + minPackageNameLength
 
-        return if (minClassNameWithPackageSegmentsLength >= maxLength) {
+        return if (minPackageNameLength > maxLength) {
             if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts))
             } else {
                 null
             }
+        } else if (minPackageSegmentsWithClassNameLength > maxLength) {
+            if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
+                combine(firstCharOfEachPackageSegment(packageParts))
+            } else if (maxLength > classNameLength && options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepOnlyIfMaxLengthLongerThanClassName) {
+                combine(firstCharOfEachPackageSegment(packageParts))
+            } else {
+                null
+            }
         } else {
-            fillPackageSegments(packageParts, maxLength, classNameLength, options)
+            if (minPackageSegmentsWithClassNameLength == maxLength) {
+                combine(firstCharOfEachPackageSegment(packageParts))
+            } else {
+                fillPackageSegments(packageParts, maxLength, classNameLength, options)
+            }
         }
     }
 
