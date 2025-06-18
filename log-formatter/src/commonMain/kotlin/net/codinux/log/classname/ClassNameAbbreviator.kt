@@ -33,7 +33,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val minPackageNameLength = packageParts.size * 2
         val minClassNameWithPackageSegmentsLength = abbreviatedClassName.length + minPackageNameLength
         if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
+            return if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts), abbreviatedClassName)
             } else {
                 abbreviatedClassName

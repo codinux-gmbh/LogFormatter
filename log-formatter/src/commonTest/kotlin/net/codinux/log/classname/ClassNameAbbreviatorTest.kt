@@ -30,7 +30,7 @@ class ClassNameAbbreviatorTest {
     @Test
     fun classNameShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
         val result = underTest.abbreviate(LongPackageName + LongClassName, LongClassName.length - 1,
-            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength))
 
         assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + LongClassName)
     }
@@ -116,7 +116,8 @@ class ClassNameAbbreviatorTest {
     fun classNameLengthEqualsMaxLength_KeepFirstCharacterOfEachPackageSegment() {
         val maxLength = 23
 
-        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength, options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
+        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength,
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength))
 
         assertThat(result).hasLength(maxLength + 3 * 2)
         assertThat(result).isEqualTo("n.c.l.ClassWithoutPackageName")
@@ -134,7 +135,7 @@ class ClassNameAbbreviatorTest {
     @Test
     fun classNameAndMinPackageSegmentLengthShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
         val result = underTest.abbreviate(LongPackageName + ShortClassName, LongClassName.length + 1,
-            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength))
 
         assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + ShortClassName)
     }
@@ -247,10 +248,10 @@ class ClassNameAbbreviatorTest {
 
     private fun options(
         classNameAbbreviationStrategy: ClassNameAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.classNameAbbreviation,
-        keepMinPackageNameEvenIfLongerThanMaxLength: Boolean = false,
+        minPackageNameTooLongStrategy: MinPackageNameTooLongStrategy = MinPackageNameTooLongStrategy.Omit,
         packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation,
         classNameAbbreviationEllipsis: String = ClassNameAbbreviatorOptions.Default.classNameAbbreviationEllipsis,
     ) =
-        ClassNameAbbreviatorOptions(classNameAbbreviationStrategy, keepMinPackageNameEvenIfLongerThanMaxLength, packageAbbreviationStrategy, classNameAbbreviationEllipsis)
+        ClassNameAbbreviatorOptions(classNameAbbreviationStrategy, minPackageNameTooLongStrategy, packageAbbreviationStrategy, classNameAbbreviationEllipsis)
 
 }
