@@ -22,16 +22,16 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val className = parts.last()
         val packageParts = parts.dropLast(1)
 
-        if (className.length == maxLength) {
-            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts), className)
-            } else {
-                className
-            }
+        val abbreviatedClassName = if (className.length > maxLength) { // class name alone exceeds already maxLength
+            abbreviateClassName(className, packageParts, maxLength, options)
+        } else {
+            className
         }
-        // class name alone exceeds already maxLength
-        else if (className.length > maxLength) {
-            val abbreviatedClassName = abbreviateClassName(className, packageParts, maxLength, options)
+
+        // class name with only one char per segment exceeds maxLength
+        val minPackageNameLength = packageParts.size * 2
+        val minClassNameWithPackageSegmentsLength = abbreviatedClassName.length + minPackageNameLength
+        if (minClassNameWithPackageSegmentsLength >= maxLength) {
             return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts), abbreviatedClassName)
             } else {
@@ -39,17 +39,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
             }
         }
 
-        // class name with only one char per segment exceeds maxLength
-        val minClassNameWithPackageSegmentsLength = className.length + packageParts.size * 2
-        if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts), className)
-            } else {
-                className
-            }
-        }
-
-        return fillPackageSegments(className, packageParts, maxLength, options)
+        return fillPackageSegments(abbreviatedClassName, packageParts, maxLength, options)
     }
 
 
