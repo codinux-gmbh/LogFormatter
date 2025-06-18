@@ -3,13 +3,13 @@ package net.codinux.log.classname
 enum class ClassNameAbbreviationStrategy {
 
     /**
-     * Always keep the class name, even if it exceeds the specified maxLength.
+     * Always keep the class name, even if it exceeds the specified `maxLength`.
      */
     KeepClassNameEvenIfLonger,
 
     /**
      * Keep the class name and the first character of each package segments,
-     * even if the resulting string exceeds maxLength.
+     * even if the resulting string exceeds `maxLength`.
      *
      * Default behavior of Logback.
      *
@@ -18,14 +18,14 @@ enum class ClassNameAbbreviationStrategy {
     KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger,
 
     /**
-     * Truncate characters from the beginning of the class name to fit maxLength.
+     * Truncate characters from the beginning of the class name to fit `maxLength`.
      *
      * No ellipsis is added.
      */
     ClipStart,
 
     /**
-     * Truncate characters from the end of the class name to fit maxLength.
+     * Truncate characters from the end of the class name to fit `maxLength`.
      *
      * No ellipsis is added.
      */

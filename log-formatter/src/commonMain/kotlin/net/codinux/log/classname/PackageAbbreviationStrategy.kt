@@ -1,7 +1,7 @@
 package net.codinux.log.classname
 
 /**
- * Strategies for abbreviating the package name if package name length exceeds maxLength.
+ * Strategies for abbreviating the package name if package name length exceeds `maxLength`.
  *
  * E.g. for `org.company.project.module.submodule.feature.service`:
  * - [FillSegmentsEqually]: `org.comp.proj.modu.subm.feat.serv`
@@ -11,7 +11,7 @@ package net.codinux.log.classname
 enum class PackageAbbreviationStrategy {
 
     /**
-     * All package segments are filled equally till maxLength is reached.
+     * All package segments are filled equally till `maxLength` is reached.
      *
      * E.g. `org.comp.proj.modu.subm.feat.serv`.
      */
