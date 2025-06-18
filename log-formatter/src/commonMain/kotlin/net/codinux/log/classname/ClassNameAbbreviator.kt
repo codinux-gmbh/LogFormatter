@@ -32,15 +32,22 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         // class name with only one char per segment exceeds maxLength
         val minPackageNameLength = packageParts.size * 2
         val minClassNameWithPackageSegmentsLength = abbreviatedClassName.length + minPackageNameLength
-        if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            return if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts), abbreviatedClassName)
+
+        val abbreviatedPackageName = if (minClassNameWithPackageSegmentsLength >= maxLength) {
+            if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
+                combine(firstCharOfEachPackageSegment(packageParts))
             } else {
-                abbreviatedClassName
+                null
             }
+        } else {
+            fillPackageSegments(abbreviatedClassName, packageParts, maxLength, options)
         }
 
-        return fillPackageSegments(abbreviatedClassName, packageParts, maxLength, options)
+        return if (abbreviatedPackageName == null) {
+            abbreviatedClassName
+        } else {
+            abbreviatedPackageName + "." + abbreviatedClassName
+        }
     }
 
 
@@ -77,7 +84,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val remainingLength = maxLength - className.length - packageParts.size
         val charsPerSegment = max(1, (remainingLength / packageParts.size)) // use at least one char per segment
 
-        return combine(packageParts.map { it.take(charsPerSegment) }, className)
+        return combine(packageParts.map { it.take(charsPerSegment) })
     }
 
     protected open fun fillPackageSegments(
@@ -106,13 +113,16 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
             }
         }
 
-        return combine(abbreviatedParts, className)
+        return combine(abbreviatedParts)
     }
 
     protected open fun firstCharOfEachPackageSegment(packageParts: List<String>): List<String> =
         packageParts.map { it.first().toString() }
 
     protected open fun combine(packageSegments: List<String>, className: String): String =
-        packageSegments.joinToString(".") + "." + className
+        combine(packageSegments) + "." + className
+
+    protected open fun combine(packageSegments: List<String>): String =
+        packageSegments.joinToString(".")
 
 }
