@@ -28,21 +28,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         }
 
         val packageParts = parts.dropLast(1)
-        val classNameLength = abbreviatedClassName.length
-
-        // class name with only one char per segment exceeds maxLength
-        val minPackageNameLength = packageParts.size * 2
-        val minClassNameWithPackageSegmentsLength = classNameLength + minPackageNameLength
-
-        val abbreviatedPackageName = if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts))
-            } else {
-                null
-            }
-        } else {
-            fillPackageSegments(packageParts, maxLength, classNameLength, options)
-        }
+        val abbreviatedPackageName = abbreviatePackageName(packageParts, maxLength, abbreviatedClassName.length, options)
 
         return if (abbreviatedPackageName == null) {
             abbreviatedClassName
@@ -69,6 +55,21 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
                     options.classNameAbbreviationEllipsis
         }
 
+
+    protected open fun abbreviatePackageName(packageParts: List<String>, maxLength: Int, classNameLength: Int, options: ClassNameAbbreviatorOptions): String? {
+        val minPackageNameLength = packageParts.size * 2
+        val minClassNameWithPackageSegmentsLength = classNameLength + minPackageNameLength
+
+        return if (minClassNameWithPackageSegmentsLength >= maxLength) {
+            if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
+                combine(firstCharOfEachPackageSegment(packageParts))
+            } else {
+                null
+            }
+        } else {
+            fillPackageSegments(packageParts, maxLength, classNameLength, options)
+        }
+    }
 
     protected open fun fillPackageSegments(packageParts: List<String>, maxLength: Int, classNameLength: Int, options: ClassNameAbbreviatorOptions): String {
         return when (options.packageAbbreviation) {
