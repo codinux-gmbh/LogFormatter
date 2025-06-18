@@ -8,16 +8,6 @@ enum class ClassNameAbbreviationStrategy {
     KeepClassNameEvenIfLonger,
 
     /**
-     * Keep the class name and the first character of each package segments,
-     * even if the resulting string exceeds `maxLength`.
-     *
-     * Default behavior of Logback.
-     *
-     * E.g. `o.c.l.s.ClassNameAbbreviator`.
-     */
-    KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger,
-
-    /**
      * Truncate characters from the beginning of the class name to fit `maxLength`.
      *
      * No ellipsis is added.

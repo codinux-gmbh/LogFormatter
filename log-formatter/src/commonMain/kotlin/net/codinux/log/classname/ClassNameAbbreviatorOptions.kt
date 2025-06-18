@@ -10,6 +10,8 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
      */
     val classNameAbbreviation: ClassNameAbbreviationStrategy = ClassNameAbbreviationStrategy.EllipsisEnd,
 
+    val keepMinPackageNameEvenIfLongerThanMaxLength: Boolean = false,
+
     /**
      * The package name abbreviation strategy that is used if class name and package name exceed
      * `maxLength`.
@@ -25,7 +27,7 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
      *
      * Defaults to `"..."`.
      */
-    val classNameAbbreviationEllipsis: String = ".."
+    val classNameAbbreviationEllipsis: String = "..",
 ) {
     companion object {
         val Default by lazy { ClassNameAbbreviatorOptions() }
@@ -35,7 +37,8 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
          * first character of each package segment even if it exceeds `maxLength`.
          */
         val Logback = ClassNameAbbreviatorOptions(
-            classNameAbbreviation = ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger,
+            classNameAbbreviation = ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger,
+            keepMinPackageNameEvenIfLongerThanMaxLength = true,
             packageAbbreviation = PackageAbbreviationStrategy.FillSegmentsFromEnd,
             classNameAbbreviationEllipsis = "..."
         )

@@ -23,7 +23,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val packageParts = parts.dropLast(1)
 
         if (className.length == maxLength) {
-            return if (options.classNameAbbreviation == ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger) {
+            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts), className)
             } else {
                 className
@@ -31,13 +31,18 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         }
         // class name alone exceeds already maxLength
         else if (className.length > maxLength) {
-            return abbreviateClassName(className, packageParts, maxLength, options)
+            val abbreviatedClassName = abbreviateClassName(className, packageParts, maxLength, options)
+            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
+                combine(firstCharOfEachPackageSegment(packageParts), abbreviatedClassName)
+            } else {
+                abbreviatedClassName
+            }
         }
 
         // class name with only one char per segment exceeds maxLength
         val minClassNameWithPackageSegmentsLength = className.length + packageParts.size * 2
         if (minClassNameWithPackageSegmentsLength >= maxLength) {
-            return if (options.classNameAbbreviation == ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger) {
+            return if (options.keepMinPackageNameEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts), className)
             } else {
                 className
@@ -51,7 +56,6 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
     protected open fun abbreviateClassName(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String =
         when (options.classNameAbbreviation) {
             ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger -> className
-            ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger -> combine(firstCharOfEachPackageSegment(packageParts), className)
             ClassNameAbbreviationStrategy.ClipStart -> className.takeLast(maxLength)
             ClassNameAbbreviationStrategy.ClipEnd -> className.take(maxLength)
             ClassNameAbbreviationStrategy.EllipsisStart -> options.classNameAbbreviationEllipsis +
@@ -62,7 +66,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
                 // in case of maxLength - options.classNameAbbreviationEllipsis.length is an odd number, give that additional char to the start part
                 className.take(lengthPerPart + remainingChars) + options.classNameAbbreviationEllipsis + className.takeLast(lengthPerPart)
             }
-            ClassNameAbbreviationStrategy.EllipsisEnd-> className.take(maxLength - options.classNameAbbreviationEllipsis.length) +
+            ClassNameAbbreviationStrategy.EllipsisEnd -> className.take(maxLength - options.classNameAbbreviationEllipsis.length) +
                     options.classNameAbbreviationEllipsis
         }
 

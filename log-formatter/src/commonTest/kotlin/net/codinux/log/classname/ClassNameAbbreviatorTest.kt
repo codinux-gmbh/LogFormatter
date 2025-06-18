@@ -30,7 +30,7 @@ class ClassNameAbbreviatorTest {
     @Test
     fun classNameShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
         val result = underTest.abbreviate(LongPackageName + LongClassName, LongClassName.length - 1,
-            options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
 
         assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + LongClassName)
     }
@@ -116,7 +116,7 @@ class ClassNameAbbreviatorTest {
     fun classNameLengthEqualsMaxLength_KeepFirstCharacterOfEachPackageSegment() {
         val maxLength = 23
 
-        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength, options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+        val result = underTest.abbreviate("net.codinux.log.ClassWithoutPackageName", maxLength, options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
 
         assertThat(result).hasLength(maxLength + 3 * 2)
         assertThat(result).isEqualTo("n.c.l.ClassWithoutPackageName")
@@ -134,7 +134,7 @@ class ClassNameAbbreviatorTest {
     @Test
     fun classNameAndMinPackageSegmentLengthShorterThanMaxLength_KeepClassNameWithMinPackageEvenIfLonger() {
         val result = underTest.abbreviate(LongPackageName + ShortClassName, LongClassName.length + 1,
-            options(ClassNameAbbreviationStrategy.KeepClassNameAndFirstCharacterOfEachPackageSegmentEvenIfLonger))
+            options(ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger, true))
 
         assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + ShortClassName)
     }
@@ -243,13 +243,14 @@ class ClassNameAbbreviatorTest {
 
 
     private fun options(packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation) =
-        options(ClassNameAbbreviatorOptions.Default.classNameAbbreviation, packageAbbreviationStrategy)
+        options(ClassNameAbbreviatorOptions.Default.classNameAbbreviation, packageAbbreviationStrategy = packageAbbreviationStrategy)
 
     private fun options(
         classNameAbbreviationStrategy: ClassNameAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.classNameAbbreviation,
+        keepMinPackageNameEvenIfLongerThanMaxLength: Boolean = false,
         packageAbbreviationStrategy: PackageAbbreviationStrategy = ClassNameAbbreviatorOptions.Default.packageAbbreviation,
         classNameAbbreviationEllipsis: String = ClassNameAbbreviatorOptions.Default.classNameAbbreviationEllipsis,
     ) =
-        ClassNameAbbreviatorOptions(classNameAbbreviationStrategy, packageAbbreviationStrategy, classNameAbbreviationEllipsis)
+        ClassNameAbbreviatorOptions(classNameAbbreviationStrategy, keepMinPackageNameEvenIfLongerThanMaxLength, packageAbbreviationStrategy, classNameAbbreviationEllipsis)
 
 }
