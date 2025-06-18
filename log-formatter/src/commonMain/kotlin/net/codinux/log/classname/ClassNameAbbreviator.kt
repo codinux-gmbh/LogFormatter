@@ -20,13 +20,14 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val parts = qualifiedClassName.split('.')
 
         val className = parts.last()
-        val packageParts = parts.dropLast(1)
 
         val abbreviatedClassName = if (className.length > maxLength) { // class name alone exceeds already maxLength
-            abbreviateClassName(className, packageParts, maxLength, options)
+            abbreviateClassName(className, maxLength, options)
         } else {
             className
         }
+
+        val packageParts = parts.dropLast(1)
 
         // class name with only one char per segment exceeds maxLength
         val minPackageNameLength = packageParts.size * 2
@@ -43,7 +44,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
     }
 
 
-    protected open fun abbreviateClassName(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String =
+    protected open fun abbreviateClassName(className: String, maxLength: Int, options: ClassNameAbbreviatorOptions): String =
         when (options.classNameAbbreviation) {
             ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger -> className
             ClassNameAbbreviationStrategy.ClipStart -> className.takeLast(maxLength)
