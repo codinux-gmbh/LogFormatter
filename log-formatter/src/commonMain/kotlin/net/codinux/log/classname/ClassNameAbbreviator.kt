@@ -28,10 +28,11 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         }
 
         val packageParts = parts.dropLast(1)
+        val classNameLength = abbreviatedClassName.length
 
         // class name with only one char per segment exceeds maxLength
         val minPackageNameLength = packageParts.size * 2
-        val minClassNameWithPackageSegmentsLength = abbreviatedClassName.length + minPackageNameLength
+        val minClassNameWithPackageSegmentsLength = classNameLength + minPackageNameLength
 
         val abbreviatedPackageName = if (minClassNameWithPackageSegmentsLength >= maxLength) {
             if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
@@ -40,7 +41,7 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
                 null
             }
         } else {
-            fillPackageSegments(abbreviatedClassName, packageParts, maxLength, options)
+            fillPackageSegments(packageParts, maxLength, classNameLength, options)
         }
 
         return if (abbreviatedPackageName == null) {
@@ -69,28 +70,28 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         }
 
 
-    protected open fun fillPackageSegments(className: String, packageParts: List<String>, maxLength: Int, options: ClassNameAbbreviatorOptions): String {
+    protected open fun fillPackageSegments(packageParts: List<String>, maxLength: Int, classNameLength: Int, options: ClassNameAbbreviatorOptions): String {
         return when (options.packageAbbreviation) {
             PackageAbbreviationStrategy.FillSegmentsEqually ->
-                fillPathSegmentsEqually(maxLength, className, packageParts)
+                fillPathSegmentsEqually(maxLength, classNameLength, packageParts)
             PackageAbbreviationStrategy.FillSegmentsFromStart ->
-                fillPackageSegments(className, packageParts, maxLength, packageParts.indices.toList())
+                fillPackageSegments(packageParts, maxLength, classNameLength, packageParts.indices.toList())
             PackageAbbreviationStrategy.FillSegmentsFromEnd ->
-                fillPackageSegments(className, packageParts, maxLength, packageParts.indices.reversed().toList())
+                fillPackageSegments(packageParts, maxLength, classNameLength, packageParts.indices.reversed().toList())
         }
     }
 
-    protected open fun fillPathSegmentsEqually(maxLength: Int, className: String, packageParts: List<String>): String {
-        val remainingLength = maxLength - className.length - packageParts.size
+    protected open fun fillPathSegmentsEqually(maxLength: Int, classNameLength: Int, packageParts: List<String>): String {
+        val remainingLength = maxLength - classNameLength - packageParts.size
         val charsPerSegment = max(1, (remainingLength / packageParts.size)) // use at least one char per segment
 
         return combine(packageParts.map { it.take(charsPerSegment) })
     }
 
     protected open fun fillPackageSegments(
-        className: String,
         packageParts: List<String>,
         maxLength: Int,
+        classNameLength: Int,
         packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled: List<Int>
     ): String {
         val abbreviatedParts = firstCharOfEachPackageSegment(packageParts).toMutableList()
@@ -99,10 +100,10 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         for (i in packageSegmentIndicesInWhichOrderSegmentsShouldBeFilled) {
             abbreviatedParts[i] = packageParts[i]
 
-            val candidate = combine(abbreviatedParts, className)
-            if (candidate.length > maxLength) {
+            val candidate = combine(abbreviatedParts)
+            if (candidate.length + classNameLength + 1 > maxLength) {
                 // the last expansion caused an overflow, truncate it to optimal length
-                val countTooManyChars = candidate.length - maxLength
+                val countTooManyChars = candidate.length + classNameLength + 1 - maxLength
                 if (abbreviatedParts[i].length - countTooManyChars <= 0) {
                     abbreviatedParts[i] = packageParts[i].first().toString() // keep at least one character
                 } else {
@@ -118,9 +119,6 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
 
     protected open fun firstCharOfEachPackageSegment(packageParts: List<String>): List<String> =
         packageParts.map { it.first().toString() }
-
-    protected open fun combine(packageSegments: List<String>, className: String): String =
-        combine(packageSegments) + "." + className
 
     protected open fun combine(packageSegments: List<String>): String =
         packageSegments.joinToString(".")
