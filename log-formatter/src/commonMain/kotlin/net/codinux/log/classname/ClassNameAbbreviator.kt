@@ -60,26 +60,18 @@ open class ClassNameAbbreviator @JvmOverloads constructor(
         val minPackageNameLength = packageParts.size * 2
         val minPackageSegmentsWithClassNameLength = classNameLength + minPackageNameLength
 
-        return if (minPackageNameLength > maxLength) {
-            if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts))
-            } else {
-                null
-            }
-        } else if (minPackageSegmentsWithClassNameLength > maxLength) {
+        return if (minPackageSegmentsWithClassNameLength > maxLength) {
             if (options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength) {
                 combine(firstCharOfEachPackageSegment(packageParts))
             } else if (maxLength > classNameLength && options.minPackageNameTooLongStrategy == MinPackageNameTooLongStrategy.KeepOnlyIfMaxLengthLongerThanClassName) {
                 combine(firstCharOfEachPackageSegment(packageParts))
-            } else {
+            }  else {
                 null
             }
+        } else if (minPackageSegmentsWithClassNameLength == maxLength) {
+            combine(firstCharOfEachPackageSegment(packageParts))
         } else {
-            if (minPackageSegmentsWithClassNameLength == maxLength) {
-                combine(firstCharOfEachPackageSegment(packageParts))
-            } else {
-                fillPackageSegments(packageParts, maxLength, classNameLength, options)
-            }
+            fillPackageSegments(packageParts, maxLength, classNameLength, options)
         }
     }
 

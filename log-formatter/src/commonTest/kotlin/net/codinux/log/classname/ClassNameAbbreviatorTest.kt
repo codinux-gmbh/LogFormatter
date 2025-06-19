@@ -157,11 +157,22 @@ class ClassNameAbbreviatorTest {
     }
 
     @Test
-    fun minPackageNameLengthEqualsMaxLength_MinPackageNameTooLongStrategy_KeepOnlyIfMaxLengthLongerThanClassName() {
-        val result = underTest.abbreviate(LongPackageName + "net.codinux.log.ClassName", LongPackageNameFirstCharPerSegmentOnly.length,
+    fun minPackageNameLengthEqualsMaxLength_MinPackageNameTooLongStrategy_KeepOnlyIfMaxLengthLongerThanClassName_ClassNameShorterThanMaxLength() {
+        val result = underTest.abbreviate(LongPackageName + "ClassName", LongPackageNameFirstCharPerSegmentOnly.length,
             options(MinPackageNameTooLongStrategy.KeepOnlyIfMaxLengthLongerThanClassName))
 
-        assertThat(result).isEqualTo("ClassName")
+        assertThat(result).isEqualTo(LongPackageNameFirstCharPerSegmentOnly + "ClassName")
+    }
+
+    @Test
+    fun minPackageNameLengthEqualsMaxLength_MinPackageNameTooLongStrategy_KeepOnlyIfMaxLengthLongerThanClassName_ClassNameLengthEqualsMaxLength() {
+        val maxLength = LongPackageNameFirstCharPerSegmentOnly.length
+        val className = LongClassName.take(maxLength)
+
+        val result = underTest.abbreviate(LongPackageName + className, maxLength,
+            options(MinPackageNameTooLongStrategy.KeepOnlyIfMaxLengthLongerThanClassName))
+
+        assertThat(result).isEqualTo(className)
     }
 
     @Test
