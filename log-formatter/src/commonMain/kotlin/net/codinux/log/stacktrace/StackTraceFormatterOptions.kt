@@ -18,23 +18,6 @@ data class StackTraceFormatterOptions(
     val suppressedExceptionIndent: String = "    ",
     val suppressedExceptionMessagePrefix: String = "Suppressed: ",
 
-    /**
-     * If `true`, prints the innermost exception (the root cause) at the beginning of the output,
-     * reversing the traditional order of the exception cause chain.
-     *
-     * This allows you to see the actual underlying error more quickly, instead of having to scroll
-     * to the end of a long stack trace to find it. The root cause is typically the most relevant
-     * and informative part of an exception, especially in deeply nested failure scenarios.
-     *
-     * Be aware, this only affects the order of the printed exceptions. But currently it does not
-     * change how common stack frames are handled: shared frames between nested exceptions are still
-     * printed only for the outermost exception. Inner exceptions will continue to include a summary
-     * line such as `... N common frames omitted`.
-     *
-     * If `false`, stack traces are printed in the conventional order — starting with the outermost
-     * exception and following the cause chain to the root.
-     */
-    val rootCauseFirst: Boolean = false,
     val wrappedByIndent: String = causedByIndent,
     val wrappedByMessagePrefix: String = "Wrapped by: ",
 
@@ -80,7 +63,6 @@ data class StackTraceFormatterOptions(
         protected var suppressedExceptionIndent: String = "    "
         protected var suppressedExceptionMessagePrefix: String = "Suppressed:"
 
-        protected var rootCauseFirst: Boolean = false
         protected var wrappedByIndent: String = causedByIndent
         protected var wrappedByMessagePrefix: String = "Wrapped by:"
 
@@ -100,7 +82,6 @@ data class StackTraceFormatterOptions(
         fun suppressedExceptionIndent(value: String) = apply { suppressedExceptionIndent = value }
         fun suppressedExceptionMessagePrefix(value: String) = apply { suppressedExceptionMessagePrefix = value }
 
-        fun rootCauseFirst(value: Boolean) = apply { rootCauseFirst = value }
         fun wrappedByIndent(value: String) = apply { wrappedByIndent = value }
         fun wrappedByMessagePrefix(value: String) = apply { wrappedByMessagePrefix = value }
 
@@ -121,7 +102,6 @@ data class StackTraceFormatterOptions(
             suppressedExceptionIndent = suppressedExceptionIndent,
             suppressedExceptionMessagePrefix = suppressedExceptionMessagePrefix,
 
-            rootCauseFirst = rootCauseFirst,
             wrappedByIndent = wrappedByIndent,
             wrappedByMessagePrefix = wrappedByMessagePrefix,
 

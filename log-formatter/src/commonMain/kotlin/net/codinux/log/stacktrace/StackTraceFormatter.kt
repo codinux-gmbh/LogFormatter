@@ -12,8 +12,7 @@ open class StackTraceFormatter @JvmOverloads constructor(
     }
 
 
-    constructor(options: StackTraceFormatterOptions,
-                shortenerOptions: StackTraceShortenerOptions = StackTraceShortenerOptions.Default.copy(rootCauseFirst = options.rootCauseFirst))
+    constructor(options: StackTraceFormatterOptions, shortenerOptions: StackTraceShortenerOptions = StackTraceShortenerOptions.Default)
             : this(options, StackTraceShortener(shortenerOptions))
 
 

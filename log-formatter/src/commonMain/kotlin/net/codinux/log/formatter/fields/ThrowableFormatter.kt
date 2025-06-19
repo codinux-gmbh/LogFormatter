@@ -12,7 +12,7 @@ open class ThrowableFormatter(
 ) : FieldFormatter(format, options) {
 
     protected open val stackTraceFormatter: StackTraceFormatter by lazy {
-        StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true, rootCauseFirst = rootCauseFirst),
+        StackTraceFormatter(StackTraceFormatterOptions(addLineSeparatorAtEnd = true),
             StackTraceShortenerOptions(maxFramesPerThrowable = firstOptionAsInt, maxNestedThrowables = secondOptionAsInt, rootCauseFirst = rootCauseFirst)) }
 
 

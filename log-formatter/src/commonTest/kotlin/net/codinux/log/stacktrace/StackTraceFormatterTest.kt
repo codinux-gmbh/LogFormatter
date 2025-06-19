@@ -143,7 +143,7 @@ class StackTraceFormatterTest {
         val throwable = StackTraceGenerator.generateThreeCausedBy()
 
         val maxFramesPerThrowable = 2
-        val options = StackTraceFormatterOptions(rootCauseFirst = true)
+        val options = StackTraceFormatterOptions()
         val stackTrace = stackTraceShortener.shorten(throwable, StackTraceShortenerOptions(maxFramesPerThrowable = maxFramesPerThrowable, rootCauseFirst = true))
 
 
@@ -196,7 +196,7 @@ class StackTraceFormatterTest {
         val rootCauseFirst = true
         val throwable = StackTraceGenerator.generateThreeCausedBy()
         val stackTrace = shortenStackTrace(throwable, maxNestedThrowables = 1, rootCauseFirst = rootCauseFirst)
-        val options = StackTraceFormatterOptions(rootCauseFirst = rootCauseFirst)
+        val options = StackTraceFormatterOptions()
 
 
         val result = underTest.format(stackTrace, options)
