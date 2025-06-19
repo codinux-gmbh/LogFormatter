@@ -17,7 +17,7 @@ allprojects {
     }
 
     group = "net.codinux.log"
-    version = "1.7.4-SNAPSHOT"
+    version = "2.0.0"
 
 
     ext["sourceCodeRepositoryBaseUrl"] = "github.com/codinux-gmbh/LogFormatter"
