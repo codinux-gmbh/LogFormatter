@@ -38,7 +38,7 @@ data class ClassNameAbbreviatorOptions @JvmOverloads constructor(
          */
         val Logback = ClassNameAbbreviatorOptions(
             classNameAbbreviation = ClassNameAbbreviationStrategy.KeepClassNameEvenIfLonger,
-            minPackageNameTooLongStrategy = MinPackageNameTooLongStrategy.KeepEvenIfLongerThanMaxLength,
+            minPackageNameTooLongStrategy = MinPackageNameTooLongStrategy.KeepOnlyIfMaxLengthLongerThanClassName,
             packageAbbreviation = PackageAbbreviationStrategy.FillSegmentsFromEnd,
             classNameAbbreviationEllipsis = "..."
         )

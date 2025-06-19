@@ -63,16 +63,14 @@ class LoggerNameFormatterTest {
     fun lengthEqualsLoggerClassNameLength() {
         val result = LoggerNameFormatter(null, loggerClassName.length.toString()).format(event())
 
-//        assertThat(result).isEqualTo(loggerClassName) // TODO: should be "UserService"
-        assertThat(result).isEqualTo("o.c.p.f.s." + loggerClassName)
+        assertThat(result).isEqualTo(loggerClassName)
     }
 
     @Test
     fun lengthLessThanLoggerClassNameLength() {
         val result = LoggerNameFormatter(null, (loggerClassName.length - 1).toString()).format(event())
 
-//        assertThat(result).isEqualTo(loggerClassName) // TODO: should be "UserService"
-        assertThat(result).isEqualTo("o.c.p.f.s." + loggerClassName)
+        assertThat(result).isEqualTo(loggerClassName)
     }
 
 
