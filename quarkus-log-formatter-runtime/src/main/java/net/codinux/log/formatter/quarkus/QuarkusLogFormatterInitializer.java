@@ -1,12 +1,11 @@
 package net.codinux.log.formatter.quarkus;
 
+import io.quarkus.bootstrap.logging.QuarkusDelayedHandler;
 import net.codinux.log.formatter.quarkus.config.LogFormatterConfig;
 import net.codinux.log.stacktrace.StackTraceFormatter;
 import net.codinux.log.stacktrace.StackTraceFormatterOptions;
 import net.codinux.log.stacktrace.StackTraceShortener;
 import net.codinux.log.stacktrace.StackTraceShortenerOptions;
-import io.quarkus.bootstrap.logging.QuarkusDelayedHandler;
-import org.jboss.logmanager.ExtFormatter;
 import org.jboss.logmanager.LogManager;
 import org.jboss.logmanager.formatters.FormatStep;
 import org.jboss.logmanager.formatters.FormatStep.ItemType;
@@ -170,7 +169,6 @@ public class QuarkusLogFormatterInitializer {
     private FormatStep patchStepWith(FormatStepInfo stepInfo, LogFormatterConfig config) {
         if (stepInfo.getType() == ItemType.EXCEPTION_TRACE) {
             StackTraceFormatterOptions options = new StackTraceFormatterOptions.Builder()
-                    .rootCauseFirst(config.isRootCauseFirst())
                     .maxStackTraceStringLength(config.getMaxStackTraceStringLength())
                     .build();
             StackTraceShortener shortener = new StackTraceShortener(new StackTraceShortenerOptions(
