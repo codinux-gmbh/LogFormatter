@@ -24,6 +24,7 @@ public class QuarkusLogFormatterSteps {
     ReflectiveClassBuildItem lokiLoggerClasses() { // register classes QuarkusLogFormatterInitializer introspects via reflection
         return ReflectiveClassBuildItem.builder(
                 "org.jboss.logmanager.formatters.FormatStep",
+                "org.jboss.logmanager.formatters.ColorPatternFormatter$ColorStep",
                 QuarkusLogFormatterInitializer.ExtFormatterDelegatingClassName
         )
         .fields(true)
