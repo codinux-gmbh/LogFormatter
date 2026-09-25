@@ -6,7 +6,6 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.runtime.RuntimeValue;
-import net.codinux.log.formatter.quarkus.config.QuarkusLogFormatterConfig;
 
 import java.util.Optional;
 import java.util.logging.Handler;
@@ -16,8 +15,8 @@ public class QuarkusLogFormatterSteps {
     @BuildStep
     @Record(ExecutionTime.RUNTIME_INIT)
     // LoggingSetupBuildItem is required so that this logic is run after log handlers have been fully set up
-    public void setUpLogAppender(QuarkusLogFormatterRecorder recorder, QuarkusLogFormatterConfig config, LoggingSetupBuildItem loggingSetup) {
-        RuntimeValue<Optional<Handler>> modifiedHandler = recorder.initializeLogFormatter(config);
+    public void setUpLogAppender(QuarkusLogFormatterRecorder recorder, LoggingSetupBuildItem loggingSetup) {
+        RuntimeValue<Optional<Handler>> modifiedHandler = recorder.initializeLogFormatter();
     }
 
 
